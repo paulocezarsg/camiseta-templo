@@ -50,7 +50,7 @@ Os pedidos de teste ficam na planilha (marcados com a data e o nome). Para apaga
 4. Na hora de confirmar, aparece o campo **Confirme o seu nome e sobrenome**. É pedido a cada pedido e precisa de pelo menos duas palavras; **não há conferência** com o nome escolhido na lista: o que a pessoa digitou vai para a planilha, na coluna **Nome confirmado**.
 5. Clica em **Confirmar pedido**: o pedido fica registrado e a pessoa vê a página de pedido recebido, com o número do pedido e o valor de cada parcela.
 
-O núcleo emite os boletos (um por parcela) a partir da planilha do admin e envia para a pessoa. O site não gera boleto bancário.
+O valor vai no **boleto do mês subsequente** da pessoa (parcelado, cada parcela no boleto de um mês); o núcleo lança a partir da planilha do admin. O site não gera boleto bancário. A página de pedido recebido mostra a estampa da camiseta, o número do pedido, as parcelas e esse aviso.
 
 **Lista de cadastrados:** fica em `api/_cadastrados.js`, com o **nome completo** de cada pessoa, um por linha (110 nomes, da planilha do núcleo). Para incluir alguém, acrescente uma linha; para corrigir um nome, edite a linha e faça o deploy de novo (no GitHub, basta salvar a alteração). A lista não é publicada como arquivo: a busca devolve no máximo 8 nomes por vez, só para quem digitou pelo menos 3 letras.
 

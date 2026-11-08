@@ -52,7 +52,7 @@ export const VIDEO = {
 
 /* Formas de pagamento.
    boleto: só para quem está na lista de cadastrados (api/_cadastrados.js), em até parcelasMax vezes.
-     Não passa pelo PagBank: o pedido fica registrado e o núcleo emite os boletos a partir da planilha do admin.
+     Não passa pelo PagBank: o pedido fica registrado e o valor vai no boleto do mês subsequente (a planilha do admin traz tudo).
    pagbank: Pix e cartão pelo PagBank. Enquanto estiver desligado (ativo: false), não aparece na loja
      e a rota do checkout recusa o pedido; para liberar, troque para true e configure as variáveis do PagBank. */
 export const PAGAMENTO = {
@@ -60,7 +60,7 @@ export const PAGAMENTO = {
     ativo: true,
     parcelasMax: 3,
     publico: "Para irmãos cadastrados no núcleo",
-    aviso: "O núcleo emite o boleto do seu pedido e envia para você. Se parcelar, cada parcela tem o seu boleto.",
+    aviso: "O valor irá no seu boleto do mês subsequente. Se parcelar, cada parcela vai no boleto de um mês.",
     semNome: "Não encontrou o seu nome? Fale com o núcleo.",
   },
   pagbank: {
