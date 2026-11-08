@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pedido recebido · Núcleo Estrela Bonita</title>
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#451b0a">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23fcf4ea'/%3E%3Cpath fill='%23451b0a' d='M32 6.5l1.9 3.9 4.3.6-3.1 3 .7 4.3-3.8-2-3.8 2 .7-4.3-3.1-3 4.3-.6z'/%3E%3Cg fill='none' stroke='%23451b0a' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 33 L32 25 L55 33'/%3E%3Cpath d='M5 36.5 H59'/%3E%3Cpath d='M8 36.5 V50 M56 36.5 V50 M15 36.5 V50 M49 36.5 V50'/%3E%3Cpath d='M28.5 50 V44 a3.5 3.5 0 0 1 7 0 V50'/%3E%3Cpath d='M20.5 50 V45.5 a2.5 2.5 0 0 1 5 0 V50'/%3E%3Cpath d='M38.5 50 V45.5 a2.5 2.5 0 0 1 5 0 V50'/%3E%3Cpath d='M4 51.5 H60'/%3E%3C/g%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500..600;1,9..144,400&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--mostarda:#db992d;--mostarda-4:#fbf0da;--creme:#fbf6ee;--linho:#e8dbc6;--cafe:#451b0a;--cafe-3:#6e3618;--suave:#6b5a4b}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;display:grid;place-items:center;padding:28px 16px;font:15.5px/1.65 Montserrat,system-ui,sans-serif;color:#24180f;background:radial-gradient(900px 520px at 50% 0%,#6b3216,rgba(107,50,22,0) 70%),var(--cafe);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+.raios{position:fixed;left:50%;bottom:-2px;width:max(900px,110%);transform:translateX(-50%);color:var(--mostarda);opacity:.16;pointer-events:none}
+.cartao{position:relative;width:min(580px,100%);background:var(--creme);border-radius:30px;padding:48px 38px 40px;text-align:center;box-shadow:0 40px 90px -30px rgba(0,0,0,.6)}
+.selo{width:80px;height:92px;margin:-88px auto 22px;border-radius:40px 40px 14px 14px;background:var(--mostarda);display:grid;place-items:center;box-shadow:0 0 0 8px var(--creme)}
+.selo svg{width:34px;height:34px;fill:var(--cafe)}
+.olho{font:600 11.5px/1 Montserrat,sans-serif;letter-spacing:.26em;text-transform:uppercase;color:#8a4718}
+h1{font:600 clamp(28px,5vw,36px)/1.12 Fraunces,Georgia,serif;letter-spacing:-.015em;color:var(--cafe);margin:14px 0 12px}
+p{color:var(--suave);margin:0 0 10px}
+.pedido{display:inline-block;margin:14px 0 26px;padding:10px 18px;border-radius:999px;background:#fff;box-shadow:inset 0 0 0 1px var(--linho);font-weight:600;font-size:14px}
+.pedido b{letter-spacing:.04em}
+.boleto{margin:-10px 0 26px;padding:16px 18px;border-radius:18px;background:#fff;box-shadow:inset 0 0 0 1px var(--linho);text-align:left;font-size:14px;color:#3a281b}
+.boleto b{color:var(--cafe)}
+.boleto ul{margin:8px 0 0;padding:0;list-style:none;display:grid;gap:4px}
+.boleto li{display:flex;justify-content:space-between;gap:12px;font-size:14px;font-variant-numeric:tabular-nums}
+.boleto li em{font-style:normal;color:var(--suave)}
+ol{text-align:left;margin:0 0 30px;padding:0;list-style:none;display:grid;gap:12px}
+li{display:flex;gap:14px;align-items:flex-start;font-size:14.5px;color:#3a281b}
+li span{flex:none;width:26px;height:26px;border-radius:50%;background:var(--cafe);color:var(--mostarda);font-weight:700;font-size:12px;display:grid;place-items:center}
+.frase{font:italic 400 17px/1.5 Fraunces,Georgia,serif;color:var(--cafe-3);margin:0 0 26px;padding-top:22px;border-top:1px solid var(--linho)}
+a.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:16px 28px;border-radius:999px;background:var(--cafe);color:var(--creme);font-weight:600;text-decoration:none}
+a.btn:hover{background:var(--cafe-3)}
+@media (max-width:480px){.cartao{padding:40px 22px 32px}}
+</style>
+</head>
+<body>
+<svg class="raios" viewBox="0 0 1000 500" aria-hidden="true" id="raios"></svg>
+<main class="cartao">
+  <div class="selo"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.6l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.4l-5.8 3.1 1.1-6.5-4.7-4.6 6.5-.9z"/></svg></div>
+  <span class="olho">Núcleo Estrela Bonita · Inauguração do Templo</span>
+  <h1>Obrigado! Sua camiseta já faz parte desta história.</h1>
+  <p id="intro">Recebemos o seu pedido. Assim que o PagBank confirmar o pagamento, separamos a sua camiseta.</p>
+  <div class="pedido" id="pedido" hidden>Pedido <b></b></div>
+  <div class="boleto" id="boleto" hidden></div>
+  <ol id="passos">
+    <li><span>1</span>Pix e cartão costumam ser confirmados em minutos; o boleto, em até 3 dias úteis.</li>
+    <li><span>2</span>O PagBank envia o comprovante para o seu e-mail.</li>
+    <li id="passo-envio"><span>3</span>Quando o pacote for postado nos Correios, você recebe o código de rastreio.</li>
+  </ol>
+  <p class="frase">A esperança planta, o amor cultiva e a união faz o sonho acontecer.</p>
+  <a class="btn" href="/">Voltar para a loja</a>
+</main>
+<script>
+  const busca = new URLSearchParams(location.search);
+  const ref = busca.get("pedido");
+  const valido = !!ref && /^[A-Z0-9-]{4,40}$/.test(ref);
+  const retirada = valido && ref.endsWith("-RETIRADA");
+  if (valido) {
+    const el = document.getElementById("pedido");
+    el.querySelector("b").textContent = ref;
+    el.hidden = false;
+    if (retirada) document.getElementById("passo-envio").innerHTML = "<span>3</span>Sua camiseta será retirada no Núcleo Estrela Bonita.";
+  }
+  // pedido no boleto: o núcleo emite o boleto (um por parcela) e envia para a pessoa
+  if (busca.get("forma") === "boleto") {
+    const brl = (c) => (c / 100).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+    let ultimo = null;
+    try { ultimo = JSON.parse(localStorage.getItem("eb-ultimo-pedido") || "null"); } catch { /* sem armazenamento */ }
+    const p = ultimo && ultimo.referencia === ref && Array.isArray(ultimo.parcelas) ? ultimo : null;
+    const n = p ? p.parcelas.length : 0;
+    document.getElementById("intro").textContent = "Seu pedido no boleto foi registrado. O núcleo emite o boleto e envia para você.";
+    if (p) {
+      const caixa = document.getElementById("boleto");
+      const linha = (rotulo, valor) => { const li = document.createElement("li"); const em = document.createElement("em"); em.textContent = rotulo; const b = document.createElement("b"); b.textContent = valor; li.append(em, b); return li; };
+      const topo = document.createElement("div");
+      topo.append("Em nome de ", Object.assign(document.createElement("b"), { textContent: p.nome || "" }));
+      const ul = document.createElement("ul");
+      if (n > 1) p.parcelas.forEach((v, i) => ul.append(linha(`${i + 1}ª parcela`, brl(v))));
+      ul.append(linha(n > 1 ? `Total em ${n}x no boleto` : "Total no boleto", brl(p.total)));
+      caixa.append(topo, ul);
+      caixa.hidden = false;
+    }
+    const passos = [
+      n > 1 ? `O núcleo emite os ${n} boletos (um por parcela) e envia para você.` : "O núcleo emite o seu boleto e envia para você.",
+      "Pague até o vencimento e guarde o número do pedido.",
+      retirada ? "Sua camiseta será retirada no Núcleo Estrela Bonita." : "Quando o pacote for postado nos Correios, você recebe o código de rastreio.",
+    ];
+    const ol = document.getElementById("passos");
+    ol.innerHTML = "";
+    passos.forEach((t, i) => { const li = document.createElement("li"); const sp = document.createElement("span"); sp.textContent = i + 1; li.append(sp, t); ol.append(li); });
+  }
+  try { localStorage.removeItem("eb-sacola"); } catch { /* sem armazenamento */ }
+  // os mesmos raios da estampa, saindo da base da página
+  let d = "";
+  for (let i = 0; i < 61; i++) {
+    const a = (184 + (172 * i) / 60) * Math.PI / 180, k = i % 4 === 0 ? 1 : i % 2 === 0 ? 0.82 : 0.64;
+    const p = (r) => `${(500 + Math.cos(a) * r).toFixed(1)} ${(500 + Math.sin(a) * r).toFixed(1)}`;
+    d += `M${p(240 + (i % 2 ? 24 : 0))}L${p(240 + 255 * k)}`;
+  }
+  document.getElementById("raios").innerHTML = `<path d="${d}" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>`;
+</script>
+</body>
+</html>
