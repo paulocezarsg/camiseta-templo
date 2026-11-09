@@ -89,7 +89,7 @@ Tudo em `produto.js`:
 | --- | --- |
 | `produto.js` | **Tudo o que se edita no dia a dia**: evento, preço, parcelas, formas de pagamento, retirada, cores, tamanhos, medidas e textos. A página e o servidor leem este mesmo arquivo. |
 | `correios.js` | Calculadora de frete: estado de origem, tabela de preços e prazos do PAC e do SEDEX. Usada pela página (valor na hora) e pelo servidor (valor cobrado), então os dois sempre batem. |
-| `index.html` | A loja (capa, compra, templo, vídeo, estampa, palavras, medidas, como comprar, sacola e finalização). |
+| `index.html` | A loja (capa, compra, templo, vídeo, estampa, palavras, tabela de medidas, como comprar — só no computador —, sacola e finalização). No celular, uma barra de compra fixa aparece a partir da escolha do modelo e do tamanho, com a escolha, o valor e o botão **Comprar**, que leva direto à sacola. |
 | `obrigado.html` | Página de pedido recebido, com as parcelas e os próximos passos. |
 | `admin.html` | Acesso admin: senha e download da planilha. |
 | `api/_cadastrados.js` | **Lista de cadastrados** (nomes completos). |

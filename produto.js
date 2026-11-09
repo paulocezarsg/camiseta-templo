@@ -145,14 +145,6 @@ export const PRODUTO = {
     },
   ],
 
-  ficha: [
-    ["Tecido", "Malha 100% algodão, fio 30.1 penteado"],
-    ["Gramatura", "160 g/m²"],
-    ["Modelagem", "Regular, gola careca reforçada"],
-    ["Estampa", "Frente, arte a traço da fachada do templo"],
-    ["Cuidados", "Lavar do avesso, água fria, não usar alvejante"],
-  ],
-
   // Embalagem de uma peça, para o cálculo do frete (correios.js).
   pacote: { pesoKg: 0.25, comprimento: 30, largura: 22, alturaPorPeca: 3, alturaMin: 4 },
 };
