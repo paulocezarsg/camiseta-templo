@@ -76,6 +76,10 @@ const LISTA = CADASTRADOS.map((c) => linha(typeof c === "string" ? c : c?.nome, 
 
 export const cadastroPronto = () => LISTA.length > 0;
 export const cadastroPorId = (id) => LISTA.find((c) => c.id === String(id || "")) || null;
+/* Para o painel de pedidos (protegido por senha): a lista inteira de nomes e a busca pelo nome exato. */
+export const nomesCadastrados = () => LISTA.map((c) => c.nome);
+export const cadastroPorNome = (nome) => LISTA.find((c) => c.chave === normalizar(nome)) || null;
+export const mesmoNome = (a, b) => normalizar(a) === normalizar(b);
 
 /* Cada palavra digitada precisa ser o começo de uma palavra do nome ("marc mart" acha "Marcelo Martinatti").
    Primeiro vêm os nomes que começam pelo que foi digitado; depois, os demais, em ordem alfabética. */

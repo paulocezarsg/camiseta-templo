@@ -127,7 +127,7 @@ function montarPorPessoa(pp) {
 }
 
 /* Painel: os números principais em cartões e tabelas com barras de proporção. */
-function montarPainel(vale, pp) {
+function montarPainel(vale, pp, pedidos = []) {
   const P = PAINEL, celulas = [], mesclas = [], alturas = { 1: 12, 4: 10 };
   const put = (ref, v, e) => celulas.push([ref, v, e]);
   const junta = (a, b) => mesclas.push(`${a}:${b}`);
@@ -232,6 +232,27 @@ function montarPainel(vale, pp) {
     [...quem.values()].sort((a, b) => b.valor - a.valor || a.nome.localeCompare(b.nome, "pt-BR")).slice(0, 10)
       .map((q) => [q.nome, q.pedidos, q.pecas, q.valor, q.valor]), "Nenhum pedido ainda.");
 
+  // alterações feitas no painel de pedidos (as mais recentes primeiro)
+  const faixa = (lin, de, ate, valor, estilo) => {
+    const cols = COL.slice(COL.indexOf(de), COL.indexOf(ate) + 1).split("");
+    cols.forEach((c, k) => put(`${c}${lin}`, k ? "" : valor, estilo));
+    if (cols.length > 1) junta(`${de}${lin}`, `${ate}${lin}`);
+  };
+  const alteracoes = pedidos.flatMap((p) => (p.alteracoes || []).map((a) => ({ ...a, nome: p.cliente?.nome || p.ref })))
+    .sort((a, b) => b.em - a.em).slice(0, 10);
+  r += 1; alturas[r - 1] = 14;
+  put(`B${r}`, "Alterações feitas no painel (as 10 mais recentes)", P.secao); junta(`B${r}`, `I${r}`); alturas[r] = 26; r++;
+  [["B", "C", "Comprador"], ["D", "E", "Alterado por"], ["F", "F", "Quando"], ["G", "I", "O que mudou"]].forEach(([a, b, t]) => faixa(r, a, b, t, P.cabecalho));
+  alturas[r] = 22; r++;
+  if (!alteracoes.length) { faixa(r, "B", "I", "Nenhuma alteração feita ainda.", P.vazio); alturas[r] = 22; r++; }
+  for (const a of alteracoes) {
+    faixa(r, "B", "C", a.nome, P.texto);
+    faixa(r, "D", "E", a.por, P.texto);
+    faixa(r, "F", "F", dataHora(a.em).replace(/\/\d{4} às/, " às"), P.texto);
+    faixa(r, "G", "I", a.mudancas.map((m) => m.campo).join(", "), P.texto);
+    alturas[r] = 21; r++;
+  }
+
   return { nome: "Painel", painel: true, larguras: [2, 15, 15, 15, 15, 15, 15, 15, 15, 2], celulas, mesclas, alturas };
 }
 
@@ -242,7 +263,7 @@ function montarAbas(pedidos) {
   const endereco = (p) => p.entrega?.endereco || {};
   const pagoEm = (p) => { const t = Date.parse(p.pagamento?.pagoEm || ""); return Number.isFinite(t) ? t : ""; };
   const colunas = [
-    { titulo: "Data", tipo: "data", largura: 17, valor: (p) => p.criadoEm, rodape: () => "Total" },
+    { titulo: "Data", tipo: "data", largura: 17, valor: (p) => p.criadoEm, rodape: () => "Total (sem cancelados)" },
     { titulo: "Pedido", largura: 28, valor: (p) => p.ref, rodape: (l) => `${l.length} pedido(s)` },
     { titulo: "Pagamento", largura: 18, valor: formaDe },
     { titulo: "Status", largura: 20, valor: statusDe },
@@ -266,11 +287,19 @@ function montarAbas(pedidos) {
     { titulo: "Cidade", largura: 22, valor: (p) => endereco(p).cidade },
     { titulo: "UF", largura: 5, valor: (p) => endereco(p).uf },
     { titulo: "Pago em (PagBank)", tipo: "data", largura: 17, valor: pagoEm, opcional: true },
+    // feitas no painel de pedidos
+    { titulo: "Observação", largura: 30, valor: (p) => p.observacao },
+    { titulo: "Alterado", largura: 9, valor: (p) => (p.alteracoes?.length ? "Sim" : "") },
+    { titulo: "Última alteração", tipo: "data", largura: 17, valor: (p) => p.alteracoes?.at(-1)?.em ?? "" },
+    { titulo: "Alterado por", largura: 22, valor: (p) => p.alteracoes?.at(-1)?.por },
+    { titulo: "Alterações", largura: 70, valor: (p) => (p.alteracoes || []).map((a) => `${dataHora(a.em)} · ${a.por}: ${a.mudancas.map((m) => `${m.campo} ${m.de} → ${m.para}`).join("; ")}`).join(" | ") },
   ].filter((c) => !c.opcional || pedidos.some((p) => c.valor(p) !== "" && c.valor(p) != null));
   const colPedidos = colunas.map(({ titulo, tipo, largura }) => ({ titulo, tipo, largura }));
   const linhasPedidos = pedidos.map((p) => colunas.map((c) => c.valor(p)));
   const vale = pedidos.filter(conta);
-  const totalPedidos = colunas.map((c) => c.rodape ? c.rodape(pedidos) : c.soma ? pedidos.reduce((s, p) => s + (Number(c.valor(p)) || 0), 0) : "");
+  // cancelados continuam na lista (com o status), mas ficam fora das somas
+  const ativos = pedidos.filter((p) => !["cancelado", "recusado"].includes(p.status));
+  const totalPedidos = colunas.map((c) => c.rodape ? c.rodape(ativos) : c.soma ? ativos.reduce((s, p) => s + (Number(c.valor(p)) || 0), 0) : "");
 
   const colItens = [
     { titulo: "Data", tipo: "data", largura: 17 },
@@ -305,7 +334,7 @@ function montarAbas(pedidos) {
 
   const pp = juntarPorPessoa(pedidos);
   return [
-    montarPainel(vale, pp),
+    montarPainel(vale, pp, pedidos),
     { nome: "Pedidos", colunas: colPedidos, linhas: linhasPedidos, rodape: [totalPedidos] },
     { nome: "Itens", colunas: colItens, linhas: linhasItens },
     {

@@ -81,6 +81,27 @@ As três abas seguintes têm o cabeçalho fixo e filtro em cada coluna:
 
 **Senha:** fica guardada no servidor como hash (nunca vai para a página). Para trocar, defina a variável `ADMIN_SENHA` na Vercel (**Settings → Environment Variables**) com a senha nova e faça um redeploy. São permitidas 10 tentativas a cada 15 minutos por endereço de internet.
 
+### Painel de pedidos
+
+Na mesma tela do admin, abaixo de **Baixar planilha**, o botão **Painel de pedidos** pede a **senha do painel** (outra senha, combinada com o núcleo) e mostra todos os pedidos, do mais recente para o mais antigo, com busca por nome ou número do pedido e filtros (todos, alterados e cancelados).
+
+Em cada pedido no boleto há o botão **Alterar**, que permite mudar:
+
+- o **comprador** (escolhido da lista de cadastrados);
+- as **camisetas** (modelo, tamanho e quantidade; dá para acrescentar e tirar itens);
+- a **entrega** (retirada no núcleo, Correios PAC ou SEDEX, com o endereço);
+- o **parcelamento** (1x, 2x ou 3x);
+- o **status** (pedido registrado ou **cancelado**);
+- uma **observação**.
+
+O valor das camisetas, o frete, o total e as parcelas são recalculados no servidor, e um resumo mostra os valores novos antes de salvar. Para salvar, o painel pede **o nome de quem está alterando** e **a senha do painel de novo**, a cada alteração.
+
+O pedido alterado ganha o selo **"Alterado por (nome) · data e hora"** e um **histórico** com cada alteração: quem, quando e o que mudou (de → para). O que a pessoa digitou ao confirmar o pedido continua guardado.
+
+A planilha do admin mostra as alterações na hora, sem nada a fazer: os valores novos em todas as abas; na aba **Pedidos**, as colunas **Observação**, **Alterado**, **Última alteração**, **Alterado por** e **Alterações** (o histórico completo); no **Painel**, a tabela das alterações mais recentes. Pedidos **cancelados** continuam na lista com o status "Cancelado", mas saem das somas, do Painel, da aba Tamanhos e da aba Por pessoa.
+
+Os pedidos pagos pelo PagBank (quando ele for ligado) aparecem no painel, mas não podem ser alterados por ali. São permitidas 10 senhas erradas a cada 15 minutos por endereço de internet. Para trocar a senha do painel sem mexer no código, defina a variável `PAINEL_SENHA` na Vercel.
+
 ## Textos e vídeo
 
 Tudo em `produto.js`:
@@ -96,11 +117,12 @@ Tudo em `produto.js`:
 | `correios.js` | Calculadora de frete: estado de origem, tabela de preços e prazos do PAC e do SEDEX. Usada pela página (valor na hora) e pelo servidor (valor cobrado), então os dois sempre batem. |
 | `index.html` | A loja (capa, compra, templo, vídeo, estampa, palavras, tabela de medidas, como comprar — só no computador —, sacola e finalização). No celular, uma barra de compra fixa aparece a partir da escolha do modelo e do tamanho, com a escolha, o valor e o botão **Comprar**, que leva direto à sacola. |
 | `obrigado.html` | Página de pedido recebido, com as parcelas e os próximos passos. |
-| `admin.html` | Acesso admin: senha e download da planilha. |
+| `admin.html` | Acesso admin: senha e download da planilha, e o painel de pedidos (lista e alteração). |
 | `api/_cadastrados.js` | **Lista de cadastrados** (nomes completos). |
 | `api/cadastro.js` | Busca de nomes na lista. |
 | `api/boleto.js` | Registra o pedido no boleto: confere o nome na lista, recalcula preço e frete no servidor, divide em parcelas e guarda no banco com o nome confirmado. |
 | `api/admin.js` e `api/_xlsx.js` | Confere a senha e gera a planilha Excel (sem dependências). |
+| `api/painel.js` | Painel de pedidos: confere a senha do painel, lista os pedidos e grava as alterações com o histórico (quem, quando e o que mudou). |
 | `api/_lib.js`, `api/_pedido.js` | Funções compartilhadas (arquivos com `_` não viram rota na Vercel). |
 | `api/checkout.js`, `api/pagbank-webhook.js` | PagBank (Pix e cartão), desligado por enquanto. |
 | `package.json`, `vercel.json` | Configuração da Vercel (módulos JavaScript e endereços sem `.html`). |
