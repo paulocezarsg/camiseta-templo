@@ -68,11 +68,16 @@ export const CADASTRADOS = [
 
 No rodapé da loja há o botão **Acesso admin**, que abre `/admin`. A tela só pede a **senha** (a combinada com o núcleo; maiúsculas e minúsculas contam); com a senha certa, a planilha **Excel** (`pedidos-camiseta-AAAA-MM-DD-HHhMM.xlsx`) é baixada na hora, com todos os pedidos. Não há painel.
 
-A planilha tem três abas, com o cabeçalho fixo e filtro em cada coluna:
+A planilha tem cinco abas:
+
+- **Painel** (a primeira): os números principais em cartões — pedidos, compradores, camisetas, valor total, camisetas de cada modelo, retiradas e envios, valor médio, peças por pedido, frete e a hora do último pedido — e tabelas com barras: quanto entra no boleto de cada mês, parcelamento, entrega, camisetas por modelo e tamanho (das mais pedidas para as menos), pedidos por dia e quem mais comprou.
+
+As três abas seguintes têm o cabeçalho fixo e filtro em cada coluna:
 
 - **Pedidos:** um pedido por linha — data e hora (de Brasília), número do pedido, forma de pagamento, status, **nome** (o escolhido na lista), **nome confirmado** (como a pessoa digitou), peças, itens, valor das camisetas, entrega (retirada ou Correios PAC/SEDEX), frete, total, número de parcelas, o valor de cada parcela, prazo, CEP e endereço completo. No fim, a linha de totais.
 - **Itens:** uma linha por item (modelo, tamanho, cor, quantidade e valores), para separar as camisetas.
 - **Tamanhos:** quantas camisetas há de cada modelo e tamanho, para a produção.
+- **Por pessoa** (a última): junta todos os pedidos no boleto de cada pessoa (uma pessoa pode comprar mais de uma vez) — nome, nome(s) confirmado(s), quantidade de pedidos, peças, valor total, o parcelamento de cada pedido e **quanto vai no boleto de cada mês** (a 1ª parcela entra no mês seguinte ao pedido e as demais nos meses depois), com o total de cada mês no rodapé.
 
 **Senha:** fica guardada no servidor como hash (nunca vai para a página). Para trocar, defina a variável `ADMIN_SENHA` na Vercel (**Settings → Environment Variables**) com a senha nova e faça um redeploy. São permitidas 10 tentativas a cada 15 minutos por endereço de internet.
 
