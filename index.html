@@ -117,19 +117,26 @@ img,svg{display:block;max-width:100%}
 .heroi-visual .recorte img{height:100%;width:auto;max-width:none}
 .onda{position:absolute;left:0;bottom:-1px;width:100%;height:clamp(90px,12vw,175px);z-index:2;pointer-events:none}
 @media (min-width:961px) and (max-width:1380px){.heroi-visual .recorte{--alt:92%;--alt-px:92cqh;--centro:37cqw}}
+/* Celular: a capa vira uma peça só — título, o modelo com os raios logo abaixo, os botões sobre a foto
+   (que se dissolve no fundo) e os destaques fechando. O valor fica na caixa de compra e na barra fixa. */
 @media (max-width:960px){
   .heroi{height:auto}
-  .heroi-grade{grid-template-columns:1fr;gap:0;padding-top:110px}
-  .heroi-texto{padding-bottom:0}
-  .heroi-visual{height:min(118vw,560px);margin:30px -20px 0;overflow:hidden}
-  .heroi-visual .recorte{--centro:44cqw}
-  .heroi-traco{width:110vw;left:-30%;bottom:auto;top:70px;opacity:.28}
+  .heroi-grade{grid-template-columns:1fr;gap:0;padding-top:104px;padding-bottom:84px}
+  .heroi-texto{display:contents}
+  .heroi h1{order:1;position:relative;z-index:4;margin:0 auto;max-width:11.5em;text-align:center;font-size:clamp(40px,11vw,62px);line-height:1.02}
+  .heroi-visual{order:2;height:min(108vw,560px);margin:-14px -20px 0;overflow:hidden;animation:capa-sobe 1.1s var(--ease) both}
+  .heroi-visual .recorte{--centro:50cqw;-webkit-mask-image:linear-gradient(180deg,#000 58%,rgba(0,0,0,.55) 78%,transparent 97%);mask-image:linear-gradient(180deg,#000 58%,rgba(0,0,0,.55) 78%,transparent 97%)}
+  .heroi-acoes{order:3;position:relative;z-index:4;margin:-104px auto 0;width:100%;max-width:520px;justify-content:center;animation:capa-sobe 1.1s .15s var(--ease) both}
+  .heroi .heroi-acoes .btn{flex:1;padding:17px 18px;font-size:15px}
+  .heroi .heroi-acoes .btn-linha{background:rgba(255,250,242,.82);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+  .destaques{order:4;justify-content:center;margin:26px 0 0}
+  .preco-pilula{display:none}
+  .heroi-traco{width:120vw;left:-10vw;bottom:auto;top:84px;opacity:.16}
 }
+@keyframes capa-sobe{from{opacity:0;transform:translateY(18px)}}
 @media (max-width:560px){
-  .destaques li{flex-direction:column;align-items:flex-start;gap:8px;padding:2px 12px;font-size:13px}
+  .destaques li{flex:1;flex-direction:column;align-items:center;text-align:center;gap:8px;padding:2px 8px;font-size:12.5px}
   .destaques .ico{width:26px;height:26px}
-  .preco-pilula{display:flex;gap:16px;padding:13px 22px;justify-content:center;font-size:14.5px}
-  .heroi .heroi-acoes .btn{flex:1;padding:17px 20px;font-size:15px}
 }
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 
