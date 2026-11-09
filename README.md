@@ -37,7 +37,7 @@ Em **Settings → Domains**, adicione `camiseta.cruzeirogestao.com.br`. No DNS d
 ### 5. Conferir antes de divulgar
 
 1. Abra a loja, escolha uma camiseta, finalize com o seu nome da lista e confirme o pedido (uma vez com retirada e outra pelos Correios).
-2. Abra `/admin` (botão **Acesso admin** no rodapé), digite a senha `admin` e confira os pedidos na planilha.
+2. Abra `/admin` (botão **Acesso admin** no rodapé), digite a senha do admin e confira os pedidos na planilha.
 3. Confira o estado de postagem (`ORIGEM_UF`) e a tabela de frete em `correios.js`.
 
 Os pedidos de teste ficam na planilha (marcados com a data e o nome). Para apagar, use o painel do Upstash (aba **Data Browser**) ou crie um banco novo antes de abrir as vendas.
@@ -66,7 +66,7 @@ export const CADASTRADOS = [
 
 ## Acesso admin
 
-No rodapé da loja há o botão **Acesso admin**, que abre `/admin`. A tela só pede a **senha** (`admin`); com a senha certa, a planilha **Excel** (`pedidos-camiseta-AAAA-MM-DD-HHhMM.xlsx`) é baixada na hora, com todos os pedidos. Não há painel.
+No rodapé da loja há o botão **Acesso admin**, que abre `/admin`. A tela só pede a **senha** (a combinada com o núcleo; maiúsculas e minúsculas contam); com a senha certa, a planilha **Excel** (`pedidos-camiseta-AAAA-MM-DD-HHhMM.xlsx`) é baixada na hora, com todos os pedidos. Não há painel.
 
 A planilha tem três abas, com o cabeçalho fixo e filtro em cada coluna:
 

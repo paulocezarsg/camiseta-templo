@@ -6,7 +6,7 @@ import { HttpError, rota, readJSON, bancoPronto, dentroDoLimite, ipDe, listarPed
 import { planilha } from "./_xlsx.js";
 import { PRODUTO, RETIRADA, PAGAMENTO } from "../produto.js";
 
-const HASH_SENHA = "kMIi3M43tMi46GIbJ/OYcg==:8/TuAjQ1LzGshrCQB9VaLf3Thw1NYIJn1AK+3kfgDP4="; // senha: admin
+const HASH_SENHA = "W+jQnwqgrk0csbugEIv7pA==:j1mhphb2aEH67XMpgY/3sClbiRR5GOPTlr69lDSzIOc="; // hash da senha combinada (maiúsculas e minúsculas contam)
 
 const POST = async (req) => {
   if (bancoPronto() && !(await dentroDoLimite("cam:tentativas:" + ipDe(req), 10, 15 * 60))) {
