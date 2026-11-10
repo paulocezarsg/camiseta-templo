@@ -554,7 +554,7 @@ function abrirConfirma(p, acao) {
   confirmando = { p, acao };
   const cancelar = acao === "cancelar";
   $("[data-confirma-titulo]").textContent = cancelar ? "Cancelar pedido" : "Reativar pedido";
-  $("[data-confirma-sub]").textContent = cancelar ? "O pedido sai das somas da planilha; dá para reativar depois." : "O pedido volta a contar nas somas da planilha.";
+  $("[data-confirma-sub]").textContent = cancelar ? "O pedido sai da planilha; dá para reativar depois." : "O pedido volta para a planilha.";
   $("[data-confirma-pedido]").innerHTML = `<b>${esc(p.cliente?.nome)}</b>${esc(p.ref)} · ${esc(textoItens(p.itens))} · ${brl(p.total)}${(p.pagamento?.parcelas || 1) > 1 ? ` em ${p.pagamento.parcelas}x` : ""}`;
   $("[data-campo-motivo]").hidden = !cancelar;
   $("[data-confirma-aviso]").textContent = `Para confirmar, informe quem está ${cancelar ? "cancelando" : "reativando"} e digite a senha do painel.`;
@@ -595,7 +595,7 @@ fc.addEventListener("submit", async (e) => {
     fecharConfirma(); desenhar();
     const card = $(`[data-ref="${CSS.escape(d.pedido.ref)}"]`);
     if (card) { card.classList.add("destaque"); card.scrollIntoView({ block: "center", behavior: "smooth" }); setTimeout(() => card.classList.remove("destaque"), 2600); }
-    avisar(acao === "cancelar" ? "Pedido cancelado. Ele saiu das somas da planilha." : "Pedido reativado. Ele voltou para as somas da planilha.");
+    avisar(acao === "cancelar" ? "Pedido cancelado. Ele não vai mais para a planilha." : "Pedido reativado. Ele voltou para a planilha.");
   } catch (err) {
     erroConfirma(err.campo, erroDeRede(err));
     if (err.campo === "senha") fc.elements.senha.select();

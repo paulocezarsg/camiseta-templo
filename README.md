@@ -99,7 +99,7 @@ O valor das camisetas, o frete, o total e as parcelas são recalculados no servi
 
 O pedido alterado ganha o selo **"Alterado por (nome) · data e hora"** e um **histórico** com cada alteração: quem, quando e o que mudou (de → para). O que a pessoa digitou ao confirmar o pedido continua guardado.
 
-A planilha do admin mostra as alterações na hora, sem nada a fazer: os valores novos em todas as abas; na aba **Pedidos**, as colunas **Cancelamento** (quando, por quem e o motivo), **Observação**, **Alterado**, **Última alteração**, **Alterado por** e **Alterações** (o histórico completo); no **Painel**, a tabela das alterações mais recentes. Pedidos **cancelados** continuam na lista com o status "Cancelado", mas saem das somas, do Painel, da aba Tamanhos e da aba Por pessoa.
+A planilha do admin mostra as alterações na hora, sem nada a fazer: os valores novos em todas as abas; na aba **Pedidos**, as colunas **Observação**, **Alterado**, **Última alteração**, **Alterado por** e **Alterações** (o histórico completo); no **Painel**, a tabela das alterações mais recentes. Pedidos **cancelados não vão para a planilha** (nenhuma aba); continuam no painel de pedidos, no filtro **Cancelados**, e voltam para a planilha se forem reativados.
 
 Os pedidos pagos pelo PagBank (quando ele for ligado) aparecem no painel, mas não podem ser alterados por ali. São permitidas 10 senhas erradas a cada 15 minutos por endereço de internet. Para trocar a senha do painel sem mexer no código, defina a variável `PAINEL_SENHA` na Vercel.
 

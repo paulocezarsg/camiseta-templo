@@ -17,7 +17,10 @@ const POST = async (req) => {
   if (!confereSenha(body.senha, HASH_SENHA, "ADMIN_SENHA")) throw new HttpError(401, "Senha incorreta.");
   if (!bancoPronto()) throw new HttpError(503, "O banco de dados ainda não foi configurado. Veja o README, seção Acesso admin.");
 
-  const pedidos = (await listarPedidos()).sort((a, b) => (a.criadoEm || 0) - (b.criadoEm || 0));
+  // pedidos cancelados (ou recusados) não vão para a planilha; continuam no painel de pedidos, onde podem ser reativados
+  const pedidos = (await listarPedidos())
+    .filter((p) => !["cancelado", "recusado"].includes(p.status))
+    .sort((a, b) => (a.criadoEm || 0) - (b.criadoEm || 0));
   const arquivo = planilha(montarAbas(pedidos));
   return new Response(arquivo, {
     headers: {
@@ -263,7 +266,7 @@ function montarAbas(pedidos) {
   const endereco = (p) => p.entrega?.endereco || {};
   const pagoEm = (p) => { const t = Date.parse(p.pagamento?.pagoEm || ""); return Number.isFinite(t) ? t : ""; };
   const colunas = [
-    { titulo: "Data", tipo: "data", largura: 17, valor: (p) => p.criadoEm, rodape: () => "Total (sem cancelados)" },
+    { titulo: "Data", tipo: "data", largura: 17, valor: (p) => p.criadoEm, rodape: () => "Total" },
     { titulo: "Pedido", largura: 28, valor: (p) => p.ref, rodape: (l) => `${l.length} pedido(s)` },
     { titulo: "Pagamento", largura: 18, valor: formaDe },
     { titulo: "Status", largura: 20, valor: statusDe },
@@ -288,7 +291,6 @@ function montarAbas(pedidos) {
     { titulo: "UF", largura: 5, valor: (p) => endereco(p).uf },
     { titulo: "Pago em (PagBank)", tipo: "data", largura: 17, valor: pagoEm, opcional: true },
     // feitas no painel de pedidos
-    { titulo: "Cancelamento", largura: 36, valor: (p) => (p.status === "cancelado" && p.cancelamento ? `${dataHora(p.cancelamento.em)} · ${p.cancelamento.por}${p.cancelamento.motivo ? ` · ${p.cancelamento.motivo}` : ""}` : "") },
     { titulo: "Observação", largura: 30, valor: (p) => p.observacao },
     { titulo: "Alterado", largura: 9, valor: (p) => (p.alteracoes?.length ? "Sim" : "") },
     { titulo: "Última alteração", tipo: "data", largura: 17, valor: (p) => p.alteracoes?.at(-1)?.em ?? "" },
@@ -298,9 +300,7 @@ function montarAbas(pedidos) {
   const colPedidos = colunas.map(({ titulo, tipo, largura }) => ({ titulo, tipo, largura }));
   const linhasPedidos = pedidos.map((p) => colunas.map((c) => c.valor(p)));
   const vale = pedidos.filter(conta);
-  // cancelados continuam na lista (com o status), mas ficam fora das somas
-  const ativos = pedidos.filter((p) => !["cancelado", "recusado"].includes(p.status));
-  const totalPedidos = colunas.map((c) => c.rodape ? c.rodape(ativos) : c.soma ? ativos.reduce((s, p) => s + (Number(c.valor(p)) || 0), 0) : "");
+  const totalPedidos = colunas.map((c) => c.rodape ? c.rodape(pedidos) : c.soma ? pedidos.reduce((s, p) => s + (Number(c.valor(p)) || 0), 0) : "");
 
   const colItens = [
     { titulo: "Data", tipo: "data", largura: 17 },
