@@ -6,6 +6,8 @@ Landing page de venda da camiseta comemorativa da inauguração do templo do **N
 - O pagamento é no **boleto em até 3x**, só para quem está na **lista de cadastrados** do núcleo: a pessoa acha o próprio nome, escolhe as parcelas e, na hora de confirmar, digita o nome e sobrenome. Pix e cartão (PagBank) estão desligados e **não aparecem** na loja.
 - O **acesso admin** pede a senha e baixa na hora uma **planilha Excel** com todos os pedidos.
 
+Detalhes técnicos (rotas da API, formato dos pedidos, banco e regras) para quem for manter ou integrar o código: [`DESENVOLVEDOR.md`](DESENVOLVEDOR.md).
+
 ## Como publicar (GitHub + Vercel)
 
 Esta pasta é o site inteiro: páginas, fotos e as funções do servidor (`api/`). Não há nada para instalar nem compilar.
