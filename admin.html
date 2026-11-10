@@ -84,6 +84,13 @@ h1,h2,h3{font-family:Fraunces,Georgia,serif;font-weight:600;letter-spacing:-.01e
 .pedido-info .obs{flex-basis:100%;padding:8px 12px;border-radius:10px;background:var(--creme);color:var(--cafe-2)}
 .pedido-acoes{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:12px}
 .pedido-acoes small{color:var(--suave);font-size:12px}
+.btn-perigo{background:transparent;color:var(--err);box-shadow:inset 0 0 0 1.5px #e7b8b2}
+.btn-perigo:hover{background:var(--err-soft);box-shadow:inset 0 0 0 1.5px var(--err)}
+.btn-perigo.cheio{background:var(--err);color:#fff;box-shadow:none}
+.btn-perigo.cheio:hover{background:#951f18}
+.cancelado-aviso{flex-basis:100%;padding:8px 12px;border-radius:10px;background:var(--err-soft);color:var(--err);font-weight:600}
+.confirma-pedido{padding:12px 14px;border-radius:14px;background:#fff;box-shadow:inset 0 0 0 1px var(--linho);font-size:14px;color:var(--cafe-2)}
+.confirma-pedido b{display:block;font-size:16px;color:var(--cafe)}
 .historico{font-size:13px;color:var(--cafe-2)}
 .historico summary{cursor:pointer;font-weight:600;color:var(--madeira)}
 .historico ol{margin:8px 0 0;padding-left:18px;display:grid;gap:6px}
@@ -219,10 +226,6 @@ h1,h2,h3{font-family:Fraunces,Georgia,serif;font-weight:600;letter-spacing:-.01e
         </div>
       </div>
       <div class="grupo"><b>Parcelamento no boleto</b><div class="opcoes" data-parcelas></div></div>
-      <div class="grupo"><b>Status</b><div class="opcoes">
-        <label class="opcao"><input type="radio" name="status" value="registrado">Pedido registrado</label>
-        <label class="opcao perigo"><input type="radio" name="status" value="cancelado">Cancelado</label>
-      </div></div>
       <label class="campo">Observação (opcional)<textarea name="observacao" maxlength="300" placeholder="Ex.: trocou o tamanho a pedido do irmão"></textarea></label>
       <div class="resumo" data-resumo-alterar aria-live="polite"></div>
       <div class="confirma">
@@ -233,6 +236,29 @@ h1,h2,h3{font-family:Fraunces,Georgia,serif;font-weight:600;letter-spacing:-.01e
       <div class="modal-pe">
         <button class="btn btn-linha" type="button" data-fechar>Cancelar</button>
         <button class="btn" type="submit" data-salvar>Salvar alteração</button>
+      </div>
+    </form>
+  </div>
+</div>
+<!-- cancelar ou reativar um pedido -->
+<div class="modal" data-modal-confirma role="dialog" aria-modal="true" aria-labelledby="titulo-confirma" hidden>
+  <div class="modal-box" style="width:min(520px,100%)">
+    <div class="modal-cab">
+      <div><h2 id="titulo-confirma" data-confirma-titulo>Cancelar pedido</h2><small data-confirma-sub></small></div>
+      <button class="fechar" type="button" data-fechar-confirma aria-label="Fechar">×</button>
+    </div>
+    <form data-form-confirma novalidate>
+      <div class="msg erro" data-erro-confirma hidden></div>
+      <div class="confirma-pedido" data-confirma-pedido></div>
+      <label class="campo" data-campo-motivo>Motivo do cancelamento (opcional)<textarea name="motivo" maxlength="300" placeholder="Ex.: desistiu da compra; pedido feito em duplicidade"></textarea></label>
+      <div class="confirma">
+        <p data-confirma-aviso>Para confirmar, informe quem está cancelando e digite a senha do painel.</p>
+        <label class="campo">Seu nome<input name="por" autocomplete="name"></label>
+        <label class="campo">Senha do painel<input name="senha" type="password" autocomplete="off"></label>
+      </div>
+      <div class="modal-pe">
+        <button class="btn btn-linha" type="button" data-fechar-confirma>Voltar</button>
+        <button class="btn btn-perigo cheio" type="submit" data-confirmar>Cancelar pedido</button>
       </div>
     </form>
   </div>
@@ -373,16 +399,21 @@ function cartao(p) {
       <span><b>${brl(p.total)}</b> · ${p.forma === "boleto" ? (n > 1 ? `boleto em ${n}x` : "boleto à vista") : "PagBank"}</span>
       ${p.cliente?.nomeConfirmado ? `<span>Confirmou como “${esc(p.cliente.nomeConfirmado)}”</span>` : ""}
       ${p.observacao ? `<span class="obs">Obs.: ${esc(p.observacao)}</span>` : ""}
+      ${p.status === "cancelado" && p.cancelamento ? `<span class="cancelado-aviso">Cancelado por ${esc(p.cancelamento.por)} em ${dataHora(p.cancelamento.em)}${p.cancelamento.motivo ? ` · Motivo: ${esc(p.cancelamento.motivo)}` : ""}</span>` : ""}
     </div>
     <div class="pedido-acoes">
-      ${p.forma === "boleto" ? `<button class="btn btn-linha mini" type="button" data-alterar>Alterar</button>` : `<small>Pago pelo PagBank: não pode ser alterado aqui.</small>`}
+      ${p.forma !== "boleto" ? `<small>Pago pelo PagBank: não pode ser alterado aqui.</small>`
+        : p.status === "cancelado" ? `<button class="btn btn-linha mini" type="button" data-reativar>Reativar pedido</button>`
+        : `<button class="btn btn-linha mini" type="button" data-alterar>Alterar</button><button class="btn btn-perigo mini" type="button" data-cancelar>Cancelar pedido</button>`}
       ${p.alteracoes?.length ? `<details class="historico"><summary>Histórico (${p.alteracoes.length} ${p.alteracoes.length === 1 ? "alteração" : "alterações"})</summary><ol>${[...p.alteracoes].reverse().map((a) => `<li><b>${esc(a.por)}</b> · ${dataHora(a.em)}${a.mudancas.map((m) => `<span>${esc(m.campo)}: ${esc(m.de)} → ${esc(m.para)}</span>`).join("")}</li>`).join("")}</ol></details>` : ""}
     </div>
   </article>`;
 }
 $("[data-lista]").addEventListener("click", (e) => {
-  const b = e.target.closest("[data-alterar]"); if (!b) return;
-  abrirAlteracao(st.pedidos.find((p) => p.ref === b.closest("[data-ref]").dataset.ref));
+  const b = e.target.closest("[data-alterar], [data-cancelar], [data-reativar]"); if (!b) return;
+  const p = st.pedidos.find((x) => x.ref === b.closest("[data-ref]").dataset.ref);
+  if (b.matches("[data-alterar]")) abrirAlteracao(p);
+  else abrirConfirma(p, b.matches("[data-cancelar]") ? "cancelar" : "reativar");
 });
 
 /* ===================== alterar um pedido ===================== */
@@ -424,7 +455,7 @@ function pintarResumo() {
   }
   const total = subtotal + frete, n = Number(marcado("parcelas")) || 1, v = parcelasDe(total, n);
   const parc = n === 1 ? `1 boleto de ${brl(total)}` : v[0] === v[n - 1] ? `${n} boletos de ${brl(v[0])}` : `${n} boletos: o primeiro de ${brl(v[0])} e os outros de ${brl(v[n - 1])}`;
-  $("[data-resumo-alterar]").innerHTML = `Camisetas: <b>${brl(subtotal)}</b> (${pecas} ${pecas === 1 ? "peça" : "peças"}) · Frete: <b>${freteTxt}</b> · Total: <b>${brl(total)}</b><br>${parc}${marcado("status") === "cancelado" ? " · <b>pedido cancelado: sai das somas da planilha</b>" : ""}`;
+  $("[data-resumo-alterar]").innerHTML = `Camisetas: <b>${brl(subtotal)}</b> (${pecas} ${pecas === 1 ? "peça" : "peças"}) · Frete: <b>${freteTxt}</b> · Total: <b>${brl(total)}</b><br>${parc}`;
 }
 function abrirAlteracao(p) {
   if (!p) return;
@@ -443,7 +474,6 @@ function abrirAlteracao(p) {
   fa.elements.uf.value = e.uf || "";
   const n = p.pagamento?.parcelas || 1;
   (fa.querySelector(`input[name="parcelas"][value="${n}"]`) || fa.querySelector(`input[name="parcelas"]`)).checked = true;
-  fa.querySelector(`input[name="status"][value="${p.status === "cancelado" ? "cancelado" : "registrado"}"]`).checked = true;
   fa.elements.observacao.value = p.observacao || "";
   fa.elements.por.value = guardado.ler("eb-painel-nome");
   fa.elements.senha.value = "";
@@ -499,7 +529,7 @@ fa.addEventListener("submit", async (e) => {
       acao: "alterar", senha: fa.elements.senha.value, ref: p.ref, por: fa.elements.por.value,
       dados: {
         nome: fa.elements.nome.value, itens, entrega: ent, parcelas: Number(marcado("parcelas")),
-        status: marcado("status") === "cancelado" ? "cancelado" : "aguardando-boleto", observacao: fa.elements.observacao.value,
+        observacao: fa.elements.observacao.value,
         endereco: ent === "RETIRADA" ? null : { cep: fa.elements.cep.value, rua: fa.elements.rua.value, numero: fa.elements.numero.value, complemento: fa.elements.complemento.value, bairro: fa.elements.bairro.value, cidade: fa.elements.cidade.value, uf: fa.elements.uf.value },
       },
     });
@@ -514,6 +544,62 @@ fa.addEventListener("submit", async (e) => {
     else { $("[data-erro-alterar]").textContent = erroDeRede(err); $("[data-erro-alterar]").hidden = false; $(".modal-box").scrollTo({ top: 0, behavior: "smooth" }); }
     if (err.campo === "senha") fa.elements.senha.select();
   } finally { b.disabled = false; b.innerHTML = rot; }
+});
+
+/* ===================== cancelar / reativar ===================== */
+const mc = $("[data-modal-confirma]"), fc = $("[data-form-confirma]");
+let confirmando = null;
+function abrirConfirma(p, acao) {
+  if (!p) return;
+  confirmando = { p, acao };
+  const cancelar = acao === "cancelar";
+  $("[data-confirma-titulo]").textContent = cancelar ? "Cancelar pedido" : "Reativar pedido";
+  $("[data-confirma-sub]").textContent = cancelar ? "O pedido sai das somas da planilha; dá para reativar depois." : "O pedido volta a contar nas somas da planilha.";
+  $("[data-confirma-pedido]").innerHTML = `<b>${esc(p.cliente?.nome)}</b>${esc(p.ref)} · ${esc(textoItens(p.itens))} · ${brl(p.total)}${(p.pagamento?.parcelas || 1) > 1 ? ` em ${p.pagamento.parcelas}x` : ""}`;
+  $("[data-campo-motivo]").hidden = !cancelar;
+  $("[data-confirma-aviso]").textContent = `Para confirmar, informe quem está ${cancelar ? "cancelando" : "reativando"} e digite a senha do painel.`;
+  const b = $("[data-confirmar]");
+  b.textContent = cancelar ? "Cancelar pedido" : "Reativar pedido";
+  b.classList.toggle("btn-perigo", cancelar); b.classList.toggle("cheio", cancelar);
+  fc.reset();
+  $$(".invalido", fc).forEach((l) => l.classList.remove("invalido"));
+  $("[data-erro-confirma]").hidden = true;
+  fc.elements.por.value = guardado.ler("eb-painel-nome");
+  mc.hidden = false;
+  setTimeout(() => (cancelar ? fc.elements.motivo : fc.elements.por.value ? fc.elements.senha : fc.elements.por).focus(), 50);
+}
+function fecharConfirma() { mc.hidden = true; confirmando = null; }
+$$("[data-fechar-confirma]", mc).forEach((b) => b.addEventListener("click", fecharConfirma));
+mc.addEventListener("click", (e) => { if (e.target === mc) fecharConfirma(); });
+addEventListener("keydown", (e) => { if (e.key === "Escape" && !mc.hidden) fecharConfirma(); });
+fc.addEventListener("input", (e) => e.target.closest(".campo")?.classList.remove("invalido"));
+function erroConfirma(nome, texto) {
+  const caixa = $("[data-erro-confirma]"); caixa.textContent = texto; caixa.hidden = false;
+  const el = nome && fc.elements[nome];
+  if (el) { el.closest(".campo")?.classList.add("invalido"); el.focus(); }
+}
+fc.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  if (!confirmando) return;
+  const { p, acao } = confirmando;
+  $$(".invalido", fc).forEach((l) => l.classList.remove("invalido"));
+  $("[data-erro-confirma]").hidden = true;
+  if (fc.elements.por.value.replace(/[^\p{L}]/gu, "").length < 2) return erroConfirma("por", `Informe o seu nome (quem está ${acao === "cancelar" ? "cancelando" : "reativando"}).`);
+  if (!fc.elements.senha.value) return erroConfirma("senha", "Digite a senha do painel para confirmar.");
+  const b = $("[data-confirmar]"), rot = b.textContent;
+  b.disabled = true; b.innerHTML = `<span class="giro"></span><span>${acao === "cancelar" ? "Cancelando" : "Reativando"}…</span>`;
+  try {
+    const d = await api({ acao, senha: fc.elements.senha.value, ref: p.ref, por: fc.elements.por.value, motivo: acao === "cancelar" ? fc.elements.motivo.value : undefined });
+    guardado.gravar("eb-painel-nome", fc.elements.por.value.trim());
+    st.pedidos = st.pedidos.map((x) => (x.ref === d.pedido.ref ? d.pedido : x));
+    fecharConfirma(); desenhar();
+    const card = $(`[data-ref="${CSS.escape(d.pedido.ref)}"]`);
+    if (card) { card.classList.add("destaque"); card.scrollIntoView({ block: "center", behavior: "smooth" }); setTimeout(() => card.classList.remove("destaque"), 2600); }
+    avisar(acao === "cancelar" ? "Pedido cancelado. Ele saiu das somas da planilha." : "Pedido reativado. Ele voltou para as somas da planilha.");
+  } catch (err) {
+    erroConfirma(err.campo, erroDeRede(err));
+    if (err.campo === "senha") fc.elements.senha.select();
+  } finally { b.disabled = false; b.textContent = rot; }
 });
 
 let tAviso;

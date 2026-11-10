@@ -288,6 +288,7 @@ function montarAbas(pedidos) {
     { titulo: "UF", largura: 5, valor: (p) => endereco(p).uf },
     { titulo: "Pago em (PagBank)", tipo: "data", largura: 17, valor: pagoEm, opcional: true },
     // feitas no painel de pedidos
+    { titulo: "Cancelamento", largura: 36, valor: (p) => (p.status === "cancelado" && p.cancelamento ? `${dataHora(p.cancelamento.em)} · ${p.cancelamento.por}${p.cancelamento.motivo ? ` · ${p.cancelamento.motivo}` : ""}` : "") },
     { titulo: "Observação", largura: 30, valor: (p) => p.observacao },
     { titulo: "Alterado", largura: 9, valor: (p) => (p.alteracoes?.length ? "Sim" : "") },
     { titulo: "Última alteração", tipo: "data", largura: 17, valor: (p) => p.alteracoes?.at(-1)?.em ?? "" },

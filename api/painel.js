@@ -4,7 +4,9 @@
    Para trocar a senha sem mexer no código, defina a variável PAINEL_SENHA na Vercel.
    POST { acao: "listar", senha }                         -> { pedidos, cadastrados }
    POST { acao: "alterar", senha, ref, por, dados }       -> { pedido }
-     dados: { nome, itens: [{ cor, modelo, tamanho, qtd }], entrega: "RETIRADA"|"PAC"|"SEDEX", endereco, parcelas, status, observacao } */
+     dados: { nome, itens: [{ cor, modelo, tamanho, qtd }], entrega: "RETIRADA"|"PAC"|"SEDEX", endereco, parcelas, observacao }
+   POST { acao: "cancelar", senha, ref, por, motivo }     -> { pedido }   (sai das somas da planilha)
+   POST { acao: "reativar", senha, ref, por }             -> { pedido }   (desfaz um cancelamento) */
 import { HttpError, json, rota, readJSON, bancoPronto, dentroDoLimite, redis, ipDe, listarPedidos, lerPedido, salvarPedido, confereSenha, linha } from "./_lib.js";
 import { lerItens, itensParaSalvar, lerEntrega, entregaParaSalvar, cadastroPorNome, nomesCadastrados, mesmoNome } from "./_pedido.js";
 import { PRODUTO, PAGAMENTO, RETIRADA, parcelasDe } from "../produto.js";
@@ -46,13 +48,46 @@ function diferencas(antes, depois) {
 }
 
 /* ===================== ações ===================== */
-async function alterar(body) {
-  const cfg = PAGAMENTO.boleto;
+// pedido no boleto que existe e o nome de quem está mexendo nele
+async function pedidoParaMexer(body, verbo) {
   const pedido = await lerPedido(linha(body.ref, 60));
   if (!pedido) throw new HttpError(404, "Pedido não encontrado.");
-  if (pedido.forma !== "boleto") throw new HttpError(400, "Só os pedidos no boleto podem ser alterados aqui.");
+  if (pedido.forma !== "boleto") throw new HttpError(400, `Só os pedidos no boleto podem ser ${verbo} aqui.`);
   const por = linha(body.por, 80);
-  if (por.replace(/[^\p{L}]/gu, "").length < 2) throw new HttpError(400, "Informe o seu nome (quem está alterando).", { campo: "por" });
+  if (por.replace(/[^\p{L}]/gu, "").length < 2) throw new HttpError(400, "Informe o seu nome (quem está fazendo a mudança).", { campo: "por" });
+  return { pedido, por };
+}
+async function registrar(pedido, novo, por, mudancas) {
+  const agora = Date.now();
+  novo.alteracoes = [...(pedido.alteracoes || []), { em: agora, por, mudancas }];
+  if (novo.status !== pedido.status) novo.historico = [...(pedido.historico || []), { em: agora, status: novo.status }];
+  await salvarPedido(novo);
+  console.log("Pedido", novo.ref, "por", por, mudancas.map((m) => `${m.campo}: ${m.para}`).join("; "));
+  return novo;
+}
+
+async function cancelar(body) {
+  const { pedido, por } = await pedidoParaMexer(body, "cancelados");
+  if (pedido.status === "cancelado") throw new HttpError(400, "Este pedido já está cancelado.");
+  const motivo = linha(body.motivo, 300);
+  const novo = { ...pedido, status: "cancelado", cancelamento: { em: Date.now(), por, motivo } };
+  const mudancas = [{ campo: "Status", de: STATUS[pedido.status] || pedido.status, para: "Cancelado" }];
+  if (motivo) mudancas.push({ campo: "Motivo do cancelamento", de: "—", para: motivo });
+  return registrar(pedido, novo, por, mudancas);
+}
+
+async function reativar(body) {
+  const { pedido, por } = await pedidoParaMexer(body, "reativados");
+  if (pedido.status !== "cancelado") throw new HttpError(400, "Este pedido não está cancelado.");
+  const { cancelamento, ...resto } = pedido;
+  const novo = { ...resto, status: "aguardando-boleto" };
+  return registrar(pedido, novo, por, [{ campo: "Status", de: "Cancelado", para: STATUS["aguardando-boleto"] }]);
+}
+
+async function alterar(body) {
+  const cfg = PAGAMENTO.boleto;
+  const { pedido, por } = await pedidoParaMexer(body, "alterados");
+  if (pedido.status === "cancelado") throw new HttpError(400, "Este pedido está cancelado. Reative o pedido para poder alterar.");
 
   const d = body.dados || {};
   // comprador: o mesmo de antes ou um nome da lista de cadastrados
@@ -67,22 +102,16 @@ async function alterar(body) {
   if (!Number.isInteger(n) || n < 1 || n > cfg.parcelasMax) throw new HttpError(400, `Escolha de 1 a ${cfg.parcelasMax} parcelas.`, { campo: "parcelas" });
   const entrega = lerEntrega({ frete: d.entrega, endereco: d.endereco }, pecas);
   if (d.entrega !== "RETIRADA" && !entrega.retirada && entrega.frete.id !== d.entrega) throw new HttpError(400, "Escolha a entrega: retirada, PAC ou SEDEX.", { campo: "entrega" });
-  const status = d.status === "cancelado" ? "cancelado" : "aguardando-boleto";
   const total = subtotal + entrega.frete.valor;
 
-  const agora = Date.now();
   const novo = {
     ...pedido, cliente, itens: itensParaSalvar(itens), pecas, entrega: entregaParaSalvar(entrega), subtotal, total,
     pagamento: { ...pedido.pagamento, metodo: "BOLETO", parcelas: n, valores: parcelasDe(total, n) },
-    status, observacao: linha(d.observacao, 300),
+    observacao: linha(d.observacao, 300),
   };
   const mudancas = diferencas(pedido, novo);
   if (!mudancas.length) throw new HttpError(400, "Nada foi alterado neste pedido.");
-  novo.alteracoes = [...(pedido.alteracoes || []), { em: agora, por, mudancas }];
-  if (status !== pedido.status) novo.historico = [...(pedido.historico || []), { em: agora, status }];
-  await salvarPedido(novo);
-  console.log("Pedido alterado:", novo.ref, "por", por, mudancas.map((m) => m.campo).join(", "));
-  return novo;
+  return registrar(pedido, novo, por, mudancas);
 }
 
 const POST = async (req) => {
@@ -93,6 +122,8 @@ const POST = async (req) => {
     return json({ pedidos, cadastrados: nomesCadastrados(), agora: Date.now() });
   }
   if (body.acao === "alterar") return json({ pedido: await alterar(body) });
+  if (body.acao === "cancelar") return json({ pedido: await cancelar(body) });
+  if (body.acao === "reativar") return json({ pedido: await reativar(body) });
   throw new HttpError(400, "Ação inválida.");
 };
 

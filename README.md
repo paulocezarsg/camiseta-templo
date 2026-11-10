@@ -91,14 +91,15 @@ Em cada pedido no boleto há o botão **Alterar**, que permite mudar:
 - as **camisetas** (modelo, tamanho e quantidade; dá para acrescentar e tirar itens);
 - a **entrega** (retirada no núcleo, Correios PAC ou SEDEX, com o endereço);
 - o **parcelamento** (1x, 2x ou 3x);
-- o **status** (pedido registrado ou **cancelado**);
 - uma **observação**.
 
 O valor das camisetas, o frete, o total e as parcelas são recalculados no servidor, e um resumo mostra os valores novos antes de salvar. Para salvar, o painel pede **o nome de quem está alterando** e **a senha do painel de novo**, a cada alteração.
 
+**Cancelar pedido:** cada pedido no boleto tem também o botão vermelho **Cancelar pedido**. Ele abre uma confirmação com o pedido (nome, número e valor), um campo para o **motivo** (opcional), **o nome de quem está cancelando** e **a senha do painel**. O pedido cancelado fica riscado, com a faixa "Cancelado por (nome) em (data) · Motivo: …", e ganha o botão **Reativar pedido** (que também pede nome e senha), para desfazer um cancelamento por engano. Pedido cancelado não pode ser alterado; para alterar, reative antes.
+
 O pedido alterado ganha o selo **"Alterado por (nome) · data e hora"** e um **histórico** com cada alteração: quem, quando e o que mudou (de → para). O que a pessoa digitou ao confirmar o pedido continua guardado.
 
-A planilha do admin mostra as alterações na hora, sem nada a fazer: os valores novos em todas as abas; na aba **Pedidos**, as colunas **Observação**, **Alterado**, **Última alteração**, **Alterado por** e **Alterações** (o histórico completo); no **Painel**, a tabela das alterações mais recentes. Pedidos **cancelados** continuam na lista com o status "Cancelado", mas saem das somas, do Painel, da aba Tamanhos e da aba Por pessoa.
+A planilha do admin mostra as alterações na hora, sem nada a fazer: os valores novos em todas as abas; na aba **Pedidos**, as colunas **Cancelamento** (quando, por quem e o motivo), **Observação**, **Alterado**, **Última alteração**, **Alterado por** e **Alterações** (o histórico completo); no **Painel**, a tabela das alterações mais recentes. Pedidos **cancelados** continuam na lista com o status "Cancelado", mas saem das somas, do Painel, da aba Tamanhos e da aba Por pessoa.
 
 Os pedidos pagos pelo PagBank (quando ele for ligado) aparecem no painel, mas não podem ser alterados por ali. São permitidas 10 senhas erradas a cada 15 minutos por endereço de internet. Para trocar a senha do painel sem mexer no código, defina a variável `PAINEL_SENHA` na Vercel.
 
