@@ -27,7 +27,7 @@ Este pacote é o site completo, igual ao que está publicado na Vercel. O `READM
 | `api/boleto.js` | `POST` cria o pedido no boleto. |
 | `api/admin.js` | `POST` gera a planilha Excel. |
 | `api/painel.js` | `POST` listar, alterar, cancelar e reativar pedidos. |
-| `api/checkout.js`, `api/pagbank-webhook.js` | PagBank (Pix e cartão), **desligado** (`PAGAMENTO.pagbank.ativo = false` em `produto.js`). |
+| `api/checkout.js`, `api/pagbank-webhook.js` | PagBank (Pix e cartão), ligado em `PAGAMENTO.pagbank.ativo` (`produto.js`). |
 
 Arquivos que começam com `_` não viram rota na Vercel e não são publicados como arquivo estático.
 
@@ -38,7 +38,8 @@ Arquivos que começam com `_` não viram rota na Vercel e não são publicados c
 | `KV_REST_API_URL` e `KV_REST_API_TOKEN` (ou `UPSTASH_REDIS_REST_URL` e `UPSTASH_REDIS_REST_TOKEN`) | Sim | Banco Upstash Redis (REST). Também são aceitas com prefixo (ex.: `STORAGE_KV_REST_API_URL`). Use o token normal, não o "read-only". |
 | `ADMIN_SENHA` | Não | Substitui a senha do admin (planilha). Sem ela, vale o hash em `api/admin.js`. |
 | `PAINEL_SENHA` | Não | Substitui a senha do painel de pedidos. Sem ela, vale o hash em `api/painel.js`. |
-| `PAGBANK_TOKEN`, `PAGBANK_AMBIENTE`, `SITE_URL` | Só com o PagBank ligado | Checkout e notificações do PagBank. |
+| `PAGBANK_TOKEN` e `PAGBANK_AMBIENTE` | Com o PagBank ligado | Token da conta (Vendas → Integrações → Gerar Token) e `producao` (sem ela, o site usa o sandbox). |
+| `SITE_URL` | Não | Endereço público da loja, para o retorno e as notificações do PagBank. Sem ela, vale o endereço de onde veio o pedido. |
 
 As senhas não aparecem em texto no código, só o hash scrypt (`sal:hash` em base64, N=16384, r=8, p=1, 32 bytes). As senhas atuais são as combinadas com o núcleo. Para trocar, defina a variável correspondente na Vercel e faça um redeploy.
 
@@ -57,8 +58,19 @@ Busca na lista de cadastrados (mínimo de 3 letras, sem acento e sem maiúsculas
 ```
 `frete`: `RETIRADA`, `PAC` ou `SEDEX` (com `endereco: { cep, rua, numero, complemento, bairro, cidade, uf }`). `confirmacao` é o nome e sobrenome digitados pela pessoa (pelo menos duas palavras, sem conferência com a lista). Responde `{ referencia, total, parcelas: [centavos...] }`. Sem banco configurado, responde `503` e não registra.
 
+### `POST /api/checkout` (PagBank)
+```json
+{ "itens": [{ "cor": "amarela", "modelo": "basica", "tamanho": "G", "qtd": 1 }],
+  "cliente": { "nome": "Maria da Silva", "email": "maria@exemplo.com", "celular": "11987654321", "cpf": "12345678909" },
+  "frete": "RETIRADA", "endereco": null }
+```
+Cria um checkout no PagBank (`POST /checkouts`, com Pix, cartão de crédito em até 3x sem juros e débito), grava o pedido com status `aguardando` e responde `{ url, referencia }`; a página leva a pessoa para `url`. Na volta, o PagBank abre `/obrigado?pedido=<referência>`.
+
+### `POST /api/pagbank-webhook`
+Recebe os avisos do PagBank (o endereço vai em cada checkout, nada a configurar no painel). Confere o cabeçalho `x-authenticity-token` (= sha256 de `PAGBANK_TOKEN + "-" + corpo`) e grava no pedido o status (`pago`, `em análise`, `aguardando`, `recusado`, `cancelado`) e o pagamento (`metodo`, `parcelas`, `valor`, `pagoEm`, `ordemId`).
+
 ### `POST /api/admin`
-`{ "senha": "..." }` → arquivo `.xlsx` (`Content-Disposition` com o nome `pedidos-camiseta-AAAA-MM-DD-HHhMM.xlsx` e o cabeçalho `X-Pedidos` com a quantidade). Abas: **Painel**, **Pedidos**, **Itens**, **Tamanhos** e **Por pessoa**. Pedidos **cancelados** não entram.
+`{ "senha": "..." }` → arquivo `.xlsx` (`Content-Disposition` com o nome `pedidos-camiseta-AAAA-MM-DD-HHhMM.xlsx` e o cabeçalho `X-Pedidos` com a quantidade). Abas: **Painel**, **Pedidos**, **Itens**, **Tamanhos** e **Por pessoa**. Entram só os pedidos que valem: no boleto (fora os cancelados) e PagBank com status `pago` ou `em análise`.
 
 ### `POST /api/painel`
 Todas as ações levam `senha` (a do painel).
@@ -118,7 +130,8 @@ Valores em centavos e datas em milissegundos (UTC).
 ## Regras de negócio
 
 - **Preço:** `PRODUTO.preco` (R$ 100,00); um modelo pode ter `preco` próprio.
-- **Parcelas:** 1x a 3x (`PAGAMENTO.boleto.parcelasMax`). `parcelasDe(total, n)` divide em centavos e o que sobra vai na **primeira** parcela (R$ 100,00 em 3x = 33,34 + 33,33 + 33,33).
+- **Cartão (PagBank):** até 3x (`PRODUTO.parcelasMax`), todas sem juros para o cliente (`PRODUTO.parcelasSemJuros`).
+- **Parcelas no boleto:** 1x a 3x (`PAGAMENTO.boleto.parcelasMax`). `parcelasDe(total, n)` divide em centavos e o que sobra vai na **primeira** parcela (R$ 100,00 em 3x = 33,34 + 33,33 + 33,33).
 - **Boleto do mês subsequente:** a 1ª parcela entra no boleto do mês seguinte ao pedido (horário de Brasília) e as demais nos meses depois. É assim que a aba "Por pessoa" soma o valor de cada mês.
 - **Entrega:** retirada no núcleo (grátis, já marcada) ou Correios pela tabela de `correios.js` (peso por peça em `PRODUTO.pacote`; prazo = trecho + `diasParaPostar`).
 - **Limite:** 30 peças por pedido (`PRODUTO.maxPorPedido`).

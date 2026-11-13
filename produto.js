@@ -53,8 +53,8 @@ export const VIDEO = {
 /* Formas de pagamento.
    boleto: só para quem está na lista de cadastrados (api/_cadastrados.js), em até parcelasMax vezes.
      Não passa pelo PagBank: o pedido fica registrado e o valor vai no boleto do mês subsequente (a planilha do admin traz tudo).
-   pagbank: Pix e cartão pelo PagBank. Enquanto estiver desligado (ativo: false), não aparece na loja
-     e a rota do checkout recusa o pedido; para liberar, troque para true e configure as variáveis do PagBank. */
+   pagbank: Pix e cartão pelo PagBank, para qualquer pessoa (não precisa estar na lista). Precisa das variáveis
+     PAGBANK_TOKEN e PAGBANK_AMBIENTE=producao na Vercel. Com ativo: false, some da loja e a rota do checkout recusa o pedido. */
 export const PAGAMENTO = {
   boleto: {
     ativo: true,
@@ -64,7 +64,7 @@ export const PAGAMENTO = {
     semNome: "Não encontrou o seu nome? Fale com o núcleo.",
   },
   pagbank: {
-    ativo: false,
+    ativo: true,
     metodos: ["PIX", "CREDIT_CARD", "DEBIT_CARD"],
   },
 };
@@ -102,8 +102,8 @@ export const PRODUTO = {
   descricao: "A camiseta comemorativa da inauguração do templo do Núcleo Estrela Bonita, com a fachada desenhada a traço, a estrela e a frase da inauguração.",
   preco: 10000,
   precoDe: null,         // preço riscado; null para esconder
-  parcelasMax: 6,        // parcelas no cartão (PagBank, quando liberado)
-  parcelasSemJuros: 3,   // quantas delas sem juros para o cliente
+  parcelasMax: 3,        // parcelas no cartão (PagBank)
+  parcelasSemJuros: 3,   // quantas delas sem juros para o cliente (o custo do parcelamento fica com o vendedor)
   maxPorPedido: 30,
   diasParaPostar: 3,     // dias úteis até a postagem; somado ao prazo dos Correios
 

@@ -3,7 +3,9 @@
 Landing page de venda da camiseta comemorativa da inauguração do templo do **Núcleo Estrela Bonita** (2027), publicada em **camiseta.cruzeirogestao.com.br**. A Cruzeiro Gestão aparece como vendedora, no rodapé.
 
 - A camiseta é **amarela** (cor única), em dois modelos: **Básica** (adulto, PP ao G5) e **Infantil** (2 a 10 anos). A pessoa escolhe **modelo, tamanho e quantidade**, pode juntar modelos e tamanhos diferentes na **sacola** e escolhe a **retirada grátis no núcleo** (já marcada) ou o **frete dos Correios** (PAC e SEDEX, com valor e prazo, digitando o CEP).
-- O pagamento é no **boleto em até 3x**, só para quem está na **lista de cadastrados** do núcleo: a pessoa acha o próprio nome, escolhe as parcelas e, na hora de confirmar, digita o nome e sobrenome. Pix e cartão (PagBank) estão desligados e **não aparecem** na loja.
+- Duas formas de pagamento:
+  - **Pix ou cartão em até 3x sem juros, pelo PagBank**, para **qualquer pessoa**. A pessoa informa nome, e-mail, celular e CPF e paga na página segura do PagBank; o pedido passa a "pago" sozinho quando o PagBank confirma.
+  - **Boleto em até 3x**, só para quem está na **lista de cadastrados** do núcleo: a pessoa acha o próprio nome, escolhe as parcelas e, na hora de confirmar, digita o nome e sobrenome.
 - O **acesso admin** pede a senha e baixa na hora uma **planilha Excel** com todos os pedidos.
 
 Detalhes técnicos (rotas da API, formato dos pedidos, banco e regras) para quem for manter ou integrar o código: [`DESENVOLVEDOR.md`](DESENVOLVEDOR.md).
@@ -68,15 +70,17 @@ export const CADASTRADOS = [
 
 ## Acesso admin
 
-No rodapé da loja há o botão **Acesso admin**, que abre `/admin`. A tela só pede a **senha** (a combinada com o núcleo; maiúsculas e minúsculas contam); com a senha certa, a planilha **Excel** (`pedidos-camiseta-AAAA-MM-DD-HHhMM.xlsx`) é baixada na hora, com todos os pedidos. Não há painel.
+No rodapé da loja há o botão **Acesso admin**, que abre `/admin`. A tela só pede a **senha** (a combinada com o núcleo; maiúsculas e minúsculas contam); com a senha certa, a planilha **Excel** (`pedidos-camiseta-AAAA-MM-DD-HHhMM.xlsx`) é baixada na hora.
+
+Entram na planilha os pedidos no **boleto** (fora os cancelados) e os de **Pix ou cartão já pagos** no PagBank. Quem abriu o pagamento do PagBank e não concluiu não entra; esses pedidos aparecem só no painel de pedidos, como "Aguardando pagamento".
 
 A planilha tem cinco abas:
 
-- **Painel** (a primeira): os números principais em cartões — pedidos, compradores, camisetas, valor total, camisetas de cada modelo, retiradas e envios, valor médio, peças por pedido, frete e a hora do último pedido — e tabelas com barras: quanto entra no boleto de cada mês, parcelamento, entrega, camisetas por modelo e tamanho (das mais pedidas para as menos), pedidos por dia e quem mais comprou.
+- **Painel** (a primeira): os números principais em cartões — pedidos, compradores, camisetas, valor total, camisetas de cada modelo, retiradas e envios, valor médio, peças por pedido, frete e a hora do último pedido — e tabelas com barras: quanto entra no boleto de cada mês, parcelamento no boleto, **forma de pagamento** (boleto, Pix, cartão de crédito e de débito), entrega, camisetas por modelo e tamanho (das mais pedidas para as menos), pedidos por dia e quem mais comprou.
 
 As três abas seguintes têm o cabeçalho fixo e filtro em cada coluna:
 
-- **Pedidos:** um pedido por linha — data e hora (de Brasília), número do pedido, forma de pagamento, status, **nome** (o escolhido na lista), **nome confirmado** (como a pessoa digitou), peças, itens, valor das camisetas, entrega (retirada ou Correios PAC/SEDEX), frete, total, número de parcelas, o valor de cada parcela, prazo, CEP e endereço completo. No fim, a linha de totais.
+- **Pedidos:** um pedido por linha — data e hora (de Brasília), número do pedido, forma de pagamento (boleto ou PagBank, com Pix ou cartão), status, **nome** (no boleto, o escolhido na lista), **nome confirmado** (como a pessoa digitou), CPF, celular e e-mail (só nos pedidos pelo PagBank), peças, itens, valor das camisetas, entrega (retirada ou Correios PAC/SEDEX), frete, total, número de parcelas, o valor de cada parcela, prazo, CEP, endereço completo e a data do pagamento no PagBank. No fim, a linha de totais.
 - **Itens:** uma linha por item (modelo, tamanho, cor, quantidade e valores), para separar as camisetas.
 - **Tamanhos:** quantas camisetas há de cada modelo e tamanho, para a produção.
 - **Por pessoa** (a última): junta todos os pedidos no boleto de cada pessoa (uma pessoa pode comprar mais de uma vez) — nome, nome(s) confirmado(s), quantidade de pedidos, peças, valor total, o parcelamento de cada pedido e **quanto vai no boleto de cada mês** (a 1ª parcela entra no mês seguinte ao pedido e as demais nos meses depois), com o total de cada mês no rodapé.
@@ -103,7 +107,7 @@ O pedido alterado ganha o selo **"Alterado por (nome) · data e hora"** e um **h
 
 A planilha do admin mostra as alterações na hora, sem nada a fazer: os valores novos em todas as abas; na aba **Pedidos**, as colunas **Observação**, **Alterado**, **Última alteração**, **Alterado por** e **Alterações** (o histórico completo); no **Painel**, a tabela das alterações mais recentes. Pedidos **cancelados não vão para a planilha** (nenhuma aba); continuam no painel de pedidos, no filtro **Cancelados**, e voltam para a planilha se forem reativados.
 
-Os pedidos pagos pelo PagBank (quando ele for ligado) aparecem no painel, mas não podem ser alterados por ali. São permitidas 10 senhas erradas a cada 15 minutos por endereço de internet. Para trocar a senha do painel sem mexer no código, defina a variável `PAINEL_SENHA` na Vercel.
+Os pedidos de Pix e cartão (PagBank) aparecem no painel com a forma de pagamento, o e-mail e o celular da pessoa e o status (**Aguardando pagamento**, **Pago**, **Pagamento em análise** ou **Recusado**), mas não podem ser alterados nem cancelados por ali: estorno e cancelamento são feitos no próprio PagBank. O resumo do topo soma só o que vale (boleto e pagamentos confirmados). São permitidas 10 senhas erradas a cada 15 minutos por endereço de internet. Para trocar a senha do painel sem mexer no código, defina a variável `PAINEL_SENHA` na Vercel.
 
 ## Textos e vídeo
 
@@ -127,7 +131,7 @@ Tudo em `produto.js`:
 | `api/admin.js` e `api/_xlsx.js` | Confere a senha e gera a planilha Excel (sem dependências). |
 | `api/painel.js` | Painel de pedidos: confere a senha do painel, lista os pedidos e grava as alterações com o histórico (quem, quando e o que mudou). |
 | `api/_lib.js`, `api/_pedido.js` | Funções compartilhadas (arquivos com `_` não viram rota na Vercel). |
-| `api/checkout.js`, `api/pagbank-webhook.js` | PagBank (Pix e cartão), desligado por enquanto. |
+| `api/checkout.js`, `api/pagbank-webhook.js` | PagBank (Pix e cartão): cria a página de pagamento e recebe o aviso de pagamento, que atualiza o pedido. |
 | `package.json`, `vercel.json` | Configuração da Vercel (módulos JavaScript e endereços sem `.html`). |
 
 As funções seguem o formato das Vercel Functions com `Request`/`Response` da Web (`export default { fetch }`), rodam no Node.js e não usam nenhuma biblioteca externa.
@@ -174,16 +178,15 @@ Ficam em `fotos/`, em WebP (e uma JPG para compartilhamento em redes sociais):
 
 Com o [Vercel CLI](https://vercel.com/docs/cli) instalado e o projeto ligado (`vercel link`), rode `vercel env pull` para trazer as variáveis do banco e depois `vercel dev`. Abra `http://localhost:3000`.
 
-## Pix e cartão (PagBank), quando a conta for liberada
+## Pix e cartão (PagBank)
 
-O código do PagBank já está pronto, mas desligado: enquanto `pagbank.ativo` for `false` em `produto.js`, a opção não aparece na loja e a rota do checkout recusa o pedido. Para ligar:
+Ligado (`pagbank.ativo: true` em `produto.js`), para qualquer pessoa, com o cartão em até 3x sem juros (`PRODUTO.parcelasMax` e `PRODUTO.parcelasSemJuros`; o custo do parcelamento fica com o vendedor). Para desligar, troque `ativo` para `false`: a opção some da loja e a rota do checkout recusa o pedido.
 
-1. No PagBank, gere o token com permissão para criar checkout (`checkout.create`).
-2. Na Vercel, defina as variáveis abaixo e troque `pagbank.ativo` para `true` em `produto.js`. A pessoa passa a escolher entre o boleto e o Pix/cartão.
+Na Vercel ficam as variáveis abaixo. O token sai do PagBank, em **Vendas → Integrações → Gerar Token** (se já foi gerado antes, o PagBank manda por e-mail; gerar um novo desativa o antigo).
 
 | Variável | Valor |
 | --- | --- |
-| `PAGBANK_TOKEN` | Token da conta PagBank (no painel: *Venda online → Integrações → Gerar token*). Para testes, o token do ambiente sandbox. |
+| `PAGBANK_TOKEN` | Token da conta PagBank. Para testes, o token do ambiente sandbox. |
 | `PAGBANK_AMBIENTE` | `sandbox` para testes ou `producao` para vender de verdade. Padrão: `sandbox`. |
 | `SITE_URL` | Opcional. Endereço público da loja (`https://camiseta.cruzeirogestao.com.br`), usado no retorno e nas notificações. |
 

@@ -1,4 +1,4 @@
-/* Acesso admin: com a senha certa, devolve a planilha (.xlsx) com todos os pedidos. Não há painel.
+/* Acesso admin: com a senha certa, devolve a planilha (.xlsx) com os pedidos que valem.
    A senha é conferida aqui no servidor, contra um hash (scrypt) — ela nunca vai para a página.
    Para trocar a senha sem mexer no código, defina a variável ADMIN_SENHA na Vercel.
    POST { senha } -> arquivo pedidos-camiseta-AAAA-MM-DD-HHhMM.xlsx
@@ -17,9 +17,10 @@ const POST = async (req) => {
   if (!confereSenha(body.senha, HASH_SENHA, "ADMIN_SENHA")) throw new HttpError(401, "Senha incorreta.");
   if (!bancoPronto()) throw new HttpError(503, "O banco de dados ainda não foi configurado. Veja o README, seção Acesso admin.");
 
-  // pedidos cancelados (ou recusados) não vão para a planilha; continuam no painel de pedidos, onde podem ser reativados
+  // Só vão para a planilha os pedidos que valem: no boleto (fora os cancelados) e Pix/cartão já pagos no PagBank.
+  // Cancelados, recusados e pagamentos não concluídos ficam só no painel de pedidos (o cancelado pode ser reativado lá).
   const pedidos = (await listarPedidos())
-    .filter((p) => !["cancelado", "recusado"].includes(p.status))
+    .filter(conta)
     .sort((a, b) => (a.criadoEm || 0) - (b.criadoEm || 0));
   const arquivo = planilha(montarAbas(pedidos));
   return new Response(arquivo, {
@@ -198,6 +199,16 @@ function montarPainel(vale, pp, pedidos = []) {
       const ped = noBoleto.filter((p) => (p.pagamento?.parcelas || 1) === n);
       return [n === 1 ? "À vista (1x)" : `${n}x`, ped.length, soma(ped, (p) => p.total), noBoleto.length ? ped.length / noBoleto.length : 0, ped.length];
     }), "Nenhum pedido no boleto ainda.");
+
+  // Forma de pagamento: boleto (cadastrados) e Pix/cartão pelo PagBank
+  const formaCurta = (p) => ehBoleto(p) ? "Boleto (cadastrados)" : METODO[p.pagamento?.metodo] ? `${METODO[p.pagamento.metodo]} (PagBank)` : "PagBank";
+  const formas = ["Boleto (cadastrados)", "Pix (PagBank)", "Cartão de crédito (PagBank)", "Cartão de débito (PagBank)"];
+  for (const p of vale) if (!formas.includes(formaCurta(p))) formas.push(formaCurta(p));
+  tabela("Forma de pagamento", ["Forma", "Pedidos", "Peças", "Valor"], [P.inteiro, P.inteiro, P.moeda],
+    formas.map((f) => {
+      const ped = vale.filter((p) => formaCurta(p) === f);
+      return [f, ped.length, soma(ped, pecasDe), soma(ped, (p) => p.total), ped.length];
+    }), "");
 
   tabela("Entrega", ["Entrega", "Pedidos", "Peças", "Frete"], [P.inteiro, P.inteiro, P.moeda],
     [["RETIRADA", RETIRADA?.nome || "Retirada no núcleo"], ["PAC", "Correios PAC"], ["SEDEX", "Correios SEDEX"]].map(([tipo, rotulo]) => {

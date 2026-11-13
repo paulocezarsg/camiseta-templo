@@ -316,8 +316,21 @@ form.addEventListener("submit", async (e) => {
 // A senha do painel fica só na memória desta aba (para atualizar a lista); cada alteração pede a senha de novo.
 const st = { senha: "", pedidos: [], filtro: "todos", editando: null };
 const formPainel = $("[data-form-painel]"), msgPainel = $("[data-msg-painel]");
-const STATUS = { "aguardando-boleto": ["registrado", "Pedido registrado"], cancelado: ["cancelado", "Cancelado"], pago: ["registrado", "Pago"], aguardando: ["pagbank", "Aguardando PagBank"], recusado: ["cancelado", "Recusado"] };
+const STATUS = {
+  "aguardando-boleto": ["registrado", "Pedido registrado"], cancelado: ["cancelado", "Cancelado"], pago: ["registrado", "Pago"],
+  aguardando: ["pagbank", "Aguardando pagamento"], "em análise": ["pagbank", "Pagamento em análise"], recusado: ["cancelado", "Recusado"],
+};
 const ativo = (p) => !["cancelado", "recusado"].includes(p.status);
+// o que entra nas somas (e na planilha): boleto não cancelado, ou Pix/cartão já pago no PagBank
+const vale = (p) => ativo(p) && (p.forma === "boleto" || ["pago", "em análise"].includes(p.status));
+const METODO = { PIX: "Pix", CREDIT_CARD: "cartão de crédito", DEBIT_CARD: "cartão de débito" };
+const celularTexto = (c) => { const n = String(c || "").replace(/\D/g, ""); return n.length === 11 ? n.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3") : n.length === 10 ? n.replace(/(\d{2})(\d{4})(\d{4})/, "($1) $2-$3") : n; };
+function pagamentoTexto(p) {
+  const n = p.pagamento?.parcelas || 1;
+  if (p.forma === "boleto") return n > 1 ? `boleto em ${n}x` : "boleto à vista";
+  const m = METODO[p.pagamento?.metodo];
+  return m ? `PagBank · ${m}${n > 1 ? ` em ${n}x` : ""}` : "PagBank (Pix ou cartão)";
+}
 const modeloId = (nome) => (PRODUTO.modelos.find((m) => m.nome === nome) || PRODUTO.modelos[0]).id;
 const corId = (nome) => (PRODUTO.cores.find((c) => c.nome === nome || c.id === nome) || PRODUTO.cores[0]).id;
 const textoItens = (itens = []) => itens.map((i) => `${i.qtd}× ${i.modelo} ${i.tamanho}`).join(", ");
@@ -375,19 +388,19 @@ $("[data-filtros]").addEventListener("click", (e) => {
 });
 
 function desenhar() {
-  const todos = st.pedidos, ativos = todos.filter(ativo);
+  const todos = st.pedidos, ativos = todos.filter(vale);
   const n = { todos: todos.length, alterados: todos.filter((p) => p.alteracoes?.length).length, cancelados: todos.filter((p) => !ativo(p)).length };
   for (const [k, v] of Object.entries(n)) $(`[data-n="${k}"]`).textContent = v;
-  $("[data-resumo]").textContent = `${ativos.length} ${ativos.length === 1 ? "pedido" : "pedidos"} · ${ativos.reduce((s, p) => s + (p.pecas || 0), 0)} camisetas · ${brl(ativos.reduce((s, p) => s + (p.total || 0), 0))} (sem cancelados)`;
+  $("[data-resumo]").textContent = `${ativos.length} ${ativos.length === 1 ? "pedido" : "pedidos"} · ${ativos.reduce((s, p) => s + (p.pecas || 0), 0)} camisetas · ${brl(ativos.reduce((s, p) => s + (p.total || 0), 0))} (fora cancelados e pagamentos não concluídos)`;
   const t = norm($("[data-busca]").value.trim());
   const lista = todos.filter((p) => (st.filtro === "todos" || (st.filtro === "alterados" && p.alteracoes?.length) || (st.filtro === "cancelados" && !ativo(p)))
-    && (!t || norm(`${p.cliente?.nome} ${p.ref} ${p.cliente?.nomeConfirmado || ""}`).includes(t)));
+    && (!t || norm(`${p.cliente?.nome} ${p.ref} ${p.cliente?.nomeConfirmado || ""} ${p.cliente?.email || ""}`).includes(t)));
   $("[data-contagem]").textContent = lista.length === todos.length ? `${lista.length} ${lista.length === 1 ? "pedido" : "pedidos"}, do mais recente para o mais antigo` : `${lista.length} de ${todos.length} pedidos`;
   $("[data-lista]").innerHTML = lista.length ? lista.map(cartao).join("") : `<div class="vazio">${todos.length ? "Nenhum pedido com esse filtro." : "Nenhum pedido ainda."}</div>`;
 }
 function cartao(p) {
   const [cls, rotulo] = STATUS[p.status] || ["registrado", p.status];
-  const alt = p.alteracoes?.at(-1), n = p.pagamento?.parcelas || 1;
+  const alt = p.alteracoes?.at(-1);
   return `<article class="pedido${ativo(p) ? "" : " cancelado"}" data-ref="${esc(p.ref)}">
     <div class="pedido-topo">
       <div><b class="nome">${esc(p.cliente?.nome)}</b><small>${esc(p.ref)} · ${dataHora(p.criadoEm)}</small></div>
@@ -396,13 +409,14 @@ function cartao(p) {
     <div class="pedido-info">
       <span>${esc(textoItens(p.itens))}</span>
       <span>${esc(textoEntrega(p.entrega))}</span>
-      <span><b>${brl(p.total)}</b> · ${p.forma === "boleto" ? (n > 1 ? `boleto em ${n}x` : "boleto à vista") : "PagBank"}</span>
+      <span><b>${brl(p.total)}</b> · ${esc(pagamentoTexto(p))}</span>
+      ${p.forma !== "boleto" && (p.cliente?.email || p.cliente?.celular) ? `<span>${esc([p.cliente.email, celularTexto(p.cliente.celular)].filter(Boolean).join(" · "))}</span>` : ""}
       ${p.cliente?.nomeConfirmado ? `<span>Confirmou como “${esc(p.cliente.nomeConfirmado)}”</span>` : ""}
       ${p.observacao ? `<span class="obs">Obs.: ${esc(p.observacao)}</span>` : ""}
       ${p.status === "cancelado" && p.cancelamento ? `<span class="cancelado-aviso">Cancelado por ${esc(p.cancelamento.por)} em ${dataHora(p.cancelamento.em)}${p.cancelamento.motivo ? ` · Motivo: ${esc(p.cancelamento.motivo)}` : ""}</span>` : ""}
     </div>
     <div class="pedido-acoes">
-      ${p.forma !== "boleto" ? `<small>Pago pelo PagBank: não pode ser alterado aqui.</small>`
+      ${p.forma !== "boleto" ? `<small>${p.status === "pago" ? "Pago pelo PagBank" : "Pix ou cartão pelo PagBank"}: não pode ser alterado aqui.</small>`
         : p.status === "cancelado" ? `<button class="btn btn-linha mini" type="button" data-reativar>Reativar pedido</button>`
         : `<button class="btn btn-linha mini" type="button" data-alterar>Alterar</button><button class="btn btn-perigo mini" type="button" data-cancelar>Cancelar pedido</button>`}
       ${p.alteracoes?.length ? `<details class="historico"><summary>Histórico (${p.alteracoes.length} ${p.alteracoes.length === 1 ? "alteração" : "alterações"})</summary><ol>${[...p.alteracoes].reverse().map((a) => `<li><b>${esc(a.por)}</b> · ${dataHora(a.em)}${a.mudancas.map((m) => `<span>${esc(m.campo)}: ${esc(m.de)} → ${esc(m.para)}</span>`).join("")}</li>`).join("")}</ol></details>` : ""}

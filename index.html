@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Camiseta da Inauguração do Templo · Núcleo Estrela Bonita</title>
-<meta name="description" content="Camiseta comemorativa da inauguração do templo do Núcleo Estrela Bonita, nos modelos básica e infantil. Escolha o tamanho, retire grátis no núcleo ou receba pelos Correios em todo o Brasil, e pague no boleto em até 3x.">
+<meta name="description" content="Camiseta comemorativa da inauguração do templo do Núcleo Estrela Bonita, nos modelos básica e infantil. Escolha o tamanho, retire grátis no núcleo ou receba pelos Correios em todo o Brasil, e pague com Pix, cartão em até 3x ou boleto (cadastrados no núcleo).">
 <meta name="theme-color" content="#451b0a">
 <meta property="og:type" content="product">
 <meta property="og:title" content="Camiseta da Inauguração do Templo · Núcleo Estrela Bonita">
@@ -1142,12 +1142,13 @@ const reservado = (texto) => `<div class="reservado"><b>${icone("pincel")} Texto
 
 /* ===================== textos e seções ===================== */
 /* ===================== textos de pagamento ===================== */
-/* Dependem do que está ligado em PAGAMENTO (produto.js): hoje só o boleto. */
+/* Dependem do que está ligado em PAGAMENTO (produto.js): boleto (cadastrados) e Pix/cartão pelo PagBank (todos). */
 const minuscula = (t) => String(t || "").charAt(0).toLowerCase() + String(t || "").slice(1);
 function textoParcelasPreco(preco) {
+  // o parcelamento do cartão vale para qualquer pessoa; o do boleto, só para os cadastrados
+  if (PAGBANK && PRODUTO.parcelasSemJuros > 1) return `ou <b>${PRODUTO.parcelasSemJuros}x de ${brl(parcelasDe(preco, PRODUTO.parcelasSemJuros).at(-1))}</b> sem juros`;
   if (BOLETO?.parcelasMax > 1) return `ou <b>${BOLETO.parcelasMax}x de ${brl(parcelasDe(preco, BOLETO.parcelasMax).at(-1))}</b> no boleto`;
-  if (PAGBANK && PRODUTO.parcelasSemJuros > 1) return `ou <b>${PRODUTO.parcelasSemJuros}x de ${brl(Math.round(preco / PRODUTO.parcelasSemJuros))}</b> sem juros`;
-  return BOLETO ? "à vista no boleto" : "à vista no Pix ou no cartão";
+  return PAGBANK ? "à vista no Pix ou no cartão" : "à vista no boleto";
 }
 /* "3 boletos de R$ 40,00." ou, quando o centavo não divide, "3 boletos: o primeiro de R$ 33,34 e os outros 2 de R$ 33,33." */
 function textoParcelas(total, n) {
@@ -1159,7 +1160,9 @@ function textoParcelas(total, n) {
 function pintarTextosPagamento() {
   const n = BOLETO?.parcelasMax || 1;
   const chips = [BOLETO && "<span>BOLETO</span>", PAGBANK && "<span>PIX</span><span>CARTÃO</span>"].filter(Boolean).join("");
-  const selo = BOLETO
+  const selo = BOLETO && PAGBANK
+    ? `<span>${icone("cadeado")} Pix ou cartão em até ${PRODUTO.parcelasMax}x pelo PagBank, ou boleto para cadastrados</span>`
+    : BOLETO
     ? `<span>${icone("escudo")} Boleto${n > 1 ? ` em até ${n}x` : ""}, ${esc(minuscula(BOLETO.publico))}</span>`
     : `<span>${icone("cadeado")} Pagamento processado pelo PagBank</span>`;
   $$("[data-selo-pagamento]").forEach((el) => (el.innerHTML = `${selo}<span class="metodos">${chips}</span>`));
@@ -1168,7 +1171,7 @@ function pintarTextosPagamento() {
     BOLETO && !PAGBANK ? `<h3>Pague no boleto</h3><p>Em até ${n}x, ${esc(minuscula(BOLETO.publico))}: é só escolher o seu nome.</p>`
     : BOLETO ? `<h3>Pague como preferir</h3><p>No boleto em até ${n}x (cadastrados no núcleo) ou no PagBank, com Pix ou cartão em até ${PRODUTO.parcelasMax}x.</p>`
     : `<h3>Pague com segurança</h3><p>No PagBank, com Pix ou cartão em até ${PRODUTO.parcelasMax}x.</p>`);
-  $$("[data-rodape-pagamento]").forEach((el) => (el.textContent = PAGBANK ? "Pagamento processado pelo PagBank." : "Pagamento no boleto, emitido pelo núcleo."));
+  $$("[data-rodape-pagamento]").forEach((el) => (el.textContent = PAGBANK && BOLETO ? "Pix e cartão processados pelo PagBank; boleto emitido pelo núcleo." : PAGBANK ? "Pagamento processado pelo PagBank." : "Pagamento no boleto, emitido pelo núcleo."));
   $$("[data-boleto-aviso]").forEach((el) => (el.textContent = BOLETO?.aviso || ""));
 }
 
@@ -1676,12 +1679,12 @@ const regras = {
   confirmacao: (v) => v.trim().split(/\s+/).filter(Boolean).length >= 2,
   rua: (v) => !!v.trim(), numero: (v) => !!v.trim(), bairro: (v) => !!v.trim(), cidade: (v) => !!v.trim(), uf: (v) => UFS.includes(v),
 };
-/* Formas de pagamento: hoje só o boleto (para cadastrados). Pix e cartão (PagBank) só aparecem quando
-   forem ligados em produto.js. Com uma forma só, não há o que escolher: o bloco vira "Pagamento no boleto". */
+/* Formas de pagamento ligadas em produto.js: boleto (só cadastrados) e Pix ou cartão pelo PagBank (qualquer pessoa).
+   Com uma forma só, não há o que escolher: com só o boleto, o bloco vira "Pagamento no boleto". */
 function pintarFormas() {
   const opcoes = [];
   if (BOLETO) opcoes.push({ id: "boleto", ico: "boleto", titulo: `Boleto${BOLETO.parcelasMax > 1 ? ` em até ${BOLETO.parcelasMax}x` : ""}`, sub: BOLETO.publico });
-  if (PAGBANK) opcoes.push({ id: "pagbank", ico: "cartao", titulo: "Pix ou cartão", sub: `Pelo PagBank, cartão em até ${PRODUTO.parcelasMax}x` });
+  if (PAGBANK) opcoes.push({ id: "pagbank", ico: "cartao", titulo: "Pix ou cartão", sub: `Para todos, pelo PagBank · cartão em até ${PRODUTO.parcelasMax}x${PRODUTO.parcelasSemJuros >= PRODUTO.parcelasMax ? " sem juros" : ""}` });
   const soBoleto = opcoes.length === 1 && !!BOLETO;
   $("[data-formas]").hidden = opcoes.length < 2;
   $("[data-titulo-pagamento]").textContent = soBoleto ? "Pagamento no boleto" : "Forma de pagamento";
@@ -1756,6 +1759,12 @@ function abrirCheckout() {
   pintarCheckout();
   abrirModal("checkout");
   setTimeout(() => {
+    // com mais de uma forma de pagamento, a escolha vem primeiro: o checkout abre no topo, com o foco nela
+    if (!$("[data-formas]").hidden) {
+      $("input[name=forma]:checked", f)?.focus({ preventScroll: true });
+      $(".modal-box", $("[data-modal=checkout]")).scrollTo({ top: 0 });
+      return;
+    }
     const vazio = $$("input:not([readonly]):not([type=radio])", f).find((i) => !i.value && i.name !== "complemento" && !i.closest("[hidden]"));
     if (vazio) vazio.focus(); else $("[data-pagar]").focus({ preventScroll: true });
   }, 80);
