@@ -24,12 +24,17 @@ export function json(data, status = 200, headers = {}) {
     headers: { "Content-Type": "application/json; charset=utf-8", "Cache-Control": "no-store", ...headers },
   });
 }
+/* Texto do erro para o log, sem segredos: um erro de cabeçalho inválido, por exemplo, traz o token inteiro
+   na mensagem. Some o que vem depois de "Bearer" e qualquer sequência longa com cara de chave. */
+export const semSegredos = (e) => String(e?.stack || e?.message || e)
+  .replace(/Bearer\s+\S+/gi, "Bearer [oculto]")
+  .replace(/[A-Za-z0-9_+/=-]{32,}/g, "[oculto]");
 export function handle(fn) {
   return async (req) => {
     try { return await fn(req); }
     catch (e) {
       if (e instanceof HttpError) return json({ error: e.message, ...(e.extra || {}) }, e.status);
-      console.error(e);
+      console.error(semSegredos(e));
       return json({ error: "Erro interno. Tente de novo em instantes." }, 500);
     }
   };

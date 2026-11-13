@@ -2,7 +2,7 @@
    Fica travado enquanto PAGAMENTO.pagbank.ativo for false (produto.js); o boleto é feito em api/boleto.js.
    O preço e o frete são recalculados aqui: o valor enviado pelo navegador não é usado.
    Variáveis: PAGBANK_TOKEN (obrigatória), PAGBANK_AMBIENTE=sandbox|producao (padrão: sandbox), SITE_URL (opcional). */
-import { HttpError, json, rota, readJSON, bancoPronto, salvarPedido } from "./_lib.js";
+import { HttpError, json, rota, readJSON, bancoPronto, salvarPedido, semSegredos } from "./_lib.js";
 import { lerItens, itensParaSalvar, lerCliente, lerEntrega, entregaParaSalvar, novaReferencia } from "./_pedido.js";
 import { PRODUTO, LOJA, PAGAMENTO } from "../produto.js";
 
@@ -75,7 +75,7 @@ const POST = async (req) => {
       signal: AbortSignal.timeout(15_000),
     });
   } catch (e) {
-    console.error("PagBank fora do ar ou sem resposta:", e);
+    console.error("PagBank fora do ar ou sem resposta:", semSegredos(e));
     throw new HttpError(502, "Não conseguimos abrir o pagamento agora. Tente de novo em instantes.");
   }
   const d = await r.json().catch(() => null);
@@ -101,7 +101,7 @@ const POST = async (req) => {
         subtotal, total: subtotal + frete.valor,
         pagamento: null, entregue: false, historico: [{ em: Date.now(), status: "aguardando" }],
       });
-    } catch (e) { console.error("Não foi possível salvar o pedido", referencia, e); }
+    } catch (e) { console.error("Não foi possível salvar o pedido", referencia, semSegredos(e)); }
   }
   return json({ url: pagar.href, referencia });
 };
