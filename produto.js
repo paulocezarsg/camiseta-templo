@@ -51,7 +51,7 @@ export const VIDEO = {
 };
 
 /* Formas de pagamento.
-   boleto: só para os sócios do Estrela Bonita (a lista de nomes fica em api/_cadastrados.js), em até parcelasMax vezes.
+   boleto: só para os sócios do Núcleo Estrela Bonita (a lista de nomes fica em api/_cadastrados.js), em até parcelasMax vezes.
      Não passa pelo PagBank: o pedido fica registrado e o valor vai no boleto do mês subsequente (a planilha do admin traz tudo).
    pagbank: Pix e cartão pelo PagBank, para qualquer pessoa (não precisa estar na lista). Precisa das variáveis
      PAGBANK_TOKEN e PAGBANK_AMBIENTE=producao na Vercel. Com ativo: false, some da loja e a rota do checkout recusa o pedido. */
@@ -59,10 +59,10 @@ export const PAGAMENTO = {
   boleto: {
     ativo: true,
     parcelasMax: 3,
-    quem: "sócios do Estrela Bonita", // para quem é o boleto: aparece no selo da compra e no passo 3 do "Como comprar"
-    publico: "Só para sócios do Estrela Bonita",
+    quem: "sócios do Núcleo Estrela Bonita", // para quem é o boleto: aparece no selo da compra e no passo 3 do "Como comprar"
+    publico: "Para sócios do Núcleo Estrela Bonita",
     aviso: "O valor irá no seu boleto do mês subsequente. Se parcelar, cada parcela vai no boleto de um mês.",
-    semNome: "Não encontrou o seu nome? O boleto é só para sócios do Estrela Bonita: fale com o núcleo ou pague com Pix ou cartão.",
+    semNome: "Não encontrou o seu nome? O boleto é só para sócios do Núcleo Estrela Bonita: fale com o núcleo ou pague com Pix ou cartão.",
   },
   pagbank: {
     ativo: true,

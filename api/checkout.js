@@ -11,7 +11,7 @@ const pagbankBase = () =>
 
 const POST = async (req) => {
   if (!PAGAMENTO.pagbank?.ativo) throw new HttpError(403, "Pix e cartão ainda não estão disponíveis. Use o boleto.");
-  const token = process.env.PAGBANK_TOKEN;
+  const token = (process.env.PAGBANK_TOKEN || "").trim(); // espaço ou quebra de linha colados junto com o token
   if (!token) throw new HttpError(503, "O pagamento ainda não foi configurado. Fale com a gente para concluir o pedido.");
 
   const body = await readJSON(req);
@@ -24,7 +24,8 @@ const POST = async (req) => {
   const referencia = novaReferencia(retirada);
   const pedido = {
     reference_id: referencia,
-    expiration_date: new Date(Date.now() + 2 * 86400_000).toISOString(),
+    // no formato do exemplo do PagBank (2023-08-14T19:09:10-03:00), em horário de Brasília
+    expiration_date: new Date(Date.now() + 2 * 86400_000 - 3 * 3600_000).toISOString().slice(0, 19) + "-03:00",
     customer: {
       name: cliente.nome, email: cliente.email, tax_id: cliente.cpf,
       phone: { country: "+55", area: cliente.area, number: cliente.numero },
@@ -81,7 +82,10 @@ const POST = async (req) => {
   const pagar = d && Array.isArray(d.links) && d.links.find((l) => l.rel === "PAY");
   if (!r.ok || !pagar) {
     console.error("PagBank checkout:", r.status, JSON.stringify(d).slice(0, 1000));
-    throw new HttpError(502, "Não conseguimos abrir o pagamento agora. Tente de novo em instantes.");
+    // o motivo que o PagBank devolveu vai junto na mensagem, para saber o que corrigir
+    const motivo = (Array.isArray(d?.error_messages) ? d.error_messages : [])
+      .map((e) => [e.parameter_name, e.description || e.error || e.code].filter(Boolean).join(": ")).filter(Boolean).join("; ");
+    throw new HttpError(502, `Não conseguimos abrir o pagamento agora. Tente de novo em instantes. (PagBank ${r.status}${motivo ? `: ${motivo}` : ""})`.slice(0, 400));
   }
   console.log("Checkout criado:", referencia, d.id, `${total} peça(s)`, `frete ${frete.id} ${frete.valor}`);
 

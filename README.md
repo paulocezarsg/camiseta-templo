@@ -5,7 +5,7 @@ Landing page de venda da camiseta comemorativa da inauguração do templo do **N
 - A camiseta é **amarela** (cor única), em dois modelos: **Básica** (adulto, PP ao G5) e **Infantil** (2 a 10 anos). A pessoa escolhe **modelo, tamanho e quantidade**, pode juntar modelos e tamanhos diferentes na **sacola** e escolhe a **retirada grátis no núcleo** (já marcada) ou o **frete dos Correios** (PAC e SEDEX, com valor e prazo, digitando o CEP).
 - Duas formas de pagamento:
   - **Pix ou cartão em até 3x sem juros, pelo PagBank**, para **qualquer pessoa**. A pessoa informa nome, e-mail, celular e CPF e paga na página segura do PagBank; o pedido passa a "pago" sozinho quando o PagBank confirma.
-  - **Boleto em até 3x**, só para os **sócios do Estrela Bonita** (a lista de cadastrados do núcleo): a pessoa acha o próprio nome, escolhe as parcelas e, na hora de confirmar, digita o nome e sobrenome.
+  - **Boleto em até 3x**, só para os **sócios do Núcleo Estrela Bonita** (a lista de cadastrados do núcleo): a pessoa acha o próprio nome, escolhe as parcelas e, na hora de confirmar, digita o nome e sobrenome.
 - O **acesso admin** pede a senha e baixa na hora uma **planilha Excel** com todos os pedidos.
 
 Detalhes técnicos (rotas da API, formato dos pedidos, banco e regras) para quem for manter ou integrar o código: [`DESENVOLVEDOR.md`](DESENVOLVEDOR.md).
@@ -56,7 +56,7 @@ Os pedidos de teste ficam na planilha (marcados com a data e o nome). Para apaga
 
 O valor vai no **boleto do mês subsequente** da pessoa (parcelado, cada parcela no boleto de um mês); o núcleo lança a partir da planilha do admin. O site não gera boleto bancário. A página de pedido recebido mostra a estampa da camiseta, o número do pedido, as parcelas e esse aviso.
 
-**Lista de cadastrados (sócios do Estrela Bonita):** fica em `api/_cadastrados.js`, com o **nome completo** de cada pessoa, um por linha (110 nomes, da planilha do núcleo). Para incluir alguém, acrescente uma linha; para corrigir um nome, edite a linha e faça o deploy de novo (no GitHub, basta salvar a alteração). A lista não é publicada como arquivo: a busca devolve no máximo 8 nomes por vez, só para quem digitou pelo menos 3 letras.
+**Lista de cadastrados (sócios do Núcleo Estrela Bonita):** fica em `api/_cadastrados.js`, com o **nome completo** de cada pessoa, um por linha (110 nomes, da planilha do núcleo). Para incluir alguém, acrescente uma linha; para corrigir um nome, edite a linha e faça o deploy de novo (no GitHub, basta salvar a alteração). A lista não é publicada como arquivo: a busca devolve no máximo 8 nomes por vez, só para quem digitou pelo menos 3 letras.
 
 ```js
 export const CADASTRADOS = [
@@ -125,7 +125,7 @@ Tudo em `produto.js`:
 | `index.html` | A loja (capa, compra, templo, vídeo, estampa, palavras, tabela de medidas, como comprar — só no computador —, sacola e finalização). No celular, uma barra de compra fixa aparece a partir da escolha do modelo e do tamanho, com a escolha, o valor e o botão **Comprar**, que leva direto à sacola. |
 | `obrigado.html` | Página de pedido recebido, com as parcelas e os próximos passos. |
 | `admin.html` | Acesso admin: senha e download da planilha, e o painel de pedidos (lista e alteração). |
-| `api/_cadastrados.js` | **Lista de cadastrados** (sócios do Estrela Bonita, nomes completos). |
+| `api/_cadastrados.js` | **Lista de cadastrados** (sócios do Núcleo Estrela Bonita, nomes completos). |
 | `api/cadastro.js` | Busca de nomes na lista. |
 | `api/boleto.js` | Registra o pedido no boleto: confere o nome na lista, recalcula preço e frete no servidor, divide em parcelas e guarda no banco com o nome confirmado. |
 | `api/admin.js` e `api/_xlsx.js` | Confere a senha e gera a planilha Excel (sem dependências). |

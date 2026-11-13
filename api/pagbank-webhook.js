@@ -7,7 +7,7 @@ import { HttpError, json, rota, bancoPronto, lerPedido, salvarPedido } from "./_
 const STATUS = { PAID: "pago", AUTHORIZED: "pago", AVAILABLE: "pago", IN_ANALYSIS: "em análise", WAITING: "aguardando", DECLINED: "recusado", CANCELED: "cancelado" };
 
 const POST = async (req) => {
-  const token = process.env.PAGBANK_TOKEN;
+  const token = (process.env.PAGBANK_TOKEN || "").trim();
   if (!token) throw new HttpError(503, "PagBank não configurado.");
   const corpo = await req.text();
   const recebido = Buffer.from(req.headers.get("x-authenticity-token") || "");

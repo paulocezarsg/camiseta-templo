@@ -19,7 +19,7 @@ Este pacote é o site completo, igual ao que está publicado na Vercel. O `READM
 | `produto.js` | Configuração e regras: evento, textos, vídeo, preço, modelos, tamanhos, medidas, formas de pagamento, retirada, `parcelasDe()`. |
 | `correios.js` | Tabela de frete (PAC e SEDEX) por trecho e faixa de peso; `calcularFrete(cep, qtd, dias)`. Origem: `ORIGEM_UF = "SP"`. |
 | `fotos/` | Imagens em WebP (e uma JPG para compartilhamento). A galeria da compra segue a lista `PRODUTO.cores[].fotos`. |
-| `api/_cadastrados.js` | Lista de nomes completos de quem pode comprar no boleto: os sócios do Estrela Bonita (110 nomes). |
+| `api/_cadastrados.js` | Lista de nomes completos de quem pode comprar no boleto: os sócios do Núcleo Estrela Bonita (110 nomes). |
 | `api/_lib.js` | Utilitários: respostas JSON, erros, leitura do corpo, rota por método, senha (scrypt), Redis REST, limite de tentativas, pedidos. |
 | `api/_pedido.js` | Leitura e validação da sacola, cliente, entrega e da lista de cadastrados (busca e conferência). |
 | `api/_xlsx.js` | Gerador de `.xlsx` sem dependências (abas de tabela e aba de painel). |
