@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Camiseta da Inauguração do Templo · Núcleo Estrela Bonita</title>
-<meta name="description" content="Camiseta comemorativa da inauguração do templo do Núcleo Estrela Bonita, nos modelos básica e infantil. Escolha o tamanho, retire grátis no núcleo ou receba pelos Correios em todo o Brasil, e pague com Pix, cartão em até 3x ou boleto (cadastrados no núcleo).">
+<meta name="description" content="Camiseta comemorativa da inauguração do templo do Núcleo Estrela Bonita, nos modelos básica e infantil. Escolha o tamanho, retire grátis no núcleo ou receba pelos Correios em todo o Brasil, e pague com Pix, cartão em até 3x ou boleto (sócios do Estrela Bonita).">
 <meta name="theme-color" content="#451b0a">
 <meta property="og:type" content="product">
 <meta property="og:title" content="Camiseta da Inauguração do Templo · Núcleo Estrela Bonita">
@@ -872,7 +872,7 @@ body.travado .barra.ver{transform:translateY(calc(100% + 40px));opacity:0;pointe
     <ol class="arcos">
       <li class="arco-passo aparece"><span class="num">01</span><span class="janela"><svg class="ico"><use href="#i-camisa"/></svg></span><h3>Escolha</h3><p>O modelo (básica ou infantil), o tamanho e quantas peças quiser, tudo na mesma sacola.</p></li>
       <li class="arco-passo aparece"><span class="num">02</span><span class="janela"><svg class="ico"><use href="#i-pin"/></svg></span><h3>Entrega ou retirada</h3><p>Retire grátis no núcleo ou digite o seu CEP e veja na hora o valor e o prazo do PAC e do SEDEX.</p></li>
-      <li class="arco-passo aparece" data-passo-pagamento><span class="num">03</span><span class="janela"><svg class="ico"><use href="#i-boleto"/></svg></span><h3>Pague no boleto</h3><p></p></li>
+      <li class="arco-passo aparece" data-passo-pagamento><span class="num">03</span><span class="janela"><svg class="ico"><use href="#i-cartao"/></svg></span><h3>Pague como preferir</h3><p>Pix ou cartão em até 3x sem juros, pelo PagBank. Sócios do Estrela Bonita também podem pagar no boleto, em até 3x.</p></li>
       <li class="arco-passo aparece"><span class="num">04</span><span class="janela"><svg class="ico"><use href="#i-caixa"/></svg></span><h3>Retire ou receba</h3><p>Retire no núcleo ou receba pelos Correios: postamos em até <b data-dias-postar></b> dias úteis após a confirmação, com rastreio.</p></li>
     </ol>
   </div>
@@ -906,7 +906,7 @@ body.travado .barra.ver{transform:translateY(calc(100% + 40px));opacity:0;pointe
       </div>
       <div class="vendedor">
         <h4>Loja</h4>
-        <p style="margin:0">Vendido por <a data-site-principal target="_blank" rel="noopener"><span data-vendedor></span></a>.<br><span data-rodape-pagamento></span></p>
+        <p style="margin:0">Desenvolvido por <span data-desenvolvedor></span>.<br><span data-rodape-pagamento></span></p>
         <div class="contatos" data-contatos></div>
       </div>
     </div>
@@ -963,12 +963,12 @@ body.travado .barra.ver{transform:translateY(calc(100% + 40px));opacity:0;pointe
           </div>
           <div class="bloco" data-bloco-cadastro>
             <h4><span class="num">2</span> Seu nome no cadastro</h4>
-            <p class="bloco-sub">Como você já é cadastrado no núcleo, é só achar o seu nome: não precisa preencher os seus dados.</p>
+            <p class="bloco-sub">O boleto é só para sócios do Estrela Bonita. Ache o seu nome na lista: não precisa preencher os seus dados.</p>
             <div data-busca-area>
               <div class="campos">
                 <label>Digite o seu nome e escolha na lista<input name="busca" autocomplete="off" autocapitalize="words" spellcheck="false" enterkeyhint="search" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="sugestoes-nome" placeholder="Ex.: Maria da Silva"><span class="msg">Escolha o seu nome na lista.</span></label>
               </div>
-              <ul class="sugestoes" id="sugestoes-nome" role="listbox" aria-label="Nomes cadastrados" data-sugestoes hidden></ul>
+              <ul class="sugestoes" id="sugestoes-nome" role="listbox" aria-label="Sócios do Estrela Bonita" data-sugestoes hidden></ul>
               <p class="busca-info" data-busca-info aria-live="polite"></p>
             </div>
             <div class="escolhido" data-escolhido hidden>
@@ -1091,7 +1091,7 @@ const st = {
   servico: RETIRADA?.ativa ? "RETIRADA" : "PAC", // a retirada no núcleo já vem marcada
   forma: BOLETO ? "boleto" : PAGBANK ? "pagbank" : "",
   parcelas: 1,
-  cadastro: cadastroGuardado, // nome escolhido na lista de cadastrados (boleto)
+  cadastro: cadastroGuardado, // nome escolhido na lista de sócios (boleto)
 };
 const qtdSacola = () => st.sacola.reduce((s, i) => s + i.qtd, 0);
 const salvarSacola = () => guardado.gravar("eb-sacola", st.sacola);
@@ -1142,10 +1142,10 @@ const reservado = (texto) => `<div class="reservado"><b>${icone("pincel")} Texto
 
 /* ===================== textos e seções ===================== */
 /* ===================== textos de pagamento ===================== */
-/* Dependem do que está ligado em PAGAMENTO (produto.js): boleto (cadastrados) e Pix/cartão pelo PagBank (todos). */
+/* Dependem do que está ligado em PAGAMENTO (produto.js): boleto (sócios) e Pix/cartão pelo PagBank (todos). */
 const minuscula = (t) => String(t || "").charAt(0).toLowerCase() + String(t || "").slice(1);
 function textoParcelasPreco(preco) {
-  // o parcelamento do cartão vale para qualquer pessoa; o do boleto, só para os cadastrados
+  // o parcelamento do cartão vale para qualquer pessoa; o do boleto, só para os sócios
   if (PAGBANK && PRODUTO.parcelasSemJuros > 1) return `ou <b>${PRODUTO.parcelasSemJuros}x de ${brl(parcelasDe(preco, PRODUTO.parcelasSemJuros).at(-1))}</b> sem juros`;
   if (BOLETO?.parcelasMax > 1) return `ou <b>${BOLETO.parcelasMax}x de ${brl(parcelasDe(preco, BOLETO.parcelasMax).at(-1))}</b> no boleto`;
   return PAGBANK ? "à vista no Pix ou no cartão" : "à vista no boleto";
@@ -1161,16 +1161,17 @@ function pintarTextosPagamento() {
   const n = BOLETO?.parcelasMax || 1;
   const chips = [BOLETO && "<span>BOLETO</span>", PAGBANK && "<span>PIX</span><span>CARTÃO</span>"].filter(Boolean).join("");
   const selo = BOLETO && PAGBANK
-    ? `<span>${icone("cadeado")} Pix ou cartão em até ${PRODUTO.parcelasMax}x pelo PagBank, ou boleto para cadastrados</span>`
+    ? `<span>${icone("cadeado")} Pix ou cartão em até ${PRODUTO.parcelasMax}x pelo PagBank, ou boleto para ${esc(BOLETO.quem || "cadastrados")}</span>`
     : BOLETO
     ? `<span>${icone("escudo")} Boleto${n > 1 ? ` em até ${n}x` : ""}, ${esc(minuscula(BOLETO.publico))}</span>`
     : `<span>${icone("cadeado")} Pagamento processado pelo PagBank</span>`;
   $$("[data-selo-pagamento]").forEach((el) => (el.innerHTML = `${selo}<span class="metodos">${chips}</span>`));
   const passo = $("[data-passo-pagamento]");
-  if (passo) passo.innerHTML = `<span class="num">03</span><span class="janela">${icone(BOLETO ? "boleto" : "cadeado")}</span>` + (
+  const cartao = `Pix ou cartão em até ${PRODUTO.parcelasMax}x${PRODUTO.parcelasSemJuros >= PRODUTO.parcelasMax ? " sem juros" : ""}, pelo PagBank`;
+  if (passo) passo.innerHTML = `<span class="num">03</span><span class="janela">${icone(PAGBANK ? "cartao" : BOLETO ? "boleto" : "cadeado")}</span>` + (
     BOLETO && !PAGBANK ? `<h3>Pague no boleto</h3><p>Em até ${n}x, ${esc(minuscula(BOLETO.publico))}: é só escolher o seu nome.</p>`
-    : BOLETO ? `<h3>Pague como preferir</h3><p>No boleto em até ${n}x (cadastrados no núcleo) ou no PagBank, com Pix ou cartão em até ${PRODUTO.parcelasMax}x.</p>`
-    : `<h3>Pague com segurança</h3><p>No PagBank, com Pix ou cartão em até ${PRODUTO.parcelasMax}x.</p>`);
+    : BOLETO ? `<h3>Pague como preferir</h3><p>${cartao}. ${esc(BOLETO.quem ? BOLETO.quem.charAt(0).toUpperCase() + BOLETO.quem.slice(1) : "Cadastrados")} também podem pagar no boleto, em até ${n}x.</p>`
+    : `<h3>Pague com segurança</h3><p>${cartao}.</p>`);
   $$("[data-rodape-pagamento]").forEach((el) => (el.textContent = PAGBANK && BOLETO ? "Pix e cartão processados pelo PagBank; boleto emitido pelo núcleo." : PAGBANK ? "Pagamento processado pelo PagBank." : "Pagamento no boleto, emitido pelo núcleo."));
   $$("[data-boleto-aviso]").forEach((el) => (el.textContent = BOLETO?.aviso || ""));
 }
@@ -1186,14 +1187,13 @@ function preencherTextos() {
     "data-evento-data": EVENTO.data ? ` · ${EVENTO.data}` : "", "data-frase": EVENTO.frase,
     "data-nome": p.nome, "data-edicao": p.edicao, "data-preco": brl(p.preco),
     "data-parcelas-max": p.parcelasMax, "data-dias-postar": p.diasParaPostar, "data-ano-atual": new Date().getFullYear(),
-    "data-vendedor": LOJA.nome,
+    "data-desenvolvedor": LOJA.desenvolvedor || "",
   };
   for (const [attr, txt] of Object.entries(textos)) $$(`[${attr}]`).forEach((el) => (el.textContent = txt));
   $$("[data-preco-de]").forEach((el) => { el.textContent = p.precoDe ? brl(p.precoDe) : ""; el.hidden = !p.precoDe; });
   if (p.precoDe > p.preco) { const d = $("[data-desconto]"); d.hidden = false; d.textContent = `-${Math.round((1 - p.preco / p.precoDe) * 100)}%`; }
   $$("[data-parcelas-texto]").forEach((el) => (el.innerHTML = textoParcelasPreco(p.preco)));
   pintarTextosPagamento();
-  $$("[data-site-principal]").forEach((a) => (a.href = LOJA.site));
 
   // herói: a camiseta recortada, integrada à luz do fundo
   const fotoCapa = p.capa || p.cores[0].fotos?.[0];
@@ -1679,7 +1679,7 @@ const regras = {
   confirmacao: (v) => v.trim().split(/\s+/).filter(Boolean).length >= 2,
   rua: (v) => !!v.trim(), numero: (v) => !!v.trim(), bairro: (v) => !!v.trim(), cidade: (v) => !!v.trim(), uf: (v) => UFS.includes(v),
 };
-/* Formas de pagamento ligadas em produto.js: boleto (só cadastrados) e Pix ou cartão pelo PagBank (qualquer pessoa).
+/* Formas de pagamento ligadas em produto.js: boleto (só sócios) e Pix ou cartão pelo PagBank (qualquer pessoa).
    Com uma forma só, não há o que escolher: com só o boleto, o bloco vira "Pagamento no boleto". */
 function pintarFormas() {
   const opcoes = [];
@@ -1853,7 +1853,7 @@ function marcarSugestao(i) {
   if (li) { $("[name=busca]").setAttribute("aria-activedescendant", li.id); li.scrollIntoView({ block: "nearest" }); }
 }
 function mostrarSugestoes(d, termo) {
-  if (!d.pronta) { fecharSugestoes(); infoBusca("A lista de cadastrados ainda não foi carregada. Fale com o núcleo para fazer o seu pedido.", true); return; }
+  if (!d.pronta) { fecharSugestoes(); infoBusca("A lista de sócios ainda não foi carregada. Fale com o núcleo ou pague com Pix ou cartão.", true); return; }
   if (!d.resultados.length) { fecharSugestoes(); infoBusca(`Nenhum nome encontrado com “${termo}”. Confira como está escrito ou digite só o primeiro nome. ${BOLETO?.semNome || ""}`.trim(), true); return; }
   busca.itens = d.resultados;
   const ul = $("[data-sugestoes]");

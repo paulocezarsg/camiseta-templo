@@ -51,7 +51,7 @@ export const VIDEO = {
 };
 
 /* Formas de pagamento.
-   boleto: só para quem está na lista de cadastrados (api/_cadastrados.js), em até parcelasMax vezes.
+   boleto: só para os sócios do Estrela Bonita (a lista de nomes fica em api/_cadastrados.js), em até parcelasMax vezes.
      Não passa pelo PagBank: o pedido fica registrado e o valor vai no boleto do mês subsequente (a planilha do admin traz tudo).
    pagbank: Pix e cartão pelo PagBank, para qualquer pessoa (não precisa estar na lista). Precisa das variáveis
      PAGBANK_TOKEN e PAGBANK_AMBIENTE=producao na Vercel. Com ativo: false, some da loja e a rota do checkout recusa o pedido. */
@@ -59,9 +59,10 @@ export const PAGAMENTO = {
   boleto: {
     ativo: true,
     parcelasMax: 3,
-    publico: "Para irmãos cadastrados no núcleo",
+    quem: "sócios do Estrela Bonita", // para quem é o boleto: aparece no selo da compra e no passo 3 do "Como comprar"
+    publico: "Só para sócios do Estrela Bonita",
     aviso: "O valor irá no seu boleto do mês subsequente. Se parcelar, cada parcela vai no boleto de um mês.",
-    semNome: "Não encontrou o seu nome? Fale com o núcleo.",
+    semNome: "Não encontrou o seu nome? O boleto é só para sócios do Estrela Bonita: fale com o núcleo ou pague com Pix ou cartão.",
   },
   pagbank: {
     ativo: true,
@@ -82,8 +83,9 @@ export const RETIRADA = {
   aviso: "Retire a sua camiseta no núcleo.",
 };
 
-// Quem vende: aparece no rodapé ("Vendido por ...") e na fatura do cartão.
+// Loja: o nome de quem desenvolveu aparece no rodapé ("Desenvolvido por ..."); descricaoFatura vai na fatura do cartão.
 export const LOJA = {
+  desenvolvedor: "Paulo Gonçalves",
   nome: "Cruzeiro Gestão",
   site: "https://www.cruzeirogestao.com.br/",
   // Preencha o que quiser mostrar no rodapé; campos vazios não aparecem.
@@ -117,8 +119,11 @@ export const PRODUTO = {
   cores: [
     {
       id: "amarela", nome: "Amarela", hex: "#a06d2a",
-      // na ordem da galeria: frente e costas sem modelo, depois com o modelo
-      fotos: ["fotos/camiseta-frente.webp", "fotos/camiseta-costas.webp", "fotos/camiseta-modelo-frente.webp", "fotos/camiseta-modelo-lado.webp"],
+      // na ordem da galeria: frente e costas sem modelo, depois vestidas
+      fotos: [
+        "fotos/camiseta-frente.webp", "fotos/camiseta-costas.webp", "fotos/camiseta-modelo-frente.webp",
+        "fotos/camiseta-modelo-feminina.webp", "fotos/camiseta-modelo-lado.webp",
+      ],
     },
   ],
 

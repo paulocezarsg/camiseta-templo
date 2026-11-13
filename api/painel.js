@@ -94,7 +94,7 @@ async function alterar(body) {
   let cliente = pedido.cliente || {};
   if (!mesmoNome(d.nome, cliente.nome)) {
     const pessoa = cadastroPorNome(d.nome);
-    if (!pessoa) throw new HttpError(400, "Escolha um nome da lista de cadastrados.", { campo: "nome" });
+    if (!pessoa) throw new HttpError(400, "Escolha um nome da lista de sócios.", { campo: "nome" });
     cliente = { ...cliente, nome: pessoa.nome, cadastroId: pessoa.id };
   }
   const { itens, total: pecas, subtotal } = lerItens(d.itens);

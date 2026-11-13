@@ -212,7 +212,7 @@ h1,h2,h3{font-family:Fraunces,Georgia,serif;font-weight:600;letter-spacing:-.01e
     </div>
     <form data-form-alterar novalidate>
       <div class="msg erro" data-erro-alterar hidden></div>
-      <label class="campo">Comprador (da lista de cadastrados)<input name="nome" list="cadastrados" autocomplete="off" spellcheck="false"><small>Comece a digitar e escolha o nome na lista.</small></label>
+      <label class="campo">Comprador (da lista de sócios)<input name="nome" list="cadastrados" autocomplete="off" spellcheck="false"><small>Comece a digitar e escolha o nome na lista.</small></label>
       <div class="grupo"><b>Camisetas</b><div class="grupo" data-itens></div><button class="mais" type="button" data-mais-item>+ Adicionar item</button></div>
       <div class="grupo"><b>Entrega</b><div class="opcoes" data-entregas></div>
         <div class="endereco" data-endereco>
@@ -527,7 +527,7 @@ fa.addEventListener("submit", async (e) => {
   $$(".invalido", fa).forEach((l) => l.classList.remove("invalido"));
   $("[data-erro-alterar]").hidden = true;
   const itens = itensDoForm(), ent = marcado("entrega");
-  if (!fa.elements.nome.value.trim()) return marcarErro("nome", "Escolha o comprador na lista de cadastrados.");
+  if (!fa.elements.nome.value.trim()) return marcarErro("nome", "Escolha o comprador na lista de sócios.");
   const qtdRuim = $$("[data-item]", fa).find((d) => !(Number($("[data-qtd]", d).value) >= 1));
   if (qtdRuim) { qtdRuim.querySelector(".campo:nth-child(3)").classList.add("invalido"); $("[data-erro-alterar]").textContent = "Informe a quantidade de cada item."; $("[data-erro-alterar]").hidden = false; return; }
   if (ent !== "RETIRADA") {

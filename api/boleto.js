@@ -18,7 +18,7 @@ const POST = async (req) => {
   const body = await readJSON(req);
   const { itens, total, subtotal } = lerItens(body.itens);
   const pessoa = cadastroPorId(body.cadastro);
-  if (!pessoa) throw new HttpError(400, "Escolha o seu nome na lista de cadastrados.", { campo: "cadastro" });
+  if (!pessoa) throw new HttpError(400, "Escolha o seu nome na lista de sócios.", { campo: "cadastro" });
   const confirmacao = linha(body.confirmacao, 120);
   if (confirmacao.split(" ").length < 2) throw new HttpError(400, "Confirme o seu nome e sobrenome.", { campo: "confirmacao" });
   const n = Number(body.parcelas);

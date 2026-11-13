@@ -200,9 +200,9 @@ function montarPainel(vale, pp, pedidos = []) {
       return [n === 1 ? "À vista (1x)" : `${n}x`, ped.length, soma(ped, (p) => p.total), noBoleto.length ? ped.length / noBoleto.length : 0, ped.length];
     }), "Nenhum pedido no boleto ainda.");
 
-  // Forma de pagamento: boleto (cadastrados) e Pix/cartão pelo PagBank
-  const formaCurta = (p) => ehBoleto(p) ? "Boleto (cadastrados)" : METODO[p.pagamento?.metodo] ? `${METODO[p.pagamento.metodo]} (PagBank)` : "PagBank";
-  const formas = ["Boleto (cadastrados)", "Pix (PagBank)", "Cartão de crédito (PagBank)", "Cartão de débito (PagBank)"];
+  // Forma de pagamento: boleto (sócios) e Pix/cartão pelo PagBank
+  const formaCurta = (p) => ehBoleto(p) ? "Boleto (sócios)" : METODO[p.pagamento?.metodo] ? `${METODO[p.pagamento.metodo]} (PagBank)` : "PagBank";
+  const formas = ["Boleto (sócios)", "Pix (PagBank)", "Cartão de crédito (PagBank)", "Cartão de débito (PagBank)"];
   for (const p of vale) if (!formas.includes(formaCurta(p))) formas.push(formaCurta(p));
   tabela("Forma de pagamento", ["Forma", "Pedidos", "Peças", "Valor"], [P.inteiro, P.inteiro, P.moeda],
     formas.map((f) => {
