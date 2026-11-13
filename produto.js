@@ -62,10 +62,12 @@ export const PAGAMENTO = {
     quem: "sócios do Núcleo Estrela Bonita", // para quem é o boleto: aparece no selo da compra e no passo 3 do "Como comprar"
     publico: "Para sócios do Núcleo Estrela Bonita",
     aviso: "O valor irá no seu boleto do mês subsequente. Se parcelar, cada parcela vai no boleto de um mês.",
-    semNome: "Não encontrou o seu nome? O boleto é só para sócios do Núcleo Estrela Bonita: fale com o núcleo ou pague com Pix ou cartão.",
+    semNome: "Não encontrou o seu nome? O boleto é só para sócios do Núcleo Estrela Bonita: fale com o núcleo.",
   },
   pagbank: {
-    ativo: true,
+    // desligado até o PagBank homologar a conta (hoje ele responde 403 "Allowlist access required");
+    // quando liberar, é só trocar para true: o token já está na Vercel.
+    ativo: false,
     metodos: ["PIX", "CREDIT_CARD", "DEBIT_CARD"],
   },
 };

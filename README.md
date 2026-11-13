@@ -4,7 +4,7 @@ Landing page de venda da camiseta comemorativa da inauguração do templo do **N
 
 - A camiseta é **amarela** (cor única), em dois modelos: **Básica** (adulto, PP ao G5) e **Infantil** (2 a 10 anos). A pessoa escolhe **modelo, tamanho e quantidade**, pode juntar modelos e tamanhos diferentes na **sacola** e escolhe a **retirada grátis no núcleo** (já marcada) ou o **frete dos Correios** (PAC e SEDEX, com valor e prazo, digitando o CEP).
 - Duas formas de pagamento:
-  - **Pix ou cartão em até 3x sem juros, pelo PagBank**, para **qualquer pessoa**. A pessoa informa nome, e-mail, celular e CPF e paga na página segura do PagBank; o pedido passa a "pago" sozinho quando o PagBank confirma.
+  - **Pix ou cartão em até 3x sem juros, pelo PagBank**, para **qualquer pessoa** — **desligado por enquanto**, até o PagBank homologar a conta (veja "Pix e cartão (PagBank)" abaixo). Quando ligado, a pessoa informa nome, e-mail, celular e CPF e paga na página segura do PagBank; o pedido passa a "pago" sozinho quando o PagBank confirma.
   - **Boleto em até 3x**, só para os **sócios do Núcleo Estrela Bonita** (a lista de cadastrados do núcleo): a pessoa acha o próprio nome, escolhe as parcelas e, na hora de confirmar, digita o nome e sobrenome.
 - O **acesso admin** pede a senha e baixa na hora uma **planilha Excel** com todos os pedidos.
 
@@ -180,7 +180,9 @@ Com o [Vercel CLI](https://vercel.com/docs/cli) instalado e o projeto ligado (`v
 
 ## Pix e cartão (PagBank)
 
-Ligado (`pagbank.ativo: true` em `produto.js`), para qualquer pessoa, com o cartão em até 3x sem juros (`PRODUTO.parcelasMax` e `PRODUTO.parcelasSemJuros`; o custo do parcelamento fica com o vendedor). Para desligar, troque `ativo` para `false`: a opção some da loja e a rota do checkout recusa o pedido.
+**Situação:** desligado (`pagbank.ativo: false` em `produto.js`). O token está na Vercel e o código está pronto, mas o PagBank responde `403 Allowlist access required. Contact PagBank.`: a conta ainda precisa ser **homologada** pelo PagBank para usar a API de Checkout em produção. Peça a homologação no portal de desenvolvedores do PagBank ou pelo atendimento.
+
+**Para religar** depois da liberação: troque `ativo` para `true` em `produto.js`. A opção "Pix ou cartão" volta para qualquer pessoa, com o cartão em até 3x sem juros (`PRODUTO.parcelasMax` e `PRODUTO.parcelasSemJuros`; o custo do parcelamento fica com o vendedor), e os textos da loja (selo da compra, passo 3 do "Como comprar", rodapé e mensagens da busca do nome) passam a citar o Pix e o cartão sozinhos. Se o PagBank recusar algo, a mensagem de erro na finalização traz o motivo dele entre parênteses.
 
 Na Vercel ficam as variáveis abaixo. O token sai do PagBank, em **Vendas → Integrações → Gerar Token** (se já foi gerado antes, o PagBank manda por e-mail; gerar um novo desativa o antigo).
 

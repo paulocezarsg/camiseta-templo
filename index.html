@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Camiseta da Inauguração do Templo · Núcleo Estrela Bonita</title>
-<meta name="description" content="Camiseta comemorativa da inauguração do templo do Núcleo Estrela Bonita, nos modelos básica e infantil. Escolha o tamanho, retire grátis no núcleo ou receba pelos Correios em todo o Brasil, e pague com Pix, cartão em até 3x ou boleto (sócios do Núcleo Estrela Bonita).">
+<meta name="description" content="Camiseta comemorativa da inauguração do templo do Núcleo Estrela Bonita, nos modelos básica e infantil. Escolha o tamanho, retire grátis no núcleo ou receba pelos Correios em todo o Brasil,.">
 <meta name="theme-color" content="#451b0a">
 <meta property="og:type" content="product">
 <meta property="og:title" content="Camiseta da Inauguração do Templo · Núcleo Estrela Bonita">
@@ -872,7 +872,7 @@ body.travado .barra.ver{transform:translateY(calc(100% + 40px));opacity:0;pointe
     <ol class="arcos">
       <li class="arco-passo aparece"><span class="num">01</span><span class="janela"><svg class="ico"><use href="#i-camisa"/></svg></span><h3>Escolha</h3><p>O modelo (básica ou infantil), o tamanho e quantas peças quiser, tudo na mesma sacola.</p></li>
       <li class="arco-passo aparece"><span class="num">02</span><span class="janela"><svg class="ico"><use href="#i-pin"/></svg></span><h3>Entrega ou retirada</h3><p>Retire grátis no núcleo ou digite o seu CEP e veja na hora o valor e o prazo do PAC e do SEDEX.</p></li>
-      <li class="arco-passo aparece" data-passo-pagamento><span class="num">03</span><span class="janela"><svg class="ico"><use href="#i-cartao"/></svg></span><h3>Pague como preferir</h3><p>Pix ou cartão em até 3x sem juros, pelo PagBank. Sócios do Núcleo Estrela Bonita também podem pagar no boleto, em até 3x.</p></li>
+      <li class="arco-passo aparece" data-passo-pagamento><span class="num">03</span><span class="janela"><svg class="ico"><use href="#i-cadeado"/></svg></span><h3>Pague com segurança</h3><p></p></li>
       <li class="arco-passo aparece"><span class="num">04</span><span class="janela"><svg class="ico"><use href="#i-caixa"/></svg></span><h3>Retire ou receba</h3><p>Retire no núcleo ou receba pelos Correios: postamos em até <b data-dias-postar></b> dias úteis após a confirmação, com rastreio.</p></li>
     </ol>
   </div>
@@ -1853,8 +1853,8 @@ function marcarSugestao(i) {
   if (li) { $("[name=busca]").setAttribute("aria-activedescendant", li.id); li.scrollIntoView({ block: "nearest" }); }
 }
 function mostrarSugestoes(d, termo) {
-  if (!d.pronta) { fecharSugestoes(); infoBusca("A lista de sócios ainda não foi carregada. Fale com o núcleo ou pague com Pix ou cartão.", true); return; }
-  if (!d.resultados.length) { fecharSugestoes(); infoBusca(`Nenhum nome encontrado com “${termo}”. Confira como está escrito ou digite só o primeiro nome. ${BOLETO?.semNome || ""}`.trim(), true); return; }
+  if (!d.pronta) { fecharSugestoes(); infoBusca(`A lista de sócios ainda não foi carregada. Fale com o núcleo${PAGBANK ? " ou pague com Pix ou cartão" : ""}.`, true); return; }
+  if (!d.resultados.length) { fecharSugestoes(); infoBusca(`Nenhum nome encontrado com “${termo}”. Confira como está escrito ou digite só o primeiro nome. ${BOLETO?.semNome || ""}${PAGBANK ? " Quem não é sócio pode pagar com Pix ou cartão." : ""}`.trim(), true); return; }
   busca.itens = d.resultados;
   const ul = $("[data-sugestoes]");
   ul.innerHTML = d.resultados.map((c, i) => `<li role="option" id="nome-op-${i}" data-i="${i}">${esc(c.nome)}</li>`).join("");

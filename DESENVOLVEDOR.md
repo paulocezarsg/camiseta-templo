@@ -27,7 +27,7 @@ Este pacote é o site completo, igual ao que está publicado na Vercel. O `READM
 | `api/boleto.js` | `POST` cria o pedido no boleto. |
 | `api/admin.js` | `POST` gera a planilha Excel. |
 | `api/painel.js` | `POST` listar, alterar, cancelar e reativar pedidos. |
-| `api/checkout.js`, `api/pagbank-webhook.js` | PagBank (Pix e cartão), ligado em `PAGAMENTO.pagbank.ativo` (`produto.js`). |
+| `api/checkout.js`, `api/pagbank-webhook.js` | PagBank (Pix e cartão), ligado e desligado em `PAGAMENTO.pagbank.ativo` (`produto.js`). Hoje desligado: a conta aguarda a homologação do PagBank (403 `Allowlist access required`). |
 
 Arquivos que começam com `_` não viram rota na Vercel e não são publicados como arquivo estático.
 
