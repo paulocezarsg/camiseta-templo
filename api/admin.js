@@ -37,7 +37,7 @@ export default rota({ POST });
 
 /* ===================== conteúdo da planilha ===================== */
 const STATUS = {
-  "aguardando-boleto": "Pedido registrado", "aguardando-pix": "Aguardando conferência do Pix", aguardando: "Aguardando pagamento", pago: "Pago",
+  "aguardando-boleto": "Pedido registrado", "aguardando-pix": "Aguardando conferência do Pix", "pix-informado": "Pix informado (a conferir)", aguardando: "Aguardando pagamento", pago: "Pago",
   "em análise": "Em análise", recusado: "Recusado", cancelado: "Cancelado",
 };
 const METODO = { PIX: "Pix", CREDIT_CARD: "Cartão de crédito", DEBIT_CARD: "Cartão de débito", BOLETO: "Boleto PagBank" };
@@ -48,8 +48,8 @@ const formaDe = (p) => ehBoleto(p) ? "Boleto" : ehPix(p) ? "Pix (QR Code)" : ["P
 const statusDe = (p) => STATUS[p.status] || p.status || "";
 const entregaDe = (p) => p.entrega?.tipo === "RETIRADA" ? (RETIRADA?.nome || "Retirada") : p.entrega?.tipo ? `Correios ${p.entrega.tipo}` : "";
 // entra na contagem de produção: pedido no boleto ou pago no PagBank (fora cancelados e recusados)
-const conta = (p) => !["cancelado", "recusado"].includes(p.status) && (ehBoleto(p) || ["pago", "em análise"].includes(p.status));
-// (o Pix do QR Code só fica "pago" depois de conferido no extrato e confirmado no painel)
+const conta = (p) => !["cancelado", "recusado"].includes(p.status) && (ehBoleto(p) || ["pago", "em análise"].includes(p.status) || (ehPix(p) && p.status === "pix-informado"));
+// (o Pix do QR Code entra quando o comprador aperta "Já paguei" ou quando o núcleo confirma no painel)
 
 const cpfFmt = (c) => (c = String(c || "").replace(/\D/g, "")).length === 11 ? c.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4") : c;
 function celularDe(c = {}) {
@@ -305,6 +305,7 @@ function montarAbas(pedidos) {
     { titulo: "UF", largura: 5, valor: (p) => endereco(p).uf },
     { titulo: "Pago em (PagBank)", tipo: "data", largura: 17, valor: pagoEm, opcional: true },
     { titulo: "TXID do Pix", largura: 26, valor: (p) => (ehPix(p) ? p.pagamento?.txid : ""), opcional: true },
+    { titulo: "Pix informado em", tipo: "data", largura: 17, valor: (p) => (ehPix(p) && p.pagamento?.informadoEm) || "", opcional: true },
     { titulo: "Pix confirmado em", tipo: "data", largura: 17, valor: pixConf, opcional: true },
     { titulo: "Pix confirmado por", largura: 22, valor: (p) => (ehPix(p) ? p.pagamento?.confirmadoPor : ""), opcional: true },
     // feitas no painel de pedidos

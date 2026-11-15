@@ -59,6 +59,13 @@ a.btn:hover{background:var(--cafe-3)}
 .pix textarea{width:100%;min-height:86px;resize:none;padding:10px 12px;border-radius:12px;border:1px solid var(--linho);background:var(--creme);font:12.5px/1.45 ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--tinta);word-break:break-all}
 .pix button{margin:10px 0 0;width:100%;padding:14px 18px;border:0;border-radius:999px;background:var(--mostarda);color:var(--cafe);font:700 15px Montserrat,system-ui,sans-serif;cursor:pointer}
 .pix button:hover{background:var(--mostarda-2)}
+.pix .pago{margin:16px 0 0;background:var(--cafe);color:var(--creme)}
+.pix .pago:hover{background:var(--cafe-3)}
+.pix .pago:disabled{opacity:.6;cursor:default}
+.pix .erro{margin:8px 0 0;color:#b3261e;font-weight:600;font-size:13.5px}
+.feito{margin:0 0 22px;padding:22px 20px;border-radius:22px;background:#e9f4e6;box-shadow:inset 0 0 0 1px #cfe5c9;color:#24531f}
+.feito b{display:block;font:600 21px/1.25 Fraunces,Georgia,serif;color:#24531f;margin:0 0 4px}
+.feito span{font-size:14.5px}
 .pix .copiado{margin:8px 0 0;color:#2f7a33;font-weight:600;font-size:13.5px}
 .pix .dados{margin:16px 0 0;padding:12px 0 0;border-top:1px dashed var(--linho);display:grid;gap:4px;text-align:left;font-size:13.5px}
 .pix .dados div{display:flex;justify-content:space-between;gap:12px}
@@ -90,7 +97,10 @@ a.btn:hover{background:var(--cafe-3)}
         <div><em>Recebedor</em><b>CEBUDV Estrela Bonita</b></div>
         <div><em>Identificador (TXID)</em><b id="pix-txid"></b></div>
       </div>
+      <button type="button" class="pago" id="pix-pago">Já paguei</button>
+      <p class="erro" id="pix-erro" role="alert" hidden></p>
     </section>
+    <div class="feito" id="pix-feito" role="status" hidden><b>Pagamento informado!</b><span>Seu pedido está registrado. O núcleo confere o Pix no extrato; se houver algum problema, entramos em contato.</span></div>
     <div class="aviso" id="aviso" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4M7.5 14.5h3"/></svg><span></span></div>
     <ol id="passos">
       <li class="passo"><span>1</span>Pix e cartão costumam ser confirmados em minutos.</li>
@@ -157,10 +167,35 @@ a.btn:hover{background:var(--cafe-3)}
       } catch { $("pix-qr").hidden = true; }
       $("pix").hidden = false;
     };
+    // depois do "Já paguei": o pedido fica encerrado, como no boleto
+    const encerrado = () => {
+      $("pix").hidden = true; $("pix-feito").hidden = false;
+      $("intro").textContent = "Seu pedido foi registrado.";
+      passos[0].innerHTML = "<span>1</span>Você informou o pagamento do Pix.";
+    };
+    const statusDoServidor = () => fetch("api/pix?pedido=" + encodeURIComponent(ref)).then((r) => (r.ok ? r.json() : null)).catch(() => null);
     let ultimo = null;
     try { ultimo = JSON.parse(localStorage.getItem("eb-ultimo-pedido") || "null"); } catch { /* sem armazenamento */ }
     if (ultimo && ultimo.referencia === ref && ultimo.copiaECola) mostrar(ultimo);
-    else fetch("api/pix?pedido=" + encodeURIComponent(ref)).then((r) => (r.ok ? r.json() : null)).then((p) => { if (p?.copiaECola) mostrar(p); }).catch(() => {});
+    statusDoServidor().then((p) => {
+      if (!p?.copiaECola) return;
+      if (["pix-informado", "pago"].includes(p.status)) encerrado();
+      else if ($("pix").hidden) mostrar(p);
+    });
+    $("pix-pago").addEventListener("click", async () => {
+      const b = $("pix-pago"); b.disabled = true; b.textContent = "Registrando...";
+      $("pix-erro").hidden = true;
+      try {
+        const r = await fetch("api/pix", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ acao: "ja-paguei", pedido: ref }) });
+        const d = await r.json().catch(() => ({}));
+        if (!r.ok) throw new Error(d.error || "Não conseguimos registrar agora. Tente de novo.");
+        encerrado();
+        scrollTo({ top: 0, behavior: "smooth" });
+      } catch (e) {
+        $("pix-erro").textContent = e.message === "Failed to fetch" ? "Sem conexão. Confira a internet e tente de novo." : e.message;
+        $("pix-erro").hidden = false; b.disabled = false; b.textContent = "Já paguei";
+      }
+    });
     $("pix-copiar").addEventListener("click", async () => {
       const campo = $("pix-codigo");
       try { await navigator.clipboard.writeText(campo.value); }

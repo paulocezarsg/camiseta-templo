@@ -28,7 +28,7 @@ async function exigirSenha(req, senha) {
 
 /* ===================== textos para o histórico ===================== */
 const brl = (c) => (Number(c || 0) / 100).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-const STATUS = { "aguardando-boleto": "Pedido registrado", "aguardando-pix": "Aguardando conferência do Pix", pago: "Pix confirmado", cancelado: "Cancelado" };
+const STATUS = { "aguardando-boleto": "Pedido registrado", "aguardando-pix": "Aguardando conferência do Pix", "pix-informado": "Pix informado pelo comprador", pago: "Pix confirmado", cancelado: "Cancelado" };
 const textoItens = (itens = []) => itens.map((i) => `${i.qtd}× ${i.modelo || PRODUTO.modelos[0].nome} ${i.tamanho}`).join(", ");
 function textoEntrega(e = {}) {
   if (e.tipo === "RETIRADA") return RETIRADA?.nome || "Retirada no núcleo";
@@ -93,9 +93,9 @@ async function reativar(body) {
 async function confirmarPix(body) {
   const { pedido, por } = await pedidoParaMexer(body, "confirmados", true);
   if (pedido.forma !== "pix") throw new HttpError(400, "Só os pedidos no Pix são confirmados aqui.");
-  if (pedido.status !== "aguardando-pix") throw new HttpError(400, pedido.status === "pago" ? "Este Pix já foi confirmado." : "Reative o pedido antes de confirmar o Pix.");
+  if (!["aguardando-pix", "pix-informado"].includes(pedido.status)) throw new HttpError(400, pedido.status === "pago" ? "Este Pix já foi confirmado." : "Reative o pedido antes de confirmar o Pix.");
   const novo = { ...pedido, status: "pago", pagamento: { ...pedido.pagamento, confirmadoEm: Date.now(), confirmadoPor: por } };
-  return registrar(pedido, novo, por, [{ campo: "Status", de: STATUS["aguardando-pix"], para: STATUS.pago }]);
+  return registrar(pedido, novo, por, [{ campo: "Status", de: STATUS[pedido.status], para: STATUS.pago }]);
 }
 
 async function alterar(body) {

@@ -326,11 +326,12 @@ const STATUS = {
   "aguardando-boleto": ["registrado", "Pedido registrado"], cancelado: ["cancelado", "Cancelado"], pago: ["registrado", "Pago"],
   aguardando: ["pagbank", "Aguardando pagamento"], "em análise": ["pagbank", "Pagamento em análise"], recusado: ["cancelado", "Recusado"],
   "aguardando-pix": ["pix", "Pix a conferir"],
+  "pix-informado": ["pix", "Pix informado · conferir"],
 };
 const ativo = (p) => !["cancelado", "recusado"].includes(p.status);
 // o que entra nas somas (e na planilha): boleto não cancelado, Pix do QR Code confirmado ou Pix/cartão já pago no PagBank
-const vale = (p) => ativo(p) && (p.forma === "boleto" || ["pago", "em análise"].includes(p.status));
-const pixAConferir = (p) => p.forma === "pix" && p.status === "aguardando-pix";
+const vale = (p) => ativo(p) && (p.forma === "boleto" || ["pago", "em análise", "pix-informado"].includes(p.status));
+const pixAConferir = (p) => p.forma === "pix" && ["aguardando-pix", "pix-informado"].includes(p.status);
 const METODO = { PIX: "Pix", CREDIT_CARD: "cartão de crédito", DEBIT_CARD: "cartão de débito" };
 const celularTexto = (c) => { const n = String(c || "").replace(/\D/g, ""); return n.length === 11 ? n.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3") : n.length === 10 ? n.replace(/(\d{2})(\d{4})(\d{4})/, "($1) $2-$3") : n; };
 function pagamentoTexto(p) {
@@ -421,6 +422,7 @@ function cartao(p) {
       <span><b>${brl(p.total)}</b> · ${esc(pagamentoTexto(p))}</span>
       ${p.forma !== "boleto" && (p.cliente?.email || p.cliente?.celular) ? `<span>${esc([p.cliente.email, celularTexto(p.cliente.celular)].filter(Boolean).join(" · "))}</span>` : ""}
       ${p.forma === "pix" ? `<span class="txid">TXID do Pix: <b>${esc(p.pagamento?.txid)}</b></span>` : ""}
+      ${p.forma === "pix" && p.pagamento?.informadoEm ? `<span>O comprador apertou “Já paguei” em ${dataHora(p.pagamento.informadoEm)}</span>` : ""}
       ${p.forma === "pix" && p.pagamento?.confirmadoEm ? `<span class="pix-ok">Pix confirmado por ${esc(p.pagamento.confirmadoPor)} em ${dataHora(p.pagamento.confirmadoEm)}</span>` : ""}
       ${p.cliente?.nomeConfirmado ? `<span>Confirmou como “${esc(p.cliente.nomeConfirmado)}”</span>` : ""}
       ${p.observacao ? `<span class="obs">Obs.: ${esc(p.observacao)}</span>` : ""}
@@ -428,7 +430,7 @@ function cartao(p) {
     </div>
     <div class="pedido-acoes">
       ${p.forma === "pix" ? (p.status === "cancelado" ? `<button class="btn btn-linha mini" type="button" data-reativar>Reativar pedido</button>`
-          : `${p.status === "aguardando-pix" ? `<button class="btn mini btn-ok" type="button" data-confirmar-pix>Confirmar Pix recebido</button>` : ""}<button class="btn btn-perigo mini" type="button" data-cancelar>Cancelar pedido</button>`)
+          : `${pixAConferir(p) ? `<button class="btn mini btn-ok" type="button" data-confirmar-pix>Confirmar Pix recebido</button>` : ""}<button class="btn btn-perigo mini" type="button" data-cancelar>Cancelar pedido</button>`)
         : p.forma !== "boleto" ? `<small>${p.status === "pago" ? "Pago pelo PagBank" : "Pix ou cartão pelo PagBank"}: não pode ser alterado aqui.</small>`
         : p.status === "cancelado" ? `<button class="btn btn-linha mini" type="button" data-reativar>Reativar pedido</button>`
         : `<button class="btn btn-linha mini" type="button" data-alterar>Alterar</button><button class="btn btn-perigo mini" type="button" data-cancelar>Cancelar pedido</button>`}
