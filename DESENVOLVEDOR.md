@@ -17,6 +17,8 @@ Este pacote é o site completo, igual ao que está publicado na Vercel. O `READM
 | `obrigado.html` | Página de pedido recebido (lê `?pedido=` e `?forma=boleto` e o último pedido do `localStorage`). |
 | `admin.html` | Acesso admin (baixa a planilha) e painel de pedidos (lista, alteração, cancelamento). |
 | `produto.js` | Configuração e regras: evento, textos, vídeo, preço, modelos, tamanhos, medidas, formas de pagamento, retirada, `parcelasDe()`. |
+| `pix.js` | Pix estático (BR Code): `pixCopiaECola({ recebedor, valor, txid })` com CRC16/CCITT-FALSE e `txidDoPedido(ref)`. |
+| `vendor/qrcode.js` | qrcode-generator 1.4.4 (MIT), para desenhar o QR Code na página de obrigado. |
 | `correios.js` | Tabela de frete (PAC e SEDEX) por trecho e faixa de peso; `calcularFrete(cep, qtd, dias)`. Origem: `ORIGEM_UF = "SP"`. |
 | `fotos/` | Imagens em WebP (e uma JPG para compartilhamento). A galeria da compra segue a lista `PRODUTO.cores[].fotos`. |
 | `api/_cadastrados.js` | Lista de nomes completos de quem pode comprar no boleto: os sócios do Núcleo Estrela Bonita (110 nomes). |
@@ -57,6 +59,9 @@ Busca na lista de cadastrados (mínimo de 3 letras, sem acento e sem maiúsculas
   "endereco": null, "confirmacao": "Marcelo Martinatti" }
 ```
 `frete`: `RETIRADA`, `PAC` ou `SEDEX` (com `endereco: { cep, rua, numero, complemento, bairro, cidade, uf }`). `confirmacao` é o nome e sobrenome digitados pela pessoa (pelo menos duas palavras, sem conferência com a lista). Responde `{ referencia, total, parcelas: [centavos...] }`. Sem banco configurado, responde `503` e não registra.
+
+### `POST /api/pix` e `GET /api/pix?pedido=REF`
+POST com `{ itens, cliente: { nome, email, celular }, frete, endereco }`: grava o pedido (`forma: "pix"`, `status: "aguardando-pix"`, `pagamento: { metodo: "PIX", txid, copiaECola, chave }`) e responde `{ referencia, total, copiaECola, txid }`. GET devolve o mesmo código para reabrir o QR. No painel, `{ "acao": "confirmar-pix", "ref", "por" }` passa o pedido a `pago` (com `pagamento.confirmadoEm` e `confirmadoPor`); só então ele entra na planilha.
 
 ### `POST /api/checkout` (PagBank)
 ```json

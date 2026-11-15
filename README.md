@@ -3,7 +3,8 @@
 Landing page de venda da camiseta comemorativa da inauguração do templo do **Núcleo Estrela Bonita** (2027), publicada em **camiseta.cruzeirogestao.com.br**. O rodapé traz "Desenvolvido por Paulo Gonçalves" (`LOJA.desenvolvedor` em `produto.js`).
 
 - A camiseta é **amarela** (cor única), em dois modelos: **Básica** (adulto, PP ao G5) e **Infantil** (2 a 10 anos). A pessoa escolhe **modelo, tamanho e quantidade**, pode juntar modelos e tamanhos diferentes na **sacola** e escolhe a **retirada grátis no núcleo** (já marcada) ou o **frete dos Correios** (PAC e SEDEX, com valor e prazo, digitando o CEP).
-- Duas formas de pagamento:
+- Formas de pagamento:
+  - **Pix pelo QR Code do núcleo**, para **qualquer pessoa** (veja "Pix pelo QR Code do núcleo" abaixo).
   - **Pix ou cartão em até 3x sem juros, pelo PagBank**, para **qualquer pessoa** — **desligado por enquanto**, até o PagBank homologar a conta (veja "Pix e cartão (PagBank)" abaixo). Quando ligado, a pessoa informa nome, e-mail, celular e CPF e paga na página segura do PagBank; o pedido passa a "pago" sozinho quando o PagBank confirma.
   - **Boleto em até 3x**, só para os **sócios do Núcleo Estrela Bonita** (a lista de cadastrados do núcleo): a pessoa acha o próprio nome, escolhe as parcelas e, na hora de confirmar, digita o nome e sobrenome.
 - O **acesso admin** pede a senha e baixa na hora uma **planilha Excel** com todos os pedidos.
@@ -177,6 +178,18 @@ Ficam em `fotos/`, em WebP (e uma JPG para compartilhamento em redes sociais):
 ## Testar no computador (opcional)
 
 Com o [Vercel CLI](https://vercel.com/docs/cli) instalado e o projeto ligado (`vercel link`), rode `vercel env pull` para trazer as variáveis do banco e depois `vercel dev`. Abra `http://localhost:3000`.
+
+## Pix pelo QR Code do núcleo
+
+Ligado em `PAGAMENTO.pix` (`produto.js`), com a chave `tes.estrelabonita@udv.org.br`, recebedor **CEBUDV Estrela Bonita**, cidade **BERTIOGA**. Não passa pelo PagBank:
+
+1. Na finalização, a pessoa escolhe **Pix**, informa nome, e-mail e celular (sem CPF) e clica em **Gerar o Pix**.
+2. O pedido é gravado como **"Pix a conferir"** e a página de obrigado mostra o **QR Code**, o **Pix copia e cola** (com o valor do pedido) e o **identificador (TXID)**, que é o número do pedido sem os traços. O link da página reabre o QR a qualquer momento.
+3. O núcleo confere no extrato do banco o Pix com aquele valor (e, se o banco mostrar, o TXID) e, no **Painel de pedidos**, filtro **Pix a conferir**, clica em **Confirmar Pix recebido** (pede o nome de quem confere e a senha do painel). O pedido passa a **Pago** e entra na planilha.
+
+O Pix do QR Code **não se confirma sozinho**: enquanto não for confirmado no painel, o pedido não entra na planilha. Pedidos no Pix podem ser cancelados e reativados no painel (o reativado volta para "Pix a conferir"), mas não alterados, porque o valor está no código. Na planilha, a aba **Pedidos** traz as colunas **TXID do Pix**, **Pix confirmado em** e **Pix confirmado por**, e o **Painel** conta o "Pix (QR Code)" na tabela de forma de pagamento. Quando o Pix e o cartão do PagBank forem liberados, desligue este (`pix.ativo: false`).
+
+O código segue o padrão BR Code do Banco Central (`pix.js`, com CRC16) e o QR Code é desenhado na página pela biblioteca `vendor/qrcode.js` (qrcode-generator, licença MIT).
 
 ## Pix e cartão (PagBank)
 

@@ -53,6 +53,9 @@ export const VIDEO = {
 /* Formas de pagamento.
    boleto: só para os sócios do Núcleo Estrela Bonita (a lista de nomes fica em api/_cadastrados.js), em até parcelasMax vezes.
      Não passa pelo PagBank: o pedido fica registrado e o valor vai no boleto do mês subsequente (a planilha do admin traz tudo).
+   pix: Pix estático (QR Code e copia e cola) direto na chave do núcleo, para qualquer pessoa. Não passa pelo PagBank:
+     o pedido fica "aguardando conferência" até o núcleo achar o Pix no extrato (pelo valor e pelo txid) e
+     confirmar no painel de pedidos. Desligue (ativo: false) quando o Pix e o cartão do PagBank forem liberados.
    pagbank: Pix e cartão pelo PagBank, para qualquer pessoa (não precisa estar na lista). Precisa das variáveis
      PAGBANK_TOKEN e PAGBANK_AMBIENTE=producao na Vercel. Com ativo: false, some da loja e a rota do checkout recusa o pedido. */
 export const PAGAMENTO = {
@@ -63,6 +66,11 @@ export const PAGAMENTO = {
     publico: "Para sócios do Núcleo Estrela Bonita",
     aviso: "O valor irá no seu boleto do mês subsequente. Se parcelar, cada parcela vai no boleto de um mês.",
     semNome: "Não encontrou o seu nome? O boleto é só para sócios do Núcleo Estrela Bonita: fale com o núcleo.",
+  },
+  pix: {
+    ativo: true,
+    recebedor: { chave: "tes.estrelabonita@udv.org.br", nome: "CEBUDV Estrela Bonita", cidade: "BERTIOGA" },
+    aviso: "Pague com o QR Code ou o Pix copia e cola. O núcleo confere o Pix e confirma o seu pedido.",
   },
   pagbank: {
     // desligado até o PagBank homologar a conta (hoje ele responde 403 "Allowlist access required");

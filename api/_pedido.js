@@ -26,14 +26,14 @@ export function lerItens(lista) {
 /* Itens como ficam guardados no pedido (e na planilha do admin). */
 export const itensParaSalvar = (itens) => itens.map((i) => ({ cor: i.cor.nome, modelo: i.modelo.nome, tamanho: i.tamanho, qtd: i.qtd, unitario: i.preco }));
 
-export function lerCliente(c = {}) {
+export function lerCliente(c = {}, { cpf: pedeCpf = true } = {}) {
   const nome = linha(c.nome, 120);
   const email = linha(c.email, 120).toLowerCase();
   const cpf = digitos(c.cpf);
   const cel = digitos(c.celular).replace(/^55(?=\d{10,11}$)/, "");
   if (nome.split(" ").length < 2) throw new HttpError(400, "Informe o nome completo.");
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new HttpError(400, "Informe um e-mail válido.");
-  if (!cpfValido(cpf)) throw new HttpError(400, "Informe um CPF válido.");
+  if (pedeCpf && !cpfValido(cpf)) throw new HttpError(400, "Informe um CPF válido.");
   if (cel.length < 10 || cel.length > 11) throw new HttpError(400, "Informe o celular com DDD.");
   return { nome, email, cpf, area: cel.slice(0, 2), numero: cel.slice(2) };
 }

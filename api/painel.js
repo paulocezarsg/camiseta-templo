@@ -6,7 +6,9 @@
    POST { acao: "alterar", senha, ref, por, dados }       -> { pedido }
      dados: { nome, itens: [{ cor, modelo, tamanho, qtd }], entrega: "RETIRADA"|"PAC"|"SEDEX", endereco, parcelas, observacao }
    POST { acao: "cancelar", senha, ref, por, motivo }     -> { pedido }   (sai das somas da planilha)
-   POST { acao: "reativar", senha, ref, por }             -> { pedido }   (desfaz um cancelamento) */
+   POST { acao: "reativar", senha, ref, por }             -> { pedido }   (desfaz um cancelamento)
+   POST { acao: "confirmar-pix", senha, ref, por }        -> { pedido }   (Pix conferido no extrato: o pedido passa a valer)
+   Pedidos no Pix (QR Code do núcleo) podem ser confirmados, cancelados e reativados; só os no boleto podem ser alterados. */
 import { HttpError, json, rota, readJSON, bancoPronto, dentroDoLimite, redis, ipDe, listarPedidos, lerPedido, salvarPedido, confereSenha, linha } from "./_lib.js";
 import { lerItens, itensParaSalvar, lerEntrega, entregaParaSalvar, cadastroPorNome, nomesCadastrados, mesmoNome } from "./_pedido.js";
 import { PRODUTO, PAGAMENTO, RETIRADA, parcelasDe } from "../produto.js";
@@ -26,7 +28,7 @@ async function exigirSenha(req, senha) {
 
 /* ===================== textos para o histórico ===================== */
 const brl = (c) => (Number(c || 0) / 100).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-const STATUS = { "aguardando-boleto": "Pedido registrado", cancelado: "Cancelado" };
+const STATUS = { "aguardando-boleto": "Pedido registrado", "aguardando-pix": "Aguardando conferência do Pix", pago: "Pix confirmado", cancelado: "Cancelado" };
 const textoItens = (itens = []) => itens.map((i) => `${i.qtd}× ${i.modelo || PRODUTO.modelos[0].nome} ${i.tamanho}`).join(", ");
 function textoEntrega(e = {}) {
   if (e.tipo === "RETIRADA") return RETIRADA?.nome || "Retirada no núcleo";
@@ -48,11 +50,13 @@ function diferencas(antes, depois) {
 }
 
 /* ===================== ações ===================== */
-// pedido no boleto que existe e o nome de quem está mexendo nele
-async function pedidoParaMexer(body, verbo) {
+// pedido que existe (no boleto, ou também no Pix quando aceitaPix) e o nome de quem está mexendo nele
+async function pedidoParaMexer(body, verbo, aceitaPix = false) {
   const pedido = await lerPedido(linha(body.ref, 60));
   if (!pedido) throw new HttpError(404, "Pedido não encontrado.");
-  if (pedido.forma !== "boleto") throw new HttpError(400, `Só os pedidos no boleto podem ser ${verbo} aqui.`);
+  if (!(pedido.forma === "boleto" || (aceitaPix && pedido.forma === "pix"))) {
+    throw new HttpError(400, `Só os pedidos no boleto${aceitaPix ? " ou no Pix" : ""} podem ser ${verbo} aqui.`);
+  }
   const por = linha(body.por, 80);
   if (por.replace(/[^\p{L}]/gu, "").length < 2) throw new HttpError(400, "Informe o seu nome (quem está fazendo a mudança).", { campo: "por" });
   return { pedido, por };
@@ -67,7 +71,7 @@ async function registrar(pedido, novo, por, mudancas) {
 }
 
 async function cancelar(body) {
-  const { pedido, por } = await pedidoParaMexer(body, "cancelados");
+  const { pedido, por } = await pedidoParaMexer(body, "cancelados", true);
   if (pedido.status === "cancelado") throw new HttpError(400, "Este pedido já está cancelado.");
   const motivo = linha(body.motivo, 300);
   const novo = { ...pedido, status: "cancelado", cancelamento: { em: Date.now(), por, motivo } };
@@ -77,11 +81,21 @@ async function cancelar(body) {
 }
 
 async function reativar(body) {
-  const { pedido, por } = await pedidoParaMexer(body, "reativados");
+  const { pedido, por } = await pedidoParaMexer(body, "reativados", true);
   if (pedido.status !== "cancelado") throw new HttpError(400, "Este pedido não está cancelado.");
   const { cancelamento, ...resto } = pedido;
-  const novo = { ...resto, status: "aguardando-boleto" };
-  return registrar(pedido, novo, por, [{ campo: "Status", de: "Cancelado", para: STATUS["aguardando-boleto"] }]);
+  // no Pix, volta para "aguardando conferência" (a confirmação é feita de novo)
+  const status = pedido.forma === "pix" ? "aguardando-pix" : "aguardando-boleto";
+  const novo = { ...resto, status, ...(pedido.forma === "pix" ? { pagamento: { ...pedido.pagamento, confirmadoEm: null, confirmadoPor: null } } : {}) };
+  return registrar(pedido, novo, por, [{ campo: "Status", de: "Cancelado", para: STATUS[status] }]);
+}
+
+async function confirmarPix(body) {
+  const { pedido, por } = await pedidoParaMexer(body, "confirmados", true);
+  if (pedido.forma !== "pix") throw new HttpError(400, "Só os pedidos no Pix são confirmados aqui.");
+  if (pedido.status !== "aguardando-pix") throw new HttpError(400, pedido.status === "pago" ? "Este Pix já foi confirmado." : "Reative o pedido antes de confirmar o Pix.");
+  const novo = { ...pedido, status: "pago", pagamento: { ...pedido.pagamento, confirmadoEm: Date.now(), confirmadoPor: por } };
+  return registrar(pedido, novo, por, [{ campo: "Status", de: STATUS["aguardando-pix"], para: STATUS.pago }]);
 }
 
 async function alterar(body) {
@@ -124,6 +138,7 @@ const POST = async (req) => {
   if (body.acao === "alterar") return json({ pedido: await alterar(body) });
   if (body.acao === "cancelar") return json({ pedido: await cancelar(body) });
   if (body.acao === "reativar") return json({ pedido: await reativar(body) });
+  if (body.acao === "confirmar-pix") return json({ pedido: await confirmarPix(body) });
   throw new HttpError(400, "Ação inválida.");
 };
 

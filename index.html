@@ -983,8 +983,9 @@ body.travado .barra.ver{transform:translateY(calc(100% + 40px));opacity:0;pointe
               <label>Nome completo<input name="nome" autocomplete="name" required><span class="msg">Informe nome e sobrenome.</span></label>
               <label class="m3">E-mail<input name="email" type="email" autocomplete="email" inputmode="email" required><span class="msg">E-mail inválido.</span></label>
               <label class="m3">Celular (WhatsApp)<input name="celular" autocomplete="tel-national" inputmode="tel" placeholder="(00) 00000-0000" required><span class="msg">Informe o celular com DDD.</span></label>
-              <label class="m3">CPF<input name="cpf" inputmode="numeric" placeholder="000.000.000-00" required><span class="msg">CPF inválido.</span></label>
+              <label class="m3" data-campo-cpf>CPF<input name="cpf" inputmode="numeric" placeholder="000.000.000-00" required><span class="msg">CPF inválido.</span></label>
             </div>
+            <p class="nota-boleto" data-pix-nota hidden><svg class="ico"><use href="#i-pix"/></svg><span>Na próxima tela aparecem o QR Code e o Pix copia e cola, com a chave do núcleo. Depois de pagar, o núcleo confere o Pix e confirma o seu pedido.</span></p>
           </div>
           <div class="bloco bloco-retirada" data-bloco-retirada hidden>
             <h4><span class="num">2</span> Retirada</h4>
@@ -1078,6 +1079,10 @@ const umaCor = PRODUTO.cores.length === 1;
 // formas de pagamento ligadas em produto.js (o PagBank fica travado até ser liberado)
 const BOLETO = PAGAMENTO.boleto?.ativo ? PAGAMENTO.boleto : null;
 const PAGBANK = PAGAMENTO.pagbank?.ativo ? PAGAMENTO.pagbank : null;
+// Pix estático com a chave do núcleo (QR Code e copia e cola), para qualquer pessoa
+const PIX = PAGAMENTO.pix?.ativo ? PAGAMENTO.pix : null;
+// a forma aberta a qualquer pessoa, para os textos ("pague com ...")
+const OUTRA = PAGBANK ? "Pix ou cartão" : PIX ? "Pix" : "";
 const cadastroGuardado = (() => {
   const c = guardado.ler("eb-cadastro", null);
   return c && typeof c.id === "string" && typeof c.nome === "string" ? { id: c.id, nome: c.nome } : null;
@@ -1089,7 +1094,7 @@ const st = {
   sacola: guardado.ler("eb-sacola", []).map((i) => (i && !i.modelo ? { ...i, modelo: PRODUTO.modelos[0].id } : i)).filter(itemValido),
   cep: "", // o CEP vale só enquanto a página está aberta; não fica salvo
   servico: RETIRADA?.ativa ? "RETIRADA" : "PAC", // a retirada no núcleo já vem marcada
-  forma: BOLETO ? "boleto" : PAGBANK ? "pagbank" : "",
+  forma: BOLETO ? "boleto" : PIX ? "pix" : PAGBANK ? "pagbank" : "",
   parcelas: 1,
   cadastro: cadastroGuardado, // nome escolhido na lista de sócios (boleto)
 };
@@ -1159,8 +1164,11 @@ function textoParcelas(total, n) {
 }
 function pintarTextosPagamento() {
   const n = BOLETO?.parcelasMax || 1;
-  const chips = [BOLETO && "<span>BOLETO</span>", PAGBANK && "<span>PIX</span><span>CARTÃO</span>"].filter(Boolean).join("");
-  const selo = BOLETO && PAGBANK
+  const chips = [BOLETO && "<span>BOLETO</span>", (PAGBANK || PIX) && "<span>PIX</span>", PAGBANK && "<span>CARTÃO</span>"].filter(Boolean).join("");
+  const quem = BOLETO?.quem || "cadastrados";
+  const selo = BOLETO && PIX && !PAGBANK
+    ? `<span>${icone("escudo")} Pix para todos, ou boleto em até ${n}x para ${esc(quem)}</span>`
+    : BOLETO && PAGBANK
     ? `<span>${icone("cadeado")} Pix ou cartão em até ${PRODUTO.parcelasMax}x pelo PagBank, ou boleto para ${esc(BOLETO.quem || "cadastrados")}</span>`
     : BOLETO
     ? `<span>${icone("escudo")} Boleto${n > 1 ? ` em até ${n}x` : ""}, ${esc(minuscula(BOLETO.publico))}</span>`
@@ -1168,11 +1176,15 @@ function pintarTextosPagamento() {
   $$("[data-selo-pagamento]").forEach((el) => (el.innerHTML = `${selo}<span class="metodos">${chips}</span>`));
   const passo = $("[data-passo-pagamento]");
   const cartao = `Pix ou cartão em até ${PRODUTO.parcelasMax}x${PRODUTO.parcelasSemJuros >= PRODUTO.parcelasMax ? " sem juros" : ""}, pelo PagBank`;
-  if (passo) passo.innerHTML = `<span class="num">03</span><span class="janela">${icone(PAGBANK ? "cartao" : BOLETO ? "boleto" : "cadeado")}</span>` + (
-    BOLETO && !PAGBANK ? `<h3>Pague no boleto</h3><p>Em até ${n}x, ${esc(minuscula(BOLETO.publico))}: é só escolher o seu nome.</p>`
-    : BOLETO ? `<h3>Pague como preferir</h3><p>${cartao}. ${esc(BOLETO.quem ? BOLETO.quem.charAt(0).toUpperCase() + BOLETO.quem.slice(1) : "Cadastrados")} também podem pagar no boleto, em até ${n}x.</p>`
+  const Quem = quem.charAt(0).toUpperCase() + quem.slice(1);
+  if (passo) passo.innerHTML = `<span class="num">03</span><span class="janela">${icone(PAGBANK ? "cartao" : PIX ? "pix" : BOLETO ? "boleto" : "cadeado")}</span>` + (
+    BOLETO && PIX && !PAGBANK ? `<h3>Pague como preferir</h3><p>Pix para todos, pelo QR Code ou copia e cola. ${esc(Quem)} também podem pagar no boleto, em até ${n}x.</p>`
+    : PIX && !PAGBANK ? `<h3>Pague com Pix</h3><p>Pelo QR Code ou copia e cola, direto na conta do núcleo.</p>`
+    : BOLETO && !PAGBANK ? `<h3>Pague no boleto</h3><p>Em até ${n}x, ${esc(minuscula(BOLETO.publico))}: é só escolher o seu nome.</p>`
+    : BOLETO ? `<h3>Pague como preferir</h3><p>${cartao}. ${esc(Quem)} também podem pagar no boleto, em até ${n}x.</p>`
     : `<h3>Pague com segurança</h3><p>${cartao}.</p>`);
-  $$("[data-rodape-pagamento]").forEach((el) => (el.textContent = PAGBANK && BOLETO ? "Pix e cartão processados pelo PagBank; boleto emitido pelo núcleo." : PAGBANK ? "Pagamento processado pelo PagBank." : "Pagamento no boleto, emitido pelo núcleo."));
+  $$("[data-rodape-pagamento]").forEach((el) => (el.textContent = PAGBANK && BOLETO ? "Pix e cartão processados pelo PagBank; boleto emitido pelo núcleo." : PAGBANK ? "Pagamento processado pelo PagBank."
+    : PIX && BOLETO ? "Pix direto na conta do núcleo; boleto emitido pelo núcleo." : PIX ? "Pix direto na conta do núcleo." : "Pagamento no boleto, emitido pelo núcleo."));
   $$("[data-boleto-aviso]").forEach((el) => (el.textContent = BOLETO?.aviso || ""));
 }
 
@@ -1684,6 +1696,7 @@ const regras = {
 function pintarFormas() {
   const opcoes = [];
   if (BOLETO) opcoes.push({ id: "boleto", ico: "boleto", titulo: `Boleto${BOLETO.parcelasMax > 1 ? ` em até ${BOLETO.parcelasMax}x` : ""}`, sub: BOLETO.publico });
+  if (PIX) opcoes.push({ id: "pix", ico: "pix", titulo: "Pix", sub: "Para todos · QR Code ou copia e cola" });
   if (PAGBANK) opcoes.push({ id: "pagbank", ico: "cartao", titulo: "Pix ou cartão", sub: `Para todos, pelo PagBank · cartão em até ${PRODUTO.parcelasMax}x${PRODUTO.parcelasSemJuros >= PRODUTO.parcelasMax ? " sem juros" : ""}` });
   const soBoleto = opcoes.length === 1 && !!BOLETO;
   $("[data-formas]").hidden = opcoes.length < 2;
@@ -1714,14 +1727,16 @@ function pintarResumoCheckout() {
   if (st.forma === "boleto") {
     const n = st.parcelas;
     extra = `<div><span>Pagamento</span><b>${n === 1 ? "Boleto à vista" : `Boleto em ${n}x de ${brl(parcelasDe(totalCheckout(), n).at(-1))}`}</b></div>` + extra;
-  }
+  } else if (st.forma === "pix") extra = `<div><span>Pagamento</span><b>Pix à vista</b></div>` + extra;
   $("[data-resumo-checkout]").innerHTML = linhasResumo(somaSacola(), qtdSacola(), frete) + extra;
 }
 /* Mostra só os blocos que valem para a forma de pagamento e a entrega escolhidas, numerados na ordem. */
 function pintarCheckout() {
-  const boleto = st.forma === "boleto", retirada = ehRetirada();
+  const boleto = st.forma === "boleto", pix = st.forma === "pix", retirada = ehRetirada();
   $("[data-bloco-cadastro]").hidden = !boleto;
   $("[data-bloco-dados]").hidden = boleto;
+  $("[data-campo-cpf]").hidden = pix; // o Pix do núcleo não pede CPF
+  $("[data-pix-nota]").hidden = !pix;
   $("[data-parcelas-area]").hidden = !boleto || !(BOLETO?.parcelasMax > 1);
   $("[data-boleto-nota]").hidden = !boleto;
   $("[data-bloco-endereco]").hidden = retirada;
@@ -1731,9 +1746,10 @@ function pintarCheckout() {
   pintarResumoCheckout();
   $$("[data-form-checkout] > div > .bloco:not([hidden]) h4 .num").forEach((n, i) => (n.textContent = i + 1));
   const botao = $("[data-pagar]");
-  if (!botao.disabled) botao.innerHTML = boleto ? `Confirmar pedido ${icone("check")}` : `Ir para o pagamento ${icone("seta")}`;
+  if (!botao.disabled) botao.innerHTML = boleto ? `Confirmar pedido ${icone("check")}` : pix ? `Gerar o Pix ${icone("pix")}` : `Ir para o pagamento ${icone("seta")}`;
   $("[data-selo-checkout]").innerHTML = boleto
     ? `<span>${icone("escudo")} Pedido registrado direto com o núcleo</span><span class="metodos"><span>BOLETO</span></span>`
+    : pix ? `<span>${icone("escudo")} Pix direto na conta do núcleo</span><span class="metodos"><span>PIX</span></span>`
     : `<span>${icone("cadeado")} Ambiente seguro PagBank</span><span class="metodos"><span>PIX</span><span>CARTÃO</span></span>`;
 }
 function abrirCheckout() {
@@ -1774,7 +1790,7 @@ function validar(f) {
   let primeiro = null;
   const marcar = (campo, bom) => { campo.closest("label").classList.toggle("invalido", !bom); if (!bom && !primeiro) primeiro = campo; };
   if (st.forma === "boleto") marcar(f.busca, !!st.cadastro);
-  else for (const k of ["nome", "email", "celular", "cpf"]) marcar(f[k], regras[k](f[k].value));
+  else for (const k of ["nome", "email", "celular", ...(st.forma === "pix" ? [] : ["cpf"])]) marcar(f[k], regras[k](f[k].value));
   if (!ehRetirada()) for (const k of ["cep", "rua", "numero", "bairro", "cidade", "uf"]) marcar(f[k], regras[k](f[k].value));
   if (st.forma === "boleto" && st.cadastro) marcar(f.confirmacao, regras.confirmacao(f.confirmacao.value));
   primeiro?.focus();
@@ -1792,7 +1808,7 @@ async function enviarCheckout(ev) {
   if (!st.forma) { erroCheckout("Nenhuma forma de pagamento está disponível agora. Fale com o núcleo."); return; }
   if (!validar(f)) return;
   const boleto = st.forma === "boleto", rotulo = botao.innerHTML;
-  botao.disabled = true; botao.innerHTML = `<span class="giro"></span> ${boleto ? "Registrando o pedido..." : "Abrindo o PagBank..."}`;
+  botao.disabled = true; botao.innerHTML = `<span class="giro"></span> ${boleto ? "Registrando o pedido..." : st.forma === "pix" ? "Gerando o Pix..." : "Abrindo o PagBank..."}`;
   $("[data-erro-checkout]").hidden = true;
   const endereco = ehRetirada() ? null : { cep: f.cep.value, rua: f.rua.value, numero: f.numero.value, complemento: f.complemento.value, bairro: f.bairro.value, cidade: f.cidade.value, uf: f.uf.value };
   try {
@@ -1815,6 +1831,18 @@ async function enviarCheckout(ev) {
     }
     const cliente = { nome: f.nome.value, email: f.email.value, celular: f.celular.value, cpf: f.cpf.value };
     guardado.gravar("eb-cliente", cliente);
+    if (st.forma === "pix") {
+      const r = await fetch("/api/pix", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ itens: st.sacola, cliente: { nome: cliente.nome, email: cliente.email, celular: cliente.celular }, frete: st.servico, endereco }),
+      });
+      const d = await r.json().catch(() => ({}));
+      if (!r.ok || !d.copiaECola) throw new Error(d.error || "Não conseguimos gerar o Pix agora. Tente de novo em instantes.");
+      guardado.gravar("eb-ultimo-pedido", { referencia: d.referencia, quando: Date.now(), forma: "pix", nome: cliente.nome, total: d.total, copiaECola: d.copiaECola, txid: d.txid, retirada: ehRetirada() });
+      st.sacola = []; salvarSacola();
+      location.href = `obrigado?pedido=${encodeURIComponent(d.referencia)}&forma=pix`;
+      return;
+    }
     const r = await fetch("/api/checkout", {
       method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ itens: st.sacola, cliente, frete: st.servico, endereco }),
@@ -1853,8 +1881,8 @@ function marcarSugestao(i) {
   if (li) { $("[name=busca]").setAttribute("aria-activedescendant", li.id); li.scrollIntoView({ block: "nearest" }); }
 }
 function mostrarSugestoes(d, termo) {
-  if (!d.pronta) { fecharSugestoes(); infoBusca(`A lista de sócios ainda não foi carregada. Fale com o núcleo${PAGBANK ? " ou pague com Pix ou cartão" : ""}.`, true); return; }
-  if (!d.resultados.length) { fecharSugestoes(); infoBusca(`Nenhum nome encontrado com “${termo}”. Confira como está escrito ou digite só o primeiro nome. ${BOLETO?.semNome || ""}${PAGBANK ? " Quem não é sócio pode pagar com Pix ou cartão." : ""}`.trim(), true); return; }
+  if (!d.pronta) { fecharSugestoes(); infoBusca(`A lista de sócios ainda não foi carregada. Fale com o núcleo${OUTRA ? ` ou pague com ${OUTRA}` : ""}.`, true); return; }
+  if (!d.resultados.length) { fecharSugestoes(); infoBusca(`Nenhum nome encontrado com “${termo}”. Confira como está escrito ou digite só o primeiro nome. ${BOLETO?.semNome || ""}${OUTRA ? ` Quem não é sócio pode pagar com ${OUTRA}.` : ""}`.trim(), true); return; }
   busca.itens = d.resultados;
   const ul = $("[data-sugestoes]");
   ul.innerHTML = d.resultados.map((c, i) => `<li role="option" id="nome-op-${i}" data-i="${i}">${esc(c.nome)}</li>`).join("");

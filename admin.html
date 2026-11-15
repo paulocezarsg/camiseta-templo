@@ -78,6 +78,11 @@ h1,h2,h3{font-family:Fraunces,Georgia,serif;font-weight:600;letter-spacing:-.01e
 .st.registrado{background:var(--ok-soft);color:var(--ok)}
 .st.cancelado{background:var(--err-soft);color:var(--err)}
 .st.pagbank{background:#eef0fb;color:#3c4a9e}
+.st.pix{background:#e6f6f3;color:#1f7a6b}
+.pedido-info .txid b{letter-spacing:.02em;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-weight:600}
+.pedido-info .pix-ok{color:var(--ok)}
+.btn-ok{background:var(--ok);color:#fff;border-color:var(--ok)}
+.btn-ok:hover{filter:brightness(.95)}
 .st.alterado{background:var(--mostarda-4);color:var(--madeira)}
 .pedido-info{display:flex;flex-wrap:wrap;gap:4px 18px;margin-top:10px;font-size:13.5px;color:var(--cafe-2)}
 .pedido-info b{color:var(--tinta)}
@@ -195,6 +200,7 @@ h1,h2,h3{font-family:Fraunces,Georgia,serif;font-weight:600;letter-spacing:-.01e
       <div class="abas" role="group" aria-label="Filtro" data-filtros>
         <button type="button" data-filtro="todos" aria-pressed="true">Todos<em data-n="todos"></em></button>
         <button type="button" data-filtro="alterados" aria-pressed="false">Alterados<em data-n="alterados"></em></button>
+        <button type="button" data-filtro="pix" aria-pressed="false">Pix a conferir<em data-n="pix"></em></button>
         <button type="button" data-filtro="cancelados" aria-pressed="false">Cancelados<em data-n="cancelados"></em></button>
       </div>
     </div>
@@ -319,15 +325,18 @@ const formPainel = $("[data-form-painel]"), msgPainel = $("[data-msg-painel]");
 const STATUS = {
   "aguardando-boleto": ["registrado", "Pedido registrado"], cancelado: ["cancelado", "Cancelado"], pago: ["registrado", "Pago"],
   aguardando: ["pagbank", "Aguardando pagamento"], "em análise": ["pagbank", "Pagamento em análise"], recusado: ["cancelado", "Recusado"],
+  "aguardando-pix": ["pix", "Pix a conferir"],
 };
 const ativo = (p) => !["cancelado", "recusado"].includes(p.status);
-// o que entra nas somas (e na planilha): boleto não cancelado, ou Pix/cartão já pago no PagBank
+// o que entra nas somas (e na planilha): boleto não cancelado, Pix do QR Code confirmado ou Pix/cartão já pago no PagBank
 const vale = (p) => ativo(p) && (p.forma === "boleto" || ["pago", "em análise"].includes(p.status));
+const pixAConferir = (p) => p.forma === "pix" && p.status === "aguardando-pix";
 const METODO = { PIX: "Pix", CREDIT_CARD: "cartão de crédito", DEBIT_CARD: "cartão de débito" };
 const celularTexto = (c) => { const n = String(c || "").replace(/\D/g, ""); return n.length === 11 ? n.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3") : n.length === 10 ? n.replace(/(\d{2})(\d{4})(\d{4})/, "($1) $2-$3") : n; };
 function pagamentoTexto(p) {
   const n = p.pagamento?.parcelas || 1;
   if (p.forma === "boleto") return n > 1 ? `boleto em ${n}x` : "boleto à vista";
+  if (p.forma === "pix") return "Pix (QR Code do núcleo)";
   const m = METODO[p.pagamento?.metodo];
   return m ? `PagBank · ${m}${n > 1 ? ` em ${n}x` : ""}` : "PagBank (Pix ou cartão)";
 }
@@ -389,12 +398,12 @@ $("[data-filtros]").addEventListener("click", (e) => {
 
 function desenhar() {
   const todos = st.pedidos, ativos = todos.filter(vale);
-  const n = { todos: todos.length, alterados: todos.filter((p) => p.alteracoes?.length).length, cancelados: todos.filter((p) => !ativo(p)).length };
+  const n = { todos: todos.length, alterados: todos.filter((p) => p.alteracoes?.length).length, pix: todos.filter(pixAConferir).length, cancelados: todos.filter((p) => !ativo(p)).length };
   for (const [k, v] of Object.entries(n)) $(`[data-n="${k}"]`).textContent = v;
   $("[data-resumo]").textContent = `${ativos.length} ${ativos.length === 1 ? "pedido" : "pedidos"} · ${ativos.reduce((s, p) => s + (p.pecas || 0), 0)} camisetas · ${brl(ativos.reduce((s, p) => s + (p.total || 0), 0))} (fora cancelados e pagamentos não concluídos)`;
   const t = norm($("[data-busca]").value.trim());
-  const lista = todos.filter((p) => (st.filtro === "todos" || (st.filtro === "alterados" && p.alteracoes?.length) || (st.filtro === "cancelados" && !ativo(p)))
-    && (!t || norm(`${p.cliente?.nome} ${p.ref} ${p.cliente?.nomeConfirmado || ""} ${p.cliente?.email || ""}`).includes(t)));
+  const lista = todos.filter((p) => (st.filtro === "todos" || (st.filtro === "alterados" && p.alteracoes?.length) || (st.filtro === "pix" && pixAConferir(p)) || (st.filtro === "cancelados" && !ativo(p)))
+    && (!t || norm(`${p.cliente?.nome} ${p.ref} ${p.cliente?.nomeConfirmado || ""} ${p.cliente?.email || ""} ${p.pagamento?.txid || ""}`).includes(t)));
   $("[data-contagem]").textContent = lista.length === todos.length ? `${lista.length} ${lista.length === 1 ? "pedido" : "pedidos"}, do mais recente para o mais antigo` : `${lista.length} de ${todos.length} pedidos`;
   $("[data-lista]").innerHTML = lista.length ? lista.map(cartao).join("") : `<div class="vazio">${todos.length ? "Nenhum pedido com esse filtro." : "Nenhum pedido ainda."}</div>`;
 }
@@ -411,12 +420,16 @@ function cartao(p) {
       <span>${esc(textoEntrega(p.entrega))}</span>
       <span><b>${brl(p.total)}</b> · ${esc(pagamentoTexto(p))}</span>
       ${p.forma !== "boleto" && (p.cliente?.email || p.cliente?.celular) ? `<span>${esc([p.cliente.email, celularTexto(p.cliente.celular)].filter(Boolean).join(" · "))}</span>` : ""}
+      ${p.forma === "pix" ? `<span class="txid">TXID do Pix: <b>${esc(p.pagamento?.txid)}</b></span>` : ""}
+      ${p.forma === "pix" && p.pagamento?.confirmadoEm ? `<span class="pix-ok">Pix confirmado por ${esc(p.pagamento.confirmadoPor)} em ${dataHora(p.pagamento.confirmadoEm)}</span>` : ""}
       ${p.cliente?.nomeConfirmado ? `<span>Confirmou como “${esc(p.cliente.nomeConfirmado)}”</span>` : ""}
       ${p.observacao ? `<span class="obs">Obs.: ${esc(p.observacao)}</span>` : ""}
       ${p.status === "cancelado" && p.cancelamento ? `<span class="cancelado-aviso">Cancelado por ${esc(p.cancelamento.por)} em ${dataHora(p.cancelamento.em)}${p.cancelamento.motivo ? ` · Motivo: ${esc(p.cancelamento.motivo)}` : ""}</span>` : ""}
     </div>
     <div class="pedido-acoes">
-      ${p.forma !== "boleto" ? `<small>${p.status === "pago" ? "Pago pelo PagBank" : "Pix ou cartão pelo PagBank"}: não pode ser alterado aqui.</small>`
+      ${p.forma === "pix" ? (p.status === "cancelado" ? `<button class="btn btn-linha mini" type="button" data-reativar>Reativar pedido</button>`
+          : `${p.status === "aguardando-pix" ? `<button class="btn mini btn-ok" type="button" data-confirmar-pix>Confirmar Pix recebido</button>` : ""}<button class="btn btn-perigo mini" type="button" data-cancelar>Cancelar pedido</button>`)
+        : p.forma !== "boleto" ? `<small>${p.status === "pago" ? "Pago pelo PagBank" : "Pix ou cartão pelo PagBank"}: não pode ser alterado aqui.</small>`
         : p.status === "cancelado" ? `<button class="btn btn-linha mini" type="button" data-reativar>Reativar pedido</button>`
         : `<button class="btn btn-linha mini" type="button" data-alterar>Alterar</button><button class="btn btn-perigo mini" type="button" data-cancelar>Cancelar pedido</button>`}
       ${p.alteracoes?.length ? `<details class="historico"><summary>Histórico (${p.alteracoes.length} ${p.alteracoes.length === 1 ? "alteração" : "alterações"})</summary><ol>${[...p.alteracoes].reverse().map((a) => `<li><b>${esc(a.por)}</b> · ${dataHora(a.em)}${a.mudancas.map((m) => `<span>${esc(m.campo)}: ${esc(m.de)} → ${esc(m.para)}</span>`).join("")}</li>`).join("")}</ol></details>` : ""}
@@ -424,10 +437,10 @@ function cartao(p) {
   </article>`;
 }
 $("[data-lista]").addEventListener("click", (e) => {
-  const b = e.target.closest("[data-alterar], [data-cancelar], [data-reativar]"); if (!b) return;
+  const b = e.target.closest("[data-alterar], [data-cancelar], [data-reativar], [data-confirmar-pix]"); if (!b) return;
   const p = st.pedidos.find((x) => x.ref === b.closest("[data-ref]").dataset.ref);
   if (b.matches("[data-alterar]")) abrirAlteracao(p);
-  else abrirConfirma(p, b.matches("[data-cancelar]") ? "cancelar" : "reativar");
+  else abrirConfirma(p, b.matches("[data-cancelar]") ? "cancelar" : b.matches("[data-confirmar-pix]") ? "confirmar-pix" : "reativar");
 });
 
 /* ===================== alterar um pedido ===================== */
@@ -563,17 +576,24 @@ fa.addEventListener("submit", async (e) => {
 /* ===================== cancelar / reativar ===================== */
 const mc = $("[data-modal-confirma]"), fc = $("[data-form-confirma]");
 let confirmando = null;
+const TEXTO_ACAO = {
+  cancelar: { titulo: "Cancelar pedido", gerundio: "cancelando", fazendo: "Cancelando", feito: "Pedido cancelado. Ele não vai mais para a planilha." },
+  reativar: { titulo: "Reativar pedido", gerundio: "reativando", fazendo: "Reativando", feito: "Pedido reativado. Ele voltou para a planilha." },
+  "confirmar-pix": { titulo: "Confirmar Pix recebido", gerundio: "conferindo o Pix", fazendo: "Confirmando", feito: "Pix confirmado. O pedido entrou na planilha." },
+};
 function abrirConfirma(p, acao) {
   if (!p) return;
   confirmando = { p, acao };
-  const cancelar = acao === "cancelar";
-  $("[data-confirma-titulo]").textContent = cancelar ? "Cancelar pedido" : "Reativar pedido";
-  $("[data-confirma-sub]").textContent = cancelar ? "O pedido sai da planilha; dá para reativar depois." : "O pedido volta para a planilha.";
-  $("[data-confirma-pedido]").innerHTML = `<b>${esc(p.cliente?.nome)}</b>${esc(p.ref)} · ${esc(textoItens(p.itens))} · ${brl(p.total)}${(p.pagamento?.parcelas || 1) > 1 ? ` em ${p.pagamento.parcelas}x` : ""}`;
+  const cancelar = acao === "cancelar", pix = acao === "confirmar-pix";
+  $("[data-confirma-titulo]").textContent = TEXTO_ACAO[acao].titulo;
+  $("[data-confirma-sub]").textContent = pix ? "Confira no extrato do banco: Pix recebido com este valor e, se aparecer, este TXID. O pedido passa a valer e entra na planilha."
+    : cancelar ? (p.forma === "pix" ? "O pedido sai da planilha e do Pix a conferir; dá para reativar depois." : "O pedido sai da planilha; dá para reativar depois.")
+    : p.forma === "pix" ? "O pedido volta para o Pix a conferir." : "O pedido volta para a planilha.";
+  $("[data-confirma-pedido]").innerHTML = `<b>${esc(p.cliente?.nome)}</b>${esc(p.ref)} · ${esc(textoItens(p.itens))} · ${brl(p.total)}${(p.pagamento?.parcelas || 1) > 1 ? ` em ${p.pagamento.parcelas}x` : ""}${p.forma === "pix" ? ` · TXID ${esc(p.pagamento?.txid)}` : ""}`;
   $("[data-campo-motivo]").hidden = !cancelar;
-  $("[data-confirma-aviso]").textContent = `Para confirmar, informe quem está ${cancelar ? "cancelando" : "reativando"} e digite a senha do painel.`;
+  $("[data-confirma-aviso]").textContent = `Para confirmar, informe quem está ${TEXTO_ACAO[acao].gerundio} e digite a senha do painel.`;
   const b = $("[data-confirmar]");
-  b.textContent = cancelar ? "Cancelar pedido" : "Reativar pedido";
+  b.textContent = TEXTO_ACAO[acao].titulo;
   b.classList.toggle("btn-perigo", cancelar); b.classList.toggle("cheio", cancelar);
   fc.reset();
   $$(".invalido", fc).forEach((l) => l.classList.remove("invalido"));
@@ -598,10 +618,10 @@ fc.addEventListener("submit", async (e) => {
   const { p, acao } = confirmando;
   $$(".invalido", fc).forEach((l) => l.classList.remove("invalido"));
   $("[data-erro-confirma]").hidden = true;
-  if (fc.elements.por.value.replace(/[^\p{L}]/gu, "").length < 2) return erroConfirma("por", `Informe o seu nome (quem está ${acao === "cancelar" ? "cancelando" : "reativando"}).`);
+  if (fc.elements.por.value.replace(/[^\p{L}]/gu, "").length < 2) return erroConfirma("por", `Informe o seu nome (quem está ${TEXTO_ACAO[acao].gerundio}).`);
   if (!fc.elements.senha.value) return erroConfirma("senha", "Digite a senha do painel para confirmar.");
   const b = $("[data-confirmar]"), rot = b.textContent;
-  b.disabled = true; b.innerHTML = `<span class="giro"></span><span>${acao === "cancelar" ? "Cancelando" : "Reativando"}…</span>`;
+  b.disabled = true; b.innerHTML = `<span class="giro"></span><span>${TEXTO_ACAO[acao].fazendo}…</span>`;
   try {
     const d = await api({ acao, senha: fc.elements.senha.value, ref: p.ref, por: fc.elements.por.value, motivo: acao === "cancelar" ? fc.elements.motivo.value : undefined });
     guardado.gravar("eb-painel-nome", fc.elements.por.value.trim());
@@ -609,7 +629,7 @@ fc.addEventListener("submit", async (e) => {
     fecharConfirma(); desenhar();
     const card = $(`[data-ref="${CSS.escape(d.pedido.ref)}"]`);
     if (card) { card.classList.add("destaque"); card.scrollIntoView({ block: "center", behavior: "smooth" }); setTimeout(() => card.classList.remove("destaque"), 2600); }
-    avisar(acao === "cancelar" ? "Pedido cancelado. Ele não vai mais para a planilha." : "Pedido reativado. Ele voltou para a planilha.");
+    avisar(acao === "reativar" && p.forma === "pix" ? "Pedido reativado. Ele voltou para o Pix a conferir." : TEXTO_ACAO[acao].feito);
   } catch (err) {
     erroConfirma(err.campo, erroDeRede(err));
     if (err.campo === "senha") fc.elements.senha.select();
