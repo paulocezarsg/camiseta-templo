@@ -90,7 +90,16 @@ As três abas seguintes têm o cabeçalho fixo e filtro em cada coluna:
 
 ### Painel de pedidos
 
-Na mesma tela do admin, abaixo de **Baixar planilha**, o botão **Painel de pedidos** pede a **senha do painel** (outra senha, combinada com o núcleo) e mostra todos os pedidos, do mais recente para o mais antigo, com busca por nome ou número do pedido e filtros (todos, alterados e cancelados).
+Na mesma tela do admin, abaixo de **Baixar planilha**, o botão **Painel de pedidos** pede a **senha do painel** (outra senha, combinada com o núcleo) e abre um painel no estilo CRM, com menu lateral (no celular, menu embaixo) e quatro telas:
+
+- **Visão geral:** faturamento, camisetas (por modelo), compradores e ticket médio, **Pix a conferir** (com o valor a achar no extrato), o próximo boleto e as entregas; gráficos de camisetas vendidas por dia (14 dias), forma de pagamento, tamanhos mais pedidos e boleto a receber por mês; a lista **Precisa de atenção** (Pix a conferir) e a **Atividade recente** (pedidos, avisos de "Já paguei" e mudanças feitas no painel, com quem fez).
+- **Pedidos:** tabela com busca (nome, número do pedido, e-mail, celular ou TXID), filtros (todos, boleto, Pix, Pix a conferir, alterados, cancelados), filtro de entrega e ordem (recentes, antigos, maior valor, nome).
+- **Clientes:** os compradores agrupados (quem comprou mais de uma vez aparece uma vez só), com pedidos, peças, total e contato.
+- **Produção:** quantas camisetas há de cada modelo e tamanho, os envios pelos Correios com o endereço e as retiradas no núcleo, com botão para imprimir a lista de separação.
+
+Clicando num pedido abre a **ficha do pedido**: comprador (com botões de WhatsApp e e-mail), camisetas, entrega e endereço, pagamento (parcelas com o mês de cada boleto; no Pix, o TXID e o copia e cola), observação e a **linha do tempo** (pedido feito, "Já paguei", confirmações, alterações e cancelamento, com quem e quando). Na ficha ficam os botões **Alterar pedido**, **Cancelar pedido**, **Reativar pedido** e **Confirmar Pix recebido**. Clicando num cliente abre a ficha dele, com todos os pedidos.
+
+Os detalhes de cada ação estão abaixo.
 
 Em cada pedido no boleto há o botão **Alterar**, que permite mudar:
 
