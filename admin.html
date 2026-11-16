@@ -9,7 +9,7 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23fcf4ea'/%3E%3Cpath fill='%23451b0a' d='M32 6.5l1.9 3.9 4.3.6-3.1 3 .7 4.3-3.8-2-3.8 2 .7-4.3-3.1-3 4.3-.6z'/%3E%3Cg fill='none' stroke='%23451b0a' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 33 L32 25 L55 33'/%3E%3Cpath d='M5 36.5 H59'/%3E%3Cpath d='M8 36.5 V50 M56 36.5 V50 M15 36.5 V50 M49 36.5 V50'/%3E%3Cpath d='M28.5 50 V44 a3.5 3.5 0 0 1 7 0 V50'/%3E%3Cpath d='M20.5 50 V45.5 a2.5 2.5 0 0 1 5 0 V50'/%3E%3Cpath d='M38.5 50 V45.5 a2.5 2.5 0 0 1 5 0 V50'/%3E%3Cpath d='M4 51.5 H60'/%3E%3C/g%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500..600&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500..600&family=Montserrat:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{--ouro:#f4b41e;--mostarda:#db992d;--mostarda-4:#fbf0da;--creme:#fcf4ea;--linho:#e8dbc6;--linho-2:#d6c3a3;--cafe:#451b0a;--cafe-2:#5a2a14;--madeira:#8a4718;--tinta:#2e1206;--suave:#6b5a4b;--ok:#2f7a33;--ok-soft:#e6f2e2;--err:#b3261e;--err-soft:#fbe9e6}
 *{box-sizing:border-box}
@@ -309,6 +309,35 @@ button.kpi:hover{transform:translateY(-1px);box-shadow:0 1px 2px rgba(69,27,10,.
   .modal-pe .btn{flex:1}
 }
 .toast{position:fixed;left:50%;bottom:22px;z-index:30;transform:translateX(-50%);max-width:calc(100% - 32px);padding:13px 18px;border-radius:14px;background:var(--cafe);color:var(--creme);font-weight:600;font-size:14px;box-shadow:0 20px 40px -16px rgba(0,0,0,.5)}
+
+/* ---------- tipografia do painel (CRM): Inter ---------- */
+.app,.ficha,.modal,.toast{font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-feature-settings:"cv11","ss01";letter-spacing:-.006em}
+.app h1,.app h2,.app h3,.ficha h2,.modal h2,.app .kpi .num,.app .tam b,.marca b{font-family:Inter,system-ui,sans-serif;letter-spacing:-.022em}
+.app,.ficha{font-size:14px;line-height:1.5;color:#2b1a12}
+.barra h1{font-size:22px;font-weight:700}
+.barra small{font-size:13px}
+.marca b{font-size:15px;font-weight:700;letter-spacing:-.01em}
+.nav button{font-weight:500;font-size:14px}
+.nav button[aria-current="page"]{font-weight:600}
+.kpi .rot{font-size:11.5px;font-weight:600;letter-spacing:.03em}
+.kpi .num{font-size:26px;font-weight:700;font-variant-numeric:tabular-nums}
+.kpi .sub{font-size:12.5px}
+.caixa h3{font-size:15px;font-weight:600;letter-spacing:-.01em}
+.caixa h3 small{font-family:inherit;font-weight:500}
+.tab-cab{font-size:11px;font-weight:600;letter-spacing:.04em}
+.tab-lin{font-size:13.5px}
+.tab-lin .quem b{font-weight:600}
+.tab-lin .valor,.barras b,.lista-curta .val,.itens-f b,.parcelas-f b,.dl dd{font-variant-numeric:tabular-nums}
+.st{font-weight:600;font-size:11.5px}
+.abas button{font-weight:500}
+.abas button[aria-pressed="true"]{font-weight:600}
+.seletor{font-weight:500}
+.ficha-cab h2{font-size:19px;font-weight:700}
+.bloco-f h4{font-size:11px;font-weight:600;letter-spacing:.05em}
+.dl dd{font-weight:500}
+.tam b{font-size:22px;font-weight:700}
+.modal-cab h2{font-size:19px;font-weight:700}
+.btn{font-weight:600}
 </style>
 </head>
 <body>
