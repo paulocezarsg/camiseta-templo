@@ -635,17 +635,17 @@ body.travado .barra.ver{transform:translateY(calc(100% + 40px));opacity:0;pointe
 .aparece.visto{opacity:1;transform:none}
 
 /* ---------- prazo das vendas: faixa no topo (fixa com o cabeçalho) e contagem na caixa de compra ---------- */
-.prazo{display:flex;align-items:center;justify-content:center;gap:10px 14px;flex-wrap:wrap;padding:8px 16px;background:linear-gradient(90deg,#3a1407,#5a2a14 50%,#3a1407);color:#fbeed6;font-size:13.5px;font-weight:600;text-align:center}
-.prazo .ico{width:17px;height:17px;color:var(--ouro)}
-.prazo b{color:var(--ouro);font-weight:700}
+.faixa-prazo{display:flex;align-items:center;justify-content:center;gap:10px 14px;flex-wrap:wrap;padding:8px 16px;background:linear-gradient(90deg,#3a1407,#5a2a14 50%,#3a1407);color:#fbeed6;font-size:13.5px;font-weight:600;text-align:center}
+.faixa-prazo .ico{width:17px;height:17px;color:var(--ouro)}
+.faixa-prazo b{color:var(--ouro);font-weight:700}
 .prazo-rel{display:inline-flex;gap:5px;font-variant-numeric:tabular-nums}
 .prazo-rel span{display:inline-grid;place-items:center;min-width:42px;padding:3px 7px;border-radius:8px;background:rgba(244,180,30,.16);box-shadow:inset 0 0 0 1px rgba(244,180,30,.35);color:#fff;font-weight:700;font-size:14px;line-height:1.15}
 .prazo-rel small{font-size:9.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:rgba(251,238,214,.7)}
-.prazo.urgente{background:linear-gradient(90deg,#7a1610,#a3241a 50%,#7a1610)}
-.prazo.urgente .prazo-rel span{background:rgba(255,255,255,.14);box-shadow:inset 0 0 0 1px rgba(255,255,255,.3)}
-.prazo.fim{background:#3a1407}
-@media (max-width:560px){.prazo{gap:6px 10px;padding:7px 10px;font-size:12.5px}.prazo .lbl-longo{display:none}.prazo-rel span{min-width:36px;padding:2px 5px;font-size:13px}}
-@media (min-width:561px){.prazo .lbl-curto{display:none}}
+.faixa-prazo.urgente{background:linear-gradient(90deg,#7a1610,#a3241a 50%,#7a1610)}
+.faixa-prazo.urgente .prazo-rel span{background:rgba(255,255,255,.14);box-shadow:inset 0 0 0 1px rgba(255,255,255,.3)}
+.faixa-prazo.fim{background:#3a1407}
+@media (max-width:560px){.faixa-prazo{gap:6px 10px;padding:7px 10px;font-size:12.5px}.faixa-prazo .lbl-longo{display:none}.prazo-rel span{min-width:36px;padding:2px 5px;font-size:13px}}
+@media (min-width:561px){.faixa-prazo .lbl-curto{display:none}}
 
 .prazo-caixa{margin:18px 0 4px;padding:16px 16px 14px;border-radius:20px;background:linear-gradient(160deg,#4a1d0b,#2e1206);color:#fbeed6;text-align:center;box-shadow:0 18px 36px -22px rgba(46,18,6,.7)}
 .prazo-caixa .tit{display:flex;align-items:center;justify-content:center;gap:8px;font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--ouro)}
@@ -701,7 +701,7 @@ body.encerrado .caixa .grupo,body.encerrado .caixa .acoes,body.encerrado .caixa 
 </svg>
 
 <header class="topo" id="topo">
-  <div class="prazo" data-prazo role="timer" aria-live="off">
+  <div class="faixa-prazo" data-prazo role="timer" aria-live="off">
     <svg class="ico"><use href="#i-relogio"/></svg>
     <span data-prazo-txt><span class="lbl-longo">Vendas somente até <b data-prazo-data>23/11 às 23:59</b> · faltam</span><span class="lbl-curto">Vendas até <b>23/11</b> · faltam</span></span>
     <span class="prazo-rel" data-prazo-rel></span>
