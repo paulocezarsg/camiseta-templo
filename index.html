@@ -647,17 +647,17 @@ body.travado .barra.ver{transform:translateY(calc(100% + 40px));opacity:0;pointe
 @media (max-width:560px){.faixa-prazo{gap:6px 10px;padding:7px 10px;font-size:12.5px}.faixa-prazo .lbl-longo{display:none}.prazo-rel span{min-width:36px;padding:2px 5px;font-size:13px}}
 @media (min-width:561px){.faixa-prazo .lbl-curto{display:none}}
 
-.prazo-caixa{margin:18px 0 4px;padding:16px 16px 14px;border-radius:20px;background:linear-gradient(160deg,#4a1d0b,#2e1206);color:#fbeed6;text-align:center;box-shadow:0 18px 36px -22px rgba(46,18,6,.7)}
-.prazo-caixa .tit{display:flex;align-items:center;justify-content:center;gap:8px;font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--ouro)}
-.prazo-caixa .tit .ico{width:16px;height:16px}
-.prazo-caixa .cont{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:12px 0 10px}
-.prazo-caixa .cont div{padding:10px 4px 8px;border-radius:14px;background:rgba(255,255,255,.07);box-shadow:inset 0 0 0 1px rgba(244,180,30,.28)}
-.prazo-caixa .cont b{display:block;font:700 32px/1 Montserrat,system-ui,sans-serif;letter-spacing:-.03em;color:#fff;font-variant-numeric:tabular-nums lining-nums;font-feature-settings:"tnum" 1,"lnum" 1;text-shadow:0 2px 10px rgba(244,180,30,.25)}
+.prazo-caixa{margin:14px 0 2px;padding:11px 12px 10px;border-radius:16px;background:linear-gradient(160deg,#4a1d0b,#2e1206);color:#fbeed6;text-align:center;box-shadow:0 18px 36px -22px rgba(46,18,6,.7)}
+.prazo-caixa .tit{display:flex;align-items:center;justify-content:center;gap:7px;font-size:10.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--ouro)}
+.prazo-caixa .tit .ico{width:14px;height:14px}
+.prazo-caixa .cont{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:8px auto 7px;max-width:300px}
+.prazo-caixa .cont div{padding:6px 3px 5px;border-radius:10px;background:rgba(255,255,255,.07);box-shadow:inset 0 0 0 1px rgba(244,180,30,.28)}
+.prazo-caixa .cont b{display:block;font:700 21px/1 Montserrat,system-ui,sans-serif;letter-spacing:-.02em;color:#fff;font-variant-numeric:tabular-nums lining-nums;font-feature-settings:"tnum" 1,"lnum" 1;text-shadow:0 2px 10px rgba(244,180,30,.25)}
 .prazo-caixa .cont div{position:relative}
 .prazo-rel span{font-family:Montserrat,system-ui,sans-serif;font-variant-numeric:tabular-nums lining-nums}
-@media (max-width:400px){.prazo-caixa .cont b{font-size:28px}}
-.prazo-caixa .cont small{display:block;margin-top:5px;font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(251,238,214,.7)}
-.prazo-caixa p{margin:0;font-size:13px;color:rgba(251,238,214,.85)}
+@media (max-width:400px){.prazo-caixa .cont b{font-size:19px}}
+.prazo-caixa .cont small{display:block;margin-top:3px;font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(251,238,214,.7)}
+.prazo-caixa p{margin:0;font-size:11.5px;line-height:1.4;color:rgba(251,238,214,.85)}
 .prazo-caixa.urgente{background:linear-gradient(160deg,#8a1c12,#5c0f09)}
 .encerrado-msg{margin:18px 0 0;padding:20px;border-radius:20px;background:var(--mostarda-4,#fbf0da);color:var(--cafe);text-align:center;font-weight:600}
 .encerrado-msg b{display:block;font:600 22px/1.2 Fraunces,Georgia,serif;margin-bottom:6px}
@@ -914,7 +914,7 @@ body.encerrado .caixa .grupo,body.encerrado .caixa .acoes,body.encerrado .caixa 
       <li class="arco-passo aparece"><span class="num">01</span><span class="janela"><svg class="ico"><use href="#i-camisa"/></svg></span><h3>Escolha</h3><p>O modelo (básica ou infantil), o tamanho e quantas peças quiser, tudo na mesma sacola.</p></li>
       <li class="arco-passo aparece"><span class="num">02</span><span class="janela"><svg class="ico"><use href="#i-pin"/></svg></span><h3>Entrega ou retirada</h3><p>Retire grátis no núcleo ou digite o seu CEP e veja na hora o valor e o prazo do PAC e do SEDEX.</p></li>
       <li class="arco-passo aparece" data-passo-pagamento><span class="num">03</span><span class="janela"><svg class="ico"><use href="#i-cadeado"/></svg></span><h3>Pague com segurança</h3><p></p></li>
-      <li class="arco-passo aparece"><span class="num">04</span><span class="janela"><svg class="ico"><use href="#i-caixa"/></svg></span><h3>Retire ou receba</h3><p>Retire no núcleo ou receba pelos Correios: postamos em até <b data-dias-postar></b> dias úteis após a confirmação, com rastreio.</p></li>
+      <li class="arco-passo aparece"><span class="num">04</span><span class="janela"><svg class="ico"><use href="#i-caixa"/></svg></span><h3>Retire ou receba</h3><p>Retire no núcleo ou receba pelos Correios, com rastreio.</p></li>
     </ol>
   </div>
 </section>
@@ -947,7 +947,7 @@ body.encerrado .caixa .grupo,body.encerrado .caixa .acoes,body.encerrado .caixa 
       </div>
       <div class="vendedor">
         <h4>Loja</h4>
-        <p style="margin:0">Desenvolvido por <span data-desenvolvedor></span>.<br><span data-rodape-pagamento></span></p>
+        <p style="margin:0">Desenvolvido por <span data-desenvolvedor></span>.</p>
         <div class="contatos" data-contatos></div>
       </div>
     </div>
@@ -2085,7 +2085,7 @@ const FIM_VENDAS = Date.parse(VENDAS.ate);
   const MES = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
   const dataCurta = `${dois(fim.getUTCDate())}/${dois(fim.getUTCMonth() + 1)} às ${dois(fim.getUTCHours())}:${dois(fim.getUTCMinutes())}`;
   $$("[data-prazo-data]").forEach((el) => (el.textContent = dataCurta));
-  $("[data-prazo-quando]").textContent = `Até ${SEMANA[fim.getUTCDay()]}, ${fim.getUTCDate()} de ${MES[fim.getUTCMonth()]}, às ${dois(fim.getUTCHours())}h${dois(fim.getUTCMinutes())} (horário de Brasília). Garanta a sua!`;
+  $("[data-prazo-quando]").textContent = `Até ${SEMANA[fim.getUTCDay()]}, ${fim.getUTCDate()} de ${MES[fim.getUTCMonth()]}, às ${dois(fim.getUTCHours())}h${dois(fim.getUTCMinutes())} (horário de Brasília).`;
   $("[data-encerrado-txt]").textContent = MSG_ENCERRADO;
   const faixa = $("[data-prazo]"), caixa = $("[data-prazo-caixa]");
   let relogio = 0;
