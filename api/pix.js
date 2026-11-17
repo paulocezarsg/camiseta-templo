@@ -6,7 +6,7 @@
    GET ?pedido=REF -> { referencia, total, copiaECola, txid, status } (para reabrir o QR Code na página de obrigado) */
 import { HttpError, json, rota, readJSON, bancoPronto, dentroDoLimite, ipDe, salvarPedido, lerPedido, linha } from "./_lib.js";
 import { lerItens, itensParaSalvar, lerCliente, lerEntrega, entregaParaSalvar, novaReferencia } from "./_pedido.js";
-import { PAGAMENTO } from "../produto.js";
+import { PAGAMENTO, vendasAbertas, MSG_ENCERRADO } from "../produto.js";
 import { pixCopiaECola, txidDoPedido } from "../pix.js";
 
 const POST = async (req) => {
@@ -17,7 +17,8 @@ const POST = async (req) => {
   if (!(await dentroDoLimite("cam:pix:" + ipDe(req), 60, 3600))) throw new HttpError(429, "Muitos pedidos seguidos. Tente de novo mais tarde.");
 
   const body = await readJSON(req);
-  if (body.acao === "ja-paguei") return jaPaguei(body);
+  if (body.acao === "ja-paguei") return jaPaguei(body); // avisar que pagou continua valendo depois do prazo
+  if (!vendasAbertas()) throw new HttpError(403, MSG_ENCERRADO);
   const { itens, total: pecas, subtotal } = lerItens(body.itens);
   const cliente = lerCliente(body.cliente, { cpf: false });
   const entrega = lerEntrega(body, pecas);

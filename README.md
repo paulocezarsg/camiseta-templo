@@ -157,6 +157,10 @@ Em `produto.js`, no bloco `PRODUTO.modelos`, cada modelo tem os seus tamanhos e 
 
 Os dois modelos custam o `preco` do produto (R$ 100,00). Para cobrar outro valor num modelo, acrescente `preco` nele (em centavos, ex.: `preco: 8000`).
 
+## Prazo das vendas
+
+As vendas vão até **23 de novembro de 2026, às 23:59:59 (horário de Brasília)** — `VENDAS.ate` em `produto.js`. Até lá, uma faixa fixa no topo da página mostra a contagem regressiva (dias, horas, minutos e segundos) e a caixa de compra tem um bloco grande com a mesma contagem; nas últimas 24 horas a faixa fica vermelha. Depois do prazo, a página mostra "Vendas encerradas", esconde a escolha e os botões de compra, e o servidor recusa pedidos novos (boleto, Pix e PagBank). O "Já paguei" do Pix e o painel de pedidos continuam funcionando. Para prorrogar, troque a data em `VENDAS.ate`.
+
 ## Retirada grátis no núcleo
 
 A opção **Retirada no Núcleo Estrela Bonita** aparece junto do frete, grátis e sem CEP, e **já vem marcada**; quem digita o CEP passa para os Correios. Com a retirada, o pedido não pede endereço, sai sem frete e o número do pedido termina em `-RETIRADA`. Os textos ficam no bloco `RETIRADA` em `produto.js`; `ativa: false` esconde a opção.

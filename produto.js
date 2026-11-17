@@ -15,6 +15,12 @@ export const EVENTO = {
   ],
 };
 
+/* Prazo das vendas (horário de Brasília). A página mostra a contagem regressiva até aqui e, depois, "Vendas encerradas";
+   o servidor também recusa pedidos novos depois do prazo (o painel de pedidos continua funcionando). */
+export const VENDAS = { ate: "2026-11-23T23:59:59-03:00" };
+export const vendasAbertas = (agora = Date.now()) => agora <= Date.parse(VENDAS.ate);
+export const MSG_ENCERRADO = "As vendas da camiseta foram encerradas em 23 de novembro. Obrigado a todos que fizeram parte!";
+
 /* Textos de quem fala sobre o templo, na seção "Palavras". Enquanto os parágrafos estiverem vazios,
    a página mostra o espaço reservado. Um item da lista por parágrafo; foto é o retrato (quadrado). */
 export const TEXTOS = [
