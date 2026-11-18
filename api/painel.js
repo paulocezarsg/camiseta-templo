@@ -8,10 +8,14 @@
    POST { acao: "cancelar", senha, ref, por, motivo }     -> { pedido }   (sai das somas da planilha)
    POST { acao: "reativar", senha, ref, por }             -> { pedido }   (desfaz um cancelamento)
    POST { acao: "confirmar-pix", senha, ref, por }        -> { pedido }   (Pix conferido no extrato: o pedido passa a valer)
-   Pedidos no Pix (QR Code do núcleo) podem ser confirmados, cancelados e reativados; só os no boleto podem ser alterados. */
+   Pedidos no Pix (QR Code do núcleo) podem ser confirmados, cancelados e reativados; só os no boleto podem ser alterados.
+   Produção (api/_gestao.js): "criar-lote" { refs, nome, observacao, por }, "lote-status" { id, status, por },
+     "desfazer-lote" { id, ref?, por }, "entrega" { ref, entregue, rastreio, por }.
+   Beta: "beta-listar", "beta-salvar" { colecao, item, por }, "beta-excluir" { colecao, id }. */
 import { HttpError, json, rota, readJSON, bancoPronto, dentroDoLimite, redis, ipDe, listarPedidos, lerPedido, salvarPedido, confereSenha, linha } from "./_lib.js";
 import { lerItens, itensParaSalvar, lerEntrega, entregaParaSalvar, cadastroPorNome, nomesCadastrados, mesmoNome } from "./_pedido.js";
 import { PRODUTO, PAGAMENTO, RETIRADA, parcelasDe } from "../produto.js";
+import { listarLotes, criarLote, mudarStatusLote, desfazerLote, marcarEntrega, listarBeta, salvarBeta, excluirBeta } from "./_gestao.js";
 
 const HASH_SENHA = "SiCElJgKOvTJ3Ofr/88GXQ==:CIpHfa9Q/vSEU1G+j1N41NaXK7TAeVQHaotRfuOcc+8="; // hash da senha do painel
 const ERROS_SENHA = 10, JANELA_SENHA = 15 * 60; // senhas erradas por endereço de internet
@@ -133,8 +137,21 @@ const POST = async (req) => {
   await exigirSenha(req, body.senha);
   if (body.acao === "listar") {
     const pedidos = (await listarPedidos()).sort((a, b) => (b.criadoEm || 0) - (a.criadoEm || 0));
-    return json({ pedidos, cadastrados: nomesCadastrados(), agora: Date.now() });
+    return json({ pedidos, cadastrados: nomesCadastrados(), lotes: await listarLotes(), agora: Date.now() });
   }
+  // produção e beta: quem está mexendo (obrigatório nas ações que mudam algo)
+  const quem = () => {
+    const por = linha(body.por, 80);
+    if (por.replace(/[^\p{L}]/gu, "").length < 2) throw new HttpError(400, "Informe o seu nome (quem está fazendo a mudança).", { campo: "por" });
+    return por;
+  };
+  if (body.acao === "criar-lote") return json({ lote: await criarLote(body, quem()) });
+  if (body.acao === "lote-status") return json({ lote: await mudarStatusLote(body, quem()) });
+  if (body.acao === "desfazer-lote") return json({ lote: await desfazerLote(body, quem()) });
+  if (body.acao === "entrega") return json({ pedido: await marcarEntrega(body, quem()) });
+  if (body.acao === "beta-listar") return json(await listarBeta());
+  if (body.acao === "beta-salvar") return json({ item: await salvarBeta(body, quem()) });
+  if (body.acao === "beta-excluir") return json({ ok: await excluirBeta(body) });
   if (body.acao === "alterar") return json({ pedido: await alterar(body) });
   if (body.acao === "cancelar") return json({ pedido: await cancelar(body) });
   if (body.acao === "reativar") return json({ pedido: await reativar(body) });
