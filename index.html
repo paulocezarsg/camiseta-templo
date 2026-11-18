@@ -508,7 +508,8 @@ body.travado .barra.ver{transform:translateY(calc(100% + 40px));opacity:0;pointe
 .gaveta-cab .contagem{color:var(--suave);font-weight:500;font-size:13.5px}
 .fechar{margin-left:auto;width:40px;height:40px;border:0;border-radius:50%;background:var(--creme);display:grid;place-items:center;transition:background .2s;flex:none}
 .fechar:hover{background:var(--linho)}
-.gaveta-corpo{flex:1;overflow-y:auto;padding:18px 22px;display:grid;gap:16px;align-content:start}
+.gaveta-corpo{flex:1;overflow-y:auto;overflow-x:hidden;padding:18px 22px;display:grid;grid-template-columns:minmax(0,1fr);gap:16px;align-content:start}
+.gaveta-corpo>*,.lista-itens>*,.item>*{min-width:0}
 .gaveta-pe{padding:18px 22px 22px;background:#fff;border-top:1px solid var(--linho)}
 .gaveta-pe .resumo{margin:0 0 16px}
 .lista-itens{display:grid;gap:12px}
@@ -662,6 +663,35 @@ body.travado .barra.ver{transform:translateY(calc(100% + 40px));opacity:0;pointe
 .encerrado-msg{margin:18px 0 0;padding:20px;border-radius:20px;background:var(--mostarda-4,#fbf0da);color:var(--cafe);text-align:center;font-weight:600}
 .encerrado-msg b{display:block;font:600 22px/1.2 Fraunces,Georgia,serif;margin-bottom:6px}
 body.encerrado .caixa .grupo,body.encerrado .caixa .acoes,body.encerrado .caixa [data-frete-compra],body.encerrado .caixa [data-resumo-compra],body.encerrado .caixa .seguro,body.encerrado [data-barra],body.encerrado .prazo-caixa{display:none!important}
+
+/* ---------- um pedido só: aviso na caixa de compra e "adicionar outra" na sacola ---------- */
+.na-sacola{display:flex;gap:10px;align-items:flex-start;margin:12px 0 0;padding:11px 13px;border-radius:14px;background:#eef6ea;color:#24531f;font-size:13.5px;line-height:1.45}
+.na-sacola .ico{flex:none;width:18px;height:18px;margin-top:1px;color:#2f7a33}
+.na-sacola b{color:#1e4a1a}
+.na-sacola button{border:0;background:none;padding:0;font:inherit;font-weight:700;color:#1e4a1a;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+body.encerrado .na-sacola{display:none!important}
+.mais-uma{border-radius:20px;border:1.5px dashed var(--linho-2);background:rgba(255,255,255,.55);transition:border-color .2s,background .2s}
+.mais-uma:hover{border-color:var(--cafe)}
+.mais-uma.aberta{border-style:solid;border-color:var(--linho-2);background:#fff}
+.mais-uma-abrir{display:flex;align-items:center;gap:14px;width:100%;padding:14px 16px;border:0;background:none;text-align:left;cursor:pointer}
+.mais-uma-abrir .mais{width:42px;height:42px;flex:none;border-radius:14px;display:grid;place-items:center;background:var(--mostarda-4);color:var(--madeira)}
+.mais-uma-abrir .mais .ico{width:20px;height:20px}
+.mais-uma-abrir b{display:block;font-size:15px;color:var(--cafe)}
+.mais-uma-abrir small{display:block;margin-top:2px;font-size:12.5px;color:var(--suave)}
+.mais-uma.aberta .mais-uma-abrir{display:none}
+.mais-uma-form{padding:14px 16px 16px;display:grid;gap:12px}
+.mais-uma-form .tit{display:flex;align-items:center;justify-content:space-between;gap:10px;font-weight:700;font-size:14px;color:var(--cafe)}
+.mais-uma-form .tit button{border:0;background:none;padding:4px;font-size:12.5px;font-weight:600;color:var(--suave);text-decoration:underline;cursor:pointer}
+.mu-modelos{display:flex;gap:6px;padding:4px;border-radius:999px;background:var(--creme);box-shadow:inset 0 0 0 1px var(--linho)}
+.mu-modelos button{flex:1;padding:9px 10px;border:0;border-radius:999px;background:none;font-weight:600;font-size:13.5px;color:var(--suave);cursor:pointer}
+.mu-modelos button[aria-pressed="true"]{background:var(--cafe);color:var(--creme)}
+.mu-tams{display:grid;grid-template-columns:repeat(auto-fill,minmax(52px,1fr));gap:7px}
+.mu-tams button{height:42px;border:0;border-radius:12px;background:#fff;box-shadow:inset 0 0 0 1.5px var(--linho-2);font-weight:700;font-size:14px;color:var(--tinta);cursor:pointer}
+.mu-tams button:hover{box-shadow:inset 0 0 0 1.5px var(--cafe)}
+.mu-tams button[aria-pressed="true"]{background:var(--mostarda-4);box-shadow:inset 0 0 0 2px var(--cafe);color:var(--cafe)}
+.mu-erro{margin:-4px 0 0;font-size:12.5px;font-weight:600;color:var(--err,#b3261e)}
+.item.novo{animation:item-novo 1.2s ease}
+@keyframes item-novo{0%{box-shadow:0 0 0 3px var(--ouro),var(--sh);transform:translateY(-4px)}100%{box-shadow:var(--sh)}}
 </style>
 </head>
 <body>
@@ -821,6 +851,7 @@ body.encerrado .caixa .grupo,body.encerrado .caixa .acoes,body.encerrado .caixa 
         <button class="btn btn-linha" type="button" data-adicionar><svg class="ico"><use href="#i-sacola"/></svg> Adicionar</button>
       </div>
 
+      <p class="na-sacola" data-na-sacola hidden><svg class="ico"><use href="#i-sacola"/></svg><span data-na-sacola-txt></span></p>
       <div class="seguro" data-selo-pagamento></div>
     </div>
   </div>
@@ -975,7 +1006,7 @@ body.encerrado .caixa .grupo,body.encerrado .caixa .acoes,body.encerrado .caixa 
   </div>
   <div class="gaveta-pe" data-gaveta-pe>
     <div class="resumo" data-resumo-sacola></div>
-    <button class="btn btn-cafe btn-bloco" type="button" data-finalizar>Finalizar compra <svg class="ico"><use href="#i-cadeado"/></svg></button>
+    <button class="btn btn-cafe btn-bloco" type="button" data-finalizar><span data-finalizar-txt>Finalizar pedido</span> <svg class="ico"><use href="#i-cadeado"/></svg></button>
   </div>
 </aside>
 
@@ -1613,6 +1644,7 @@ function pintarBarra(acabouDeEscolher = false) {
 }
 function desenharSacola() {
   const n = qtdSacola();
+  pintarNaSacola();
   $("[data-contador]").textContent = n;
   $("[data-gaveta-contagem]").textContent = n ? `${n} ${n === 1 ? "peça" : "peças"}` : "";
   const lista = $("[data-sacola-itens]");
@@ -1632,7 +1664,8 @@ function desenharSacola() {
         <div class="qtd mini" data-item="${k}"><button type="button" data-menos aria-label="Diminuir">${icone("menos")}</button><input type="number" min="1" inputmode="numeric" aria-label="Quantidade"><button type="button" data-mais aria-label="Aumentar">${icone("mais")}</button></div>
       </div>
       <div class="dir"><button class="remover" type="button" data-remover="${k}" aria-label="Remover">${icone("lixo")}</button><b>${brl(precoItem(i) * i.qtd)}</b></div>
-    </div>`).join("");
+    </div>`).join("") + maisUmaHTML();
+  ligarMaisUma(lista);
   $$("[data-item]", lista).forEach((el) => {
     const k = Number(el.dataset.item);
     ligarQtd(el, () => st.sacola[k].qtd, (v) => {
@@ -1645,6 +1678,60 @@ function desenharSacola() {
     st.sacola.splice(Number(b.dataset.remover), 1); salvarSacola(); desenharSacola(); freteSacola.atualizar();
   }));
   resumoSacola();
+}
+/* "Adicionar outra camiseta": escolher modelo e tamanho sem sair da sacola, tudo no mesmo pedido. */
+const mu = { aberto: false, modelo: PRODUTO.modelos[0].id, tamanho: null, erro: "", novo: null };
+function maisUmaHTML() {
+  const m = modeloDe(mu.modelo);
+  return `<div class="mais-uma${mu.aberto ? " aberta" : ""}" data-mais-uma>
+    <button type="button" class="mais-uma-abrir" data-mu-abrir aria-expanded="${mu.aberto}"><span class="mais">${icone("mais")}</span><span><b>Adicionar outra camiseta</b><small>Mais alguém da família? Junte tudo neste mesmo pedido.</small></span></button>
+    ${mu.aberto ? `<div class="mais-uma-form">
+      <div class="tit"><span>Outra camiseta, no mesmo pedido</span><button type="button" data-mu-fechar>Fechar</button></div>
+      ${PRODUTO.modelos.length > 1 ? `<div class="mu-modelos" role="group" aria-label="Modelo">${PRODUTO.modelos.map((x) => `<button type="button" data-mu-modelo="${x.id}" aria-pressed="${x.id === mu.modelo}">${esc(x.nome)}</button>`).join("")}</div>` : ""}
+      <div class="mu-tams" role="group" aria-label="Tamanho">${m.tamanhos.map((t) => `<button type="button" data-mu-tam="${esc(t)}" aria-pressed="${t === mu.tamanho}">${esc(t)}</button>`).join("")}</div>
+      ${mu.erro ? `<p class="mu-erro">${esc(mu.erro)}</p>` : ""}
+      <button class="btn btn-cafe btn-bloco" type="button" data-mu-adicionar>${icone("sacola")} Adicionar à sacola${mu.tamanho ? ` · ${esc(m.nome)} ${esc(mu.tamanho)}` : ""}</button>
+    </div>` : ""}
+  </div>`;
+}
+function ligarMaisUma(lista) {
+  const caixa = $("[data-mais-uma]", lista);
+  caixa.addEventListener("click", (e) => {
+    const b = e.target.closest("button"); if (!b) return;
+    if (b.matches("[data-mu-abrir]")) { mu.aberto = true; mu.erro = ""; }
+    else if (b.matches("[data-mu-fechar]")) { mu.aberto = false; mu.tamanho = null; mu.erro = ""; }
+    else if (b.dataset.muModelo) { mu.modelo = b.dataset.muModelo; mu.tamanho = null; mu.erro = ""; }
+    else if (b.dataset.muTam) { mu.tamanho = b.dataset.muTam; mu.erro = ""; }
+    else if (b.matches("[data-mu-adicionar]")) {
+      if (!mu.tamanho) mu.erro = "Escolha o tamanho.";
+      else if (qtdSacola() + 1 > PRODUTO.maxPorPedido) mu.erro = `O limite é de ${PRODUTO.maxPorPedido} peças por pedido.`;
+      else {
+        const cor = PRODUTO.cores[0].id;
+        const k = st.sacola.findIndex((i) => i.cor === cor && i.modelo === mu.modelo && i.tamanho === mu.tamanho);
+        if (k >= 0) st.sacola[k].qtd += 1; else st.sacola.push({ cor, modelo: mu.modelo, tamanho: mu.tamanho, qtd: 1 });
+        mu.novo = k >= 0 ? k : st.sacola.length - 1;
+        mu.aberto = false; mu.tamanho = null;
+        salvarSacola(); desenharSacola(); freteSacola.atualizar();
+        const c = $("[data-contador]"); c.classList.remove("pulo"); void c.offsetWidth; c.classList.add("pulo");
+        return;
+      }
+    } else return;
+    desenharSacola();
+    if (mu.aberto) $("[data-mais-uma]")?.scrollIntoView({ block: "nearest", behavior: "smooth" });
+  });
+  if (mu.novo != null) {
+    const it = $$(".item", lista)[mu.novo]; mu.novo = null;
+    if (it) { it.classList.add("novo"); it.scrollIntoView({ block: "nearest", behavior: "smooth" }); }
+  }
+}
+/* Caixa de compra: lembra o que já está na sacola e que dá para juntar mais no mesmo pedido. */
+function pintarNaSacola() {
+  const n = qtdSacola(), el = $("[data-na-sacola]");
+  el.hidden = !n;
+  $("[data-finalizar-txt]").textContent = n ? `Finalizar pedido · ${n} ${n === 1 ? "camiseta" : "camisetas"}` : "Finalizar pedido";
+  if (!n) return;
+  $("[data-na-sacola-txt]").innerHTML = `<b>${n} ${n === 1 ? "camiseta" : "camisetas"} na sacola.</b> Para juntar mais no mesmo pedido, escolha outro tamanho e clique em Adicionar, ou <button type="button" data-ver-sacola>ver a sacola</button>.`;
+  $("[data-ver-sacola]").addEventListener("click", abrirSacola);
 }
 function resumoSacola() {
   const n = qtdSacola();
@@ -2050,7 +2137,7 @@ resumoCompra();
 efeitos();
 
 $$("[data-abrir-sacola]").forEach((b) => b.addEventListener("click", abrirSacola));
-$("[data-adicionar]").addEventListener("click", () => { if (adicionar()) aviso(`${st.qtd}× ${modeloDe(st.modelo).nome.toLowerCase()} tamanho ${st.tamanho} na sacola`); });
+$("[data-adicionar]").addEventListener("click", () => { if (adicionar()) aviso(`${st.qtd}× ${modeloDe(st.modelo).nome.toLowerCase()} ${st.tamanho} na sacola. Escolha outro tamanho para juntar no mesmo pedido.`); });
 $("[data-comprar]").addEventListener("click", () => { if (adicionar()) abrirSacola(); });
 $("[data-barra-comprar]").addEventListener("click", () => { if (adicionar()) abrirSacola(); });
 $("[data-barra-foto]").style.backgroundImage = corDe(st.cor).fotos?.[0] ? `url("${corDe(st.cor).fotos[0]}")` : "";
