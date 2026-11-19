@@ -467,6 +467,19 @@ button.kpi:hover{transform:translateY(-1px);box-shadow:0 1px 2px rgba(69,27,10,.
   .sel-barra{top:auto;position:static}
 }
 
+
+/* ---------- exportar ---------- */
+.exportar{position:relative}
+.exportar>.btn .ico:last-child{width:15px;height:15px;margin-left:-2px}
+.menu-exp{position:absolute;top:calc(100% + 6px);right:0;z-index:7;width:320px;padding:6px;border-radius:16px;background:#fff;border:1px solid var(--borda);box-shadow:0 20px 40px -16px rgba(46,18,6,.35)}
+.menu-exp button{display:flex;gap:12px;align-items:flex-start;width:100%;padding:11px 12px;border:0;border-radius:12px;background:none;text-align:left;color:var(--tinta)}
+.menu-exp button:hover,.menu-exp button:focus-visible{background:#fbf5ea;outline:none}
+.menu-exp .ico{flex:none;width:20px;height:20px;margin-top:2px;color:var(--madeira)}
+.menu-exp b{display:block;font-size:14px;font-weight:600;color:var(--cafe)}
+.menu-exp small{display:block;margin-top:2px;font-size:12px;color:var(--suave);line-height:1.4}
+.menu-exp button[disabled]{opacity:.7}
+@media (max-width:900px){.menu-exp{left:0;right:auto;width:min(320px,calc(100vw - 32px))}}
+
 /* ---------- tipografia do painel (CRM): Inter ---------- */
 .app,.ficha,.modal,.toast{font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-feature-settings:"cv11","ss01";letter-spacing:-.006em}
 .app h1,.app h2,.app h3,.ficha h2,.modal h2,.app .kpi .num,.app .tam b,.marca b{font-family:Inter,system-ui,sans-serif;letter-spacing:-.022em}
@@ -519,6 +532,7 @@ button.kpi:hover{transform:translateY(-1px);box-shadow:0 1px 2px rgba(69,27,10,.
   <symbol id="i-whats" viewBox="0 0 24 24"><path d="M4 20l1.3-4A8 8 0 1 1 8 18.7z"/><path d="M9 9.5c.3 2 2.5 4.2 4.5 4.5l1.2-1.2 1.8.8c-.2 1.3-1.1 2-2.3 2-3.4 0-6.8-3.4-6.8-6.8 0-1.2.7-2.1 2-2.3l.8 1.8z"/></symbol>
   <symbol id="i-email" viewBox="0 0 24 24"><rect x="3.5" y="5.5" width="17" height="13" rx="2"/><path d="M4 7l8 6 8-6"/></symbol>
   <symbol id="i-imprimir" viewBox="0 0 24 24"><path d="M7 9V3.5h10V9M7 17H4.5V9h15v8H17M7 14h10v6.5H7z"/></symbol>
+  <symbol id="i-baixar" viewBox="0 0 24 24"><path d="M12 4v11M7 10.5l5 5 5-5M5 19.5h14"/></symbol>
   <symbol id="i-frasco" viewBox="0 0 24 24"><path d="M9.5 3.5h5M10.5 3.5v5.2L5.2 18a1.8 1.8 0 0 0 1.6 2.5h10.4a1.8 1.8 0 0 0 1.6-2.5l-5.3-9.3V3.5M7.6 14h8.8"/></symbol>
   <symbol id="i-seta-baixo" viewBox="0 0 24 24"><path d="M6 9.5l6 6 6-6"/></symbol>
   <symbol id="i-etiqueta" viewBox="0 0 24 24"><path d="M3.5 12.2V4.5a1 1 0 0 1 1-1h7.7L20.5 12a1.4 1.4 0 0 1 0 2l-6.5 6.5a1.4 1.4 0 0 1-2 0z"/><circle cx="8" cy="8" r="1.4"/></symbol>
@@ -962,6 +976,13 @@ function telaPedidos() {
     <div class="abas" role="group" aria-label="Filtro" data-filtros>${FILTROS.map(([k, rot, f]) => `<button type="button" data-filtro="${k}" aria-pressed="${st.filtro === k}">${rot}<em>${st.pedidos.filter(f).length}</em></button>`).join("")}</div>
     <select class="seletor" data-entrega aria-label="Entrega"><option value="">Toda entrega</option><option value="RETIRADA"${st.entrega === "RETIRADA" ? " selected" : ""}>Retirada no núcleo</option><option value="CORREIOS"${st.entrega === "CORREIOS" ? " selected" : ""}>Correios</option></select>
     <select class="seletor" data-ordem aria-label="Ordem">${[["data", "Mais recentes"], ["antigos", "Mais antigos"], ["valor", "Maior valor"], ["nome", "Nome (A-Z)"]].map(([k, r]) => `<option value="${k}"${st.ordem === k ? " selected" : ""}>${r}</option>`).join("")}</select>
+    <div class="exportar">
+      <button class="btn mini btn-linha" type="button" data-exportar-abrir aria-haspopup="menu" aria-expanded="${!!st.expAberto}">${icone("baixar")} Exportar ${icone("seta-baixo")}</button>
+      <div class="menu-exp" role="menu" ${st.expAberto ? "" : "hidden"}>
+        <button type="button" role="menuitem" data-exportar="todos">${icone("planilha")}<span><b>Todos os pedidos</b><small>Excel com todos os pedidos, status, contato, itens e entrega</small></span></button>
+        <button type="button" role="menuitem" data-exportar="boleto">${icone("boleto")}<span><b>Para o boleto</b><small>Só o nome e o valor de cada mês (parcelas somadas por pessoa)</small></span></button>
+      </div>
+    </div>
     <span class="contagem">${plural(lista.length, "pedido", "pedidos")} · ${brl(lista.filter(vale).reduce((s, p) => s + p.total, 0))} válidos</span>
   </div>
   <div class="tabela pedidos-tab">
@@ -981,6 +1002,34 @@ function linhaPedido(p) {
     <span>${statusChip(p)}${alt}</span>
   </button>`;
 }
+
+/* ---------- exportar ---------- */
+async function exportar(tipo, botao) {
+  const rot = botao.innerHTML;
+  botao.disabled = true; botao.innerHTML = '<span class="giro"></span><span><b>Gerando…</b></span>';
+  try {
+    const r = await fetch("/api/painel", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ acao: "exportar", tipo, senha: st.senha }) });
+    if (!r.ok) { const d = await r.json().catch(() => ({})); throw new Error(d.error || "Não foi possível gerar o arquivo agora."); }
+    const nome = /filename="?([^";]+)"?/i.exec(r.headers.get("content-disposition") || "")?.[1] || `pedidos-${tipo}.xlsx`;
+    const url = URL.createObjectURL(await r.blob());
+    const a = Object.assign(document.createElement("a"), { href: url, download: nome });
+    document.body.append(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 30_000);
+    const n = Number(r.headers.get("x-linhas") || 0);
+    st.expAberto = false; desenhar();
+    avisar(tipo === "boleto" ? `Planilha de boletos baixada (${plural(n, "pessoa", "pessoas")}).` : `Planilha com ${plural(n, "pedido", "pedidos")} baixada.`);
+  } catch (err) {
+    avisar(erroDeRede(err));
+    if (botao.isConnected) { botao.disabled = false; botao.innerHTML = rot; }
+  }
+}
+$("[data-secao]").addEventListener("click", (e) => {
+  if (e.target.closest("[data-exportar-abrir]")) { st.expAberto = !st.expAberto; return desenhar(); }
+  const x = e.target.closest("[data-exportar]");
+  if (x) return exportar(x.dataset.exportar, x);
+});
+document.addEventListener("click", (e) => { if (st.expAberto && !e.target.closest(".exportar")) { st.expAberto = false; if (st.view === "pedidos") desenhar(); } });
+addEventListener("keydown", (e) => { if (e.key === "Escape" && st.expAberto) { st.expAberto = false; desenhar(); } });
 
 /* ---------- clientes ---------- */
 function clientes() {

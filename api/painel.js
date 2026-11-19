@@ -11,10 +11,12 @@
    Pedidos no Pix (QR Code do núcleo) podem ser confirmados, cancelados e reativados; só os no boleto podem ser alterados.
    Produção (api/_gestao.js): "criar-lote" { refs, nome, observacao, por }, "lote-status" { id, status, por },
      "desfazer-lote" { id, ref?, por }, "entrega" { ref, entregue, rastreio, por }.
+   Exportar (Excel): "exportar" { tipo: "todos" | "boleto" }.
    Beta: "beta-listar", "beta-salvar" { colecao, item, por }, "beta-excluir" { colecao, id }. */
 import { HttpError, json, rota, readJSON, bancoPronto, dentroDoLimite, redis, ipDe, listarPedidos, lerPedido, salvarPedido, confereSenha, linha } from "./_lib.js";
 import { lerItens, itensParaSalvar, lerEntrega, entregaParaSalvar, cadastroPorNome, nomesCadastrados, mesmoNome } from "./_pedido.js";
 import { PRODUTO, PAGAMENTO, RETIRADA, parcelasDe } from "../produto.js";
+import { exportarTodos, exportarBoleto } from "./_exportar.js";
 import { listarLotes, criarLote, mudarStatusLote, desfazerLote, marcarEntrega, listarBeta, salvarBeta, excluirBeta } from "./_gestao.js";
 
 const HASH_SENHA = "SiCElJgKOvTJ3Ofr/88GXQ==:CIpHfa9Q/vSEU1G+j1N41NaXK7TAeVQHaotRfuOcc+8="; // hash da senha do painel
@@ -149,6 +151,14 @@ const POST = async (req) => {
   if (body.acao === "lote-status") return json({ lote: await mudarStatusLote(body, quem()) });
   if (body.acao === "desfazer-lote") return json({ lote: await desfazerLote(body, quem()) });
   if (body.acao === "entrega") return json({ pedido: await marcarEntrega(body, quem()) });
+  if (body.acao === "exportar") {
+    const pedidos = await listarPedidos();
+    const { arquivo, nome, quantos } = body.tipo === "boleto" ? exportarBoleto(pedidos) : exportarTodos(pedidos, await listarLotes());
+    return new Response(arquivo, { headers: {
+      "Content-Type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "Content-Disposition": `attachment; filename="${nome}"`, "Cache-Control": "no-store", "X-Linhas": String(quantos),
+    } });
+  }
   if (body.acao === "beta-listar") return json(await listarBeta());
   if (body.acao === "beta-salvar") return json({ item: await salvarBeta(body, quem()) });
   if (body.acao === "beta-excluir") return json({ ok: await excluirBeta(body) });
