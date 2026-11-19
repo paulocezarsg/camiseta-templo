@@ -1004,7 +1004,6 @@ function telaGeral() {
   const meses = new Map();
   for (const p of v.filter((x) => x.forma === "boleto")) (p.pagamento?.valores?.length ? p.pagamento.valores : [p.total || 0]).forEach((val, i) => { const m = mesParcela(p.criadoEm, i); const a = meses.get(m.chave) || { rot: m.rot, v: 0 }; a.v += val; meses.set(m.chave, a); });
   const listaMeses = [...meses.entries()].sort((a, b) => a[0] - b[0]).map(([, x]) => x);
-  const prox = listaMeses[0];
   // últimos 14 dias
   const hoje = Date.now(), dias = [];
   for (let k = 13; k >= 0; k--) { const ms = hoje - k * 86400_000; dias.push({ chave: chaveDia(ms), rot: diaCurto(ms), n: 0, v: 0 }); }
@@ -1028,7 +1027,7 @@ function telaGeral() {
     ${kpi("estrela", "Compras de sócios", pctTxt(pecasDe(soc), pecas), `das camisetas · ${socNaLista} de ${listaTotal} sócios já compraram`)}
     ${kpi("pix", "Pix a conferir", conferir.length, conferir.length ? `${brl(conferirVal)} para achar no extrato` : "tudo conferido", conferir.length ? "alerta" : "", `type="button" data-ir="pedidos" data-filtro-ir="pix"`)}
     ${kpi("carteira", "Já recebido", brl(recebido), `${brl(aConferir + noBoleto)} a receber ou conferir`)}
-    ${kpi("boleto", "Próximo boleto", prox ? brl(prox.v) : brl(0), prox ? `vai no boleto de ${prox.rot}` : "nenhum boleto ainda")}
+    ${kpi("boleto", "Vendido no boleto", brl(noBoleto), listaMeses.length ? `${plural(v.filter((p) => p.forma === "boleto").length, "pedido", "pedidos")} · ${listaMeses.length > 1 ? `${listaMeses[0].rot} a ${listaMeses.at(-1).rot}` : listaMeses[0].rot}` : "nenhum boleto ainda")}
     ${kpi("caixa", "Produção", pecasDe(pend), pecasDe(pend) ? `camisetas aguardando lote · ${etapas[2][1]} em produção` : `tudo em lote · ${etapas[2][1]} em produção`, pecasDe(pend) ? "aviso" : "", `type="button" data-ir="producao"`)}
   </div>
   <div class="grade">
