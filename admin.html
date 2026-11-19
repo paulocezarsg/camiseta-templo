@@ -21,25 +21,62 @@ button{cursor:pointer}
 h1,h2,h3{font-family:Fraunces,Georgia,serif;font-weight:600;letter-spacing:-.01em;margin:0}
 .ico{width:18px;height:18px;flex:none;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 
-/* ---------- telas de senha ---------- */
-.login{min-height:100vh;display:grid;place-items:center;padding:24px 16px;background:radial-gradient(800px 500px at 50% 0%,#6b3216,rgba(107,50,22,0) 70%),var(--cafe)}
-.login form{width:min(400px,100%);background:var(--creme);border-radius:26px;padding:36px 30px 30px;box-shadow:0 40px 90px -30px rgba(0,0,0,.6)}
-@media (max-width:420px){.login form{padding:30px 22px 24px}}
-.selo{width:54px;height:54px;border-radius:50% 50% 14px 14px;background:var(--ouro);color:var(--cafe);display:grid;place-items:center;margin-bottom:18px}
+/* ---------- entrada do admin: o templo à esquerda, a escolha à direita ---------- */
+.login{min-height:100vh;min-height:100dvh;display:grid;grid-template-columns:minmax(0,1.25fr) minmax(400px,.75fr);background:var(--creme)}
+.login-cena{position:relative;overflow:hidden;isolation:isolate;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px;padding:56px 48px;color:var(--cafe);
+  background-color:var(--mostarda);background-image:radial-gradient(70% 60% at 50% 42%,rgba(255,236,190,.38),rgba(255,236,190,0) 70%),repeating-linear-gradient(45deg,rgba(0,0,0,.022) 0 1px,transparent 1px 3px),repeating-linear-gradient(-45deg,rgba(255,255,255,.05) 0 1px,transparent 1px 3px)}
+.login-cena::after{content:"";position:absolute;inset:0;z-index:-1;background:radial-gradient(ellipse 80% 75% at 50% 55%,rgba(60,30,0,0) 40%,rgba(60,30,0,.32) 100%);pointer-events:none}
+.palco{position:relative;width:min(100%,820px);aspect-ratio:1600/928}
+.palco>div{position:absolute;inset:0}
+.palco .arte{background:#24130a;-webkit-mask:url("fotos/estampa.webp") center/contain no-repeat;mask:url("fotos/estampa.webp") center/contain no-repeat}
+.palco .luz{filter:blur(8px);background:
+  radial-gradient(ellipse 30% 24% at 50.5% 77%,rgba(255,240,196,.75),rgba(255,236,186,0) 100%),
+  radial-gradient(ellipse 26% 8% at 50.5% 88%,rgba(255,236,180,.6),rgba(255,236,180,0) 100%),
+  radial-gradient(circle at 50.4% 40.1%,rgba(255,250,228,.9) 0,rgba(255,236,180,0) 6%)}
+.palco .bloom{mix-blend-mode:screen;background:radial-gradient(ellipse 3% 9% at 50.5% 80%,rgba(255,250,232,.9),rgba(255,240,200,0) 100%),radial-gradient(ellipse 10% 15% at 50.5% 78%,rgba(255,248,222,.6),rgba(255,238,190,0) 100%);animation:respira 6s ease-in-out infinite}
+@keyframes respira{0%,100%{opacity:.75}50%{opacity:1}}
+.particulas i{position:absolute;left:var(--x);top:var(--y);width:var(--s);height:var(--s);border-radius:50%;background:radial-gradient(circle,#fffbea 0,rgba(255,236,180,.8) 40%,rgba(255,230,160,0) 70%);opacity:0;animation:sobe var(--d) linear var(--t) infinite}
+@keyframes sobe{0%{opacity:0;transform:translate(0,0)}12%{opacity:.95}80%{opacity:.5}100%{opacity:0;transform:translate(var(--dx),var(--dy))}}
+@media (prefers-reduced-motion:reduce){.palco .bloom,.particulas i{animation:none}.particulas{display:none}}
+.frase{margin:0;max-width:34ch;text-align:center;font:italic 400 clamp(17px,1.6vw,21px)/1.5 Fraunces,Georgia,serif;color:var(--cafe-2)}
+.login-lado{display:grid;place-items:center;padding:48px 32px;background:radial-gradient(500px 340px at 100% 0%,#fff6e3,rgba(255,246,227,0) 70%),var(--creme)}
+.login-caixa{width:min(380px,100%)}
+.olho{display:block;font-size:11.5px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--madeira)}
+.login h1{font-size:34px;line-height:1.1;color:var(--cafe);margin:8px 0 28px}
+.opcoes{display:grid;gap:12px}
+.opcao{display:flex;align-items:center;gap:16px;width:100%;padding:18px 18px 18px 16px;border:1px solid var(--linho);border-radius:20px;background:#fff;text-align:left;color:var(--tinta);box-shadow:0 1px 2px rgba(69,27,10,.05),0 10px 26px -18px rgba(69,27,10,.35);transition:transform .2s,box-shadow .2s,border-color .2s}
+.opcao:hover,.opcao:focus-visible{outline:none;border-color:var(--mostarda);transform:translateY(-2px);box-shadow:0 1px 2px rgba(69,27,10,.05),0 18px 34px -18px rgba(69,27,10,.45)}
+.op-ico{flex:none;width:48px;height:48px;border-radius:50% 50% 14px 14px;display:grid;place-items:center;background:var(--ouro);color:var(--cafe)}
+.op-ico.escuro,.selo.escuro{background:var(--cafe);color:var(--ouro)}
+.op-ico .ico{width:22px;height:22px}
+.op-txt{flex:1;min-width:0}
+.op-txt b{display:block;font-size:16px;font-weight:700;color:var(--cafe)}
+.op-txt small{display:block;margin-top:2px;font-size:13px;color:var(--suave)}
+.op-seta{color:var(--madeira);transition:transform .2s}
+.opcao:hover .op-seta{transform:translateX(3px)}
+.selo{width:54px;height:54px;border-radius:50% 50% 14px 14px;background:var(--ouro);color:var(--cafe);display:grid;place-items:center;margin-bottom:16px}
 .selo .ico{width:24px;height:24px}
-.login h1{font-size:26px;color:var(--cafe)}
-.login p{color:var(--suave);margin:6px 0 22px}
+.login form h1{font-size:30px;margin:0 0 24px}
+.voltar-topo{display:inline-flex;align-items:center;gap:6px;margin:0 0 26px;padding:6px 12px 6px 8px;border:0;border-radius:999px;background:#f4ebdc;color:var(--cafe-2);font-size:13px;font-weight:600}
+.voltar-topo .ico{width:16px;height:16px;transform:rotate(180deg)}
+.voltar-topo:hover{background:var(--linho)}
 .login label{display:grid;gap:6px;font-size:12.5px;font-weight:600;color:var(--cafe-2)}
-.login input{height:50px;border:0;border-radius:14px;padding:0 16px;background:#fff;box-shadow:inset 0 0 0 1.5px var(--linho-2);font-size:16px}
+.login input{height:52px;border:0;border-radius:14px;padding:0 16px;background:#fff;box-shadow:inset 0 0 0 1.5px var(--linho-2);font-size:16px}
 .login input:focus{outline:none;box-shadow:inset 0 0 0 2px var(--cafe)}
+.login .voltar{margin-top:26px}
+@media (max-width:900px){
+  .login{grid-template-columns:1fr;grid-template-rows:auto 1fr}
+  .login-cena{padding:44px 20px 70px;gap:18px}
+  .palco{width:min(100%,560px)}
+  .frase{font-size:16px}
+  .login-lado{position:relative;margin-top:-34px;border-radius:30px 30px 0 0;padding:34px 20px 40px;align-items:start}
+  .login h1{font-size:28px;margin-bottom:22px}
+}
 .btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;margin-top:16px;padding:15px;border:0;border-radius:999px;background:var(--cafe);color:var(--creme);font-weight:600;font-size:14px;transition:background .2s,box-shadow .2s}
 .btn:hover{background:#6e3618}
 .btn[disabled]{opacity:.6;pointer-events:none}
 .btn-linha{background:transparent;color:var(--cafe);box-shadow:inset 0 0 0 1.5px var(--linho-2)}
 .btn-linha:hover{background:#fff;box-shadow:inset 0 0 0 1.5px var(--cafe)}
-.ou{display:flex;align-items:center;gap:12px;margin:18px 0 0;color:var(--suave);font-size:11px;font-weight:700;letter-spacing:.2em;text-transform:uppercase}
-.ou::before,.ou::after{content:"";flex:1;height:1px;background:var(--linho)}
-.ou+.btn{margin-top:14px}
 .giro{width:16px;height:16px;border-radius:50%;border:2.5px solid currentColor;border-right-color:transparent;animation:gira .7s linear infinite}
 @keyframes gira{to{transform:rotate(360deg)}}
 .msg{margin-top:12px;padding:10px 14px;border-radius:12px;font-size:13.5px;font-weight:600}
@@ -482,6 +519,25 @@ button.kpi:hover{transform:translateY(-1px);box-shadow:0 1px 2px rgba(69,27,10,.
 .menu-exp button[disabled]{opacity:.7}
 @media (max-width:900px){.menu-exp{left:0;right:auto;width:min(320px,calc(100vw - 32px))}}
 
+
+/* ---------- visão geral: caixas da mesma linha com o conteúdo distribuído ---------- */
+.grade>.caixa{display:flex;flex-direction:column}
+.caixa>.encher{flex:1}
+.barras.encher{align-content:space-evenly}
+.lista-curta.encher{align-content:space-between}
+.encher:not(.barras):not(.lista-curta):not(.funil){display:flex;flex-direction:column;justify-content:space-between;gap:18px}
+.encher.espalhar{justify-content:space-around}
+.encher .metrica{margin:0}
+.sub-bloco{padding-top:16px;border-top:1px dashed #efe4d3}
+.sub-tit{display:block;margin:0 0 10px;font-size:12px;font-weight:600;color:var(--suave)}
+.sub-bloco .barras .lin{grid-template-columns:72px 1fr auto}
+.caixa.grafico .colunas{flex:1;height:auto;min-height:170px}
+.funil.encher{grid-auto-rows:1fr;min-height:110px}
+.funil.encher .etapa{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:14px 8px}
+.funil.encher .etapa b{font-size:26px}
+.funil.encher .etapa span{font-size:11.5px}
+@media (min-width:901px) and (max-width:1250px){.caixa.terco.ultimo{grid-column:1/-1}}
+
 /* ---------- tipografia do painel (CRM): Inter ---------- */
 .app,.ficha,.modal,.toast{font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-feature-settings:"cv11","ss01";letter-spacing:-.006em}
 .app h1,.app h2,.app h3,.ficha h2,.modal h2,.app .kpi .num,.app .tam b,.marca b{font-family:Inter,system-ui,sans-serif;letter-spacing:-.022em}
@@ -565,6 +621,7 @@ button.kpi:hover{transform:translateY(-1px);box-shadow:0 1px 2px rgba(69,27,10,.
   <symbol id="i-whats" viewBox="0 0 24 24"><path d="M4 20l1.3-4A8 8 0 1 1 8 18.7z"/><path d="M9 9.5c.3 2 2.5 4.2 4.5 4.5l1.2-1.2 1.8.8c-.2 1.3-1.1 2-2.3 2-3.4 0-6.8-3.4-6.8-6.8 0-1.2.7-2.1 2-2.3l.8 1.8z"/></symbol>
   <symbol id="i-email" viewBox="0 0 24 24"><rect x="3.5" y="5.5" width="17" height="13" rx="2"/><path d="M4 7l8 6 8-6"/></symbol>
   <symbol id="i-imprimir" viewBox="0 0 24 24"><path d="M7 9V3.5h10V9M7 17H4.5V9h15v8H17M7 14h10v6.5H7z"/></symbol>
+  <symbol id="i-seta" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
   <symbol id="i-baixar" viewBox="0 0 24 24"><path d="M12 4v11M7 10.5l5 5 5-5M5 19.5h14"/></symbol>
   <symbol id="i-frasco" viewBox="0 0 24 24"><path d="M9.5 3.5h5M10.5 3.5v5.2L5.2 18a1.8 1.8 0 0 0 1.6 2.5h10.4a1.8 1.8 0 0 0 1.6-2.5l-5.3-9.3V3.5M7.6 14h8.8"/></symbol>
   <symbol id="i-seta-baixo" viewBox="0 0 24 24"><path d="M6 9.5l6 6 6-6"/></symbol>
@@ -580,28 +637,47 @@ button.kpi:hover{transform:translateY(-1px);box-shadow:0 1px 2px rgba(69,27,10,.
 </svg>
 
 <main class="login" data-telas>
-  <!-- planilha -->
-  <form data-form novalidate>
-    <div class="selo"><svg class="ico"><use href="#i-cadeado"/></svg></div>
-    <h1>Acesso admin</h1>
-    <p>Digite a senha para baixar a planilha (Excel) com todos os pedidos da camiseta.</p>
-    <label>Senha<input type="password" name="senha" autocomplete="current-password" required autofocus></label>
-    <div class="msg" data-msg role="status" hidden></div>
-    <button class="btn" type="submit" data-baixar><svg class="ico"><use href="#i-planilha"/></svg><span>Baixar planilha</span></button>
-    <div class="ou">ou</div>
-    <button class="btn btn-linha" type="button" data-ir-painel><svg class="ico"><use href="#i-lista"/></svg><span>Painel de pedidos</span></button>
-    <a class="voltar" href="/">Voltar para a loja</a>
-  </form>
-  <!-- senha do painel -->
-  <form data-form-painel novalidate hidden>
-    <div class="selo"><svg class="ico"><use href="#i-lista"/></svg></div>
-    <h1>Painel de pedidos</h1>
-    <p>Digite a senha do painel para ver todos os pedidos e fazer alterações.</p>
-    <label>Senha do painel<input type="password" name="senha" autocomplete="off" required></label>
-    <div class="msg erro" data-msg-painel role="status" hidden></div>
-    <button class="btn" type="submit" data-entrar-painel><svg class="ico"><use href="#i-lista"/></svg><span>Entrar no painel</span></button>
-    <button class="voltar" type="button" data-voltar-admin>Voltar</button>
-  </form>
+  <section class="login-cena" aria-hidden="true">
+    <div class="palco">
+      <div class="luz"></div>
+      <div class="arte"></div>
+      <div class="bloom"></div>
+      <div class="particulas"><i style="--x:22%;--y:70%;--s:4px;--d:9s;--t:-2s;--dx:14px;--dy:-120px"></i><i style="--x:31%;--y:58%;--s:3px;--d:11s;--t:-6s;--dx:-10px;--dy:-140px"></i><i style="--x:44%;--y:76%;--s:5px;--d:10s;--t:-1s;--dx:8px;--dy:-160px"></i><i style="--x:50%;--y:62%;--s:3px;--d:8s;--t:-4s;--dx:-6px;--dy:-110px"></i><i style="--x:57%;--y:80%;--s:4px;--d:12s;--t:-7s;--dx:12px;--dy:-150px"></i><i style="--x:66%;--y:66%;--s:3px;--d:9s;--t:-3s;--dx:-14px;--dy:-130px"></i><i style="--x:74%;--y:74%;--s:4px;--d:11s;--t:-8s;--dx:10px;--dy:-120px"></i><i style="--x:38%;--y:84%;--s:3px;--d:10s;--t:-5s;--dx:-8px;--dy:-170px"></i><i style="--x:62%;--y:54%;--s:3px;--d:13s;--t:-9s;--dx:6px;--dy:-120px"></i><i style="--x:27%;--y:82%;--s:3px;--d:12s;--t:-10s;--dx:10px;--dy:-140px"></i></div>
+    </div>
+    <p class="frase">A esperança planta, o amor cultiva e a união faz o sonho acontecer.</p>
+  </section>
+  <section class="login-lado">
+    <div class="login-caixa">
+      <!-- escolha -->
+      <div class="escolha" data-escolha>
+        <span class="olho">Núcleo Estrela Bonita</span>
+        <h1>Área do admin</h1>
+        <div class="opcoes">
+          <button class="opcao" type="button" data-ir-planilha><span class="op-ico"><svg class="ico"><use href="#i-planilha"/></svg></span><span class="op-txt"><b>Baixar planilha</b><small>Excel com os pedidos</small></span><svg class="ico op-seta"><use href="#i-seta"/></svg></button>
+          <button class="opcao" type="button" data-ir-painel><span class="op-ico escuro"><svg class="ico"><use href="#i-grafico"/></svg></span><span class="op-txt"><b>Acessar painel</b><small>Pedidos, clientes e produção</small></span><svg class="ico op-seta"><use href="#i-seta"/></svg></button>
+        </div>
+        <a class="voltar" href="/">Voltar para a loja</a>
+      </div>
+      <!-- planilha -->
+      <form data-form novalidate hidden>
+        <button class="voltar-topo" type="button" data-voltar-escolha><svg class="ico"><use href="#i-seta"/></svg>Voltar</button>
+        <span class="selo"><svg class="ico"><use href="#i-planilha"/></svg></span>
+        <h1>Baixar planilha</h1>
+        <label>Senha<input type="password" name="senha" autocomplete="current-password" required></label>
+        <div class="msg" data-msg role="status" hidden></div>
+        <button class="btn" type="submit" data-baixar><svg class="ico"><use href="#i-baixar"/></svg><span>Baixar planilha</span></button>
+      </form>
+      <!-- senha do painel -->
+      <form data-form-painel novalidate hidden>
+        <button class="voltar-topo" type="button" data-voltar-admin><svg class="ico"><use href="#i-seta"/></svg>Voltar</button>
+        <span class="selo escuro"><svg class="ico"><use href="#i-grafico"/></svg></span>
+        <h1>Painel de pedidos</h1>
+        <label>Senha do painel<input type="password" name="senha" autocomplete="off" required></label>
+        <div class="msg erro" data-msg-painel role="status" hidden></div>
+        <button class="btn" type="submit" data-entrar-painel><svg class="ico"><use href="#i-seta"/></svg><span>Entrar no painel</span></button>
+      </form>
+    </div>
+  </section>
 </main>
 
 <!-- painel (CRM) -->
@@ -803,8 +879,16 @@ function mostrarPainel(sim) {
   $("[data-telas]").hidden = sim; $("[data-painel]").hidden = !sim;
   document.body.classList.toggle("no-painel", sim);
 }
-$("[data-ir-painel]").addEventListener("click", () => { form.hidden = true; formPainel.hidden = false; msgPainel.hidden = true; formPainel.elements.senha.focus(); });
-$("[data-voltar-admin]").addEventListener("click", () => { formPainel.hidden = true; form.hidden = false; campo.focus(); });
+const escolha = $("[data-escolha]");
+function telaEntrada(qual) {
+  escolha.hidden = qual !== "escolha"; form.hidden = qual !== "planilha"; formPainel.hidden = qual !== "painel";
+  if (qual === "planilha") { msg.hidden = true; campo.focus(); }
+  if (qual === "painel") { msgPainel.hidden = true; formPainel.elements.senha.focus(); }
+}
+$("[data-ir-planilha]").addEventListener("click", () => telaEntrada("planilha"));
+$("[data-ir-painel]").addEventListener("click", () => telaEntrada("painel"));
+$("[data-voltar-escolha]").addEventListener("click", () => telaEntrada("escolha"));
+$("[data-voltar-admin]").addEventListener("click", () => telaEntrada("escolha"));
 
 formPainel.addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -827,7 +911,7 @@ async function atualizar() {
 }
 function sair(texto) {
   st.senha = ""; st.pedidos = [];
-  mostrarPainel(false); form.hidden = true; formPainel.hidden = false;
+  mostrarPainel(false); escolha.hidden = true; form.hidden = true; formPainel.hidden = false;
   msgPainel.hidden = !texto; msgPainel.textContent = texto || "";
 }
 $$("[data-atualizar]").forEach((b) => b.addEventListener("click", atualizar));
@@ -926,9 +1010,6 @@ function telaGeral() {
   for (let k = 13; k >= 0; k--) { const ms = hoje - k * 86400_000; dias.push({ chave: chaveDia(ms), rot: diaCurto(ms), n: 0, v: 0 }); }
   for (const p of v) { const d = dias.find((x) => x.chave === chaveDia(p.criadoEm)); if (d) { d.n += p.pecas || 0; d.v += p.total || 0; } }
   const maxDia = Math.max(0, ...dias.map((d) => d.n));
-  const formas = [["Boleto (sócios)", (p) => p.forma === "boleto", ""], ["Pix (QR Code)", (p) => p.forma === "pix", "verde"], ["PagBank", (p) => !["boleto", "pix"].includes(p.forma), "azul"]]
-    .map(([rot, f, cls]) => { const l = v.filter(f); return { rot, cls, n: l.length, val: somaTotal(l) }; }).filter((x) => x.n || x.rot !== "PagBank");
-  const maxForma = Math.max(0, ...formas.map((x) => x.val));
   const tams = new Map(); for (const p of v) for (const i of p.itens || []) { const k = `${i.modelo} ${i.tamanho}`; tams.set(k, (tams.get(k) || 0) + i.qtd); }
   const topTam = [...tams.entries()].sort((a, b) => b[1] - a[1]).slice(0, 6), maxTam = topTam[0]?.[1] || 0;
   const eventos = [];
@@ -951,7 +1032,7 @@ function telaGeral() {
     ${kpi("caixa", "Produção", pecasDe(pend), pecasDe(pend) ? `camisetas aguardando lote · ${etapas[2][1]} em produção` : `tudo em lote · ${etapas[2][1]} em produção`, pecasDe(pend) ? "aviso" : "", `type="button" data-ir="producao"`)}
   </div>
   <div class="grade">
-    <section class="caixa larga"><h3>Camisetas vendidas por dia <small>últimos 14 dias</small></h3>
+    <section class="caixa larga grafico"><h3>Camisetas vendidas por dia <small>últimos 14 dias</small></h3>
       <div class="colunas">${dias.map((d) => `<div class="col" title="${d.rot}: ${d.n} camisetas, ${brl(d.v)}"><div class="barra-v ${d.n ? "" : "zero"}" style="height:${d.n ? pct(d.n, maxDia) : 2}%">${d.n ? `<em>${d.n}</em>` : ""}</div><small>${d.rot}</small></div>`).join("")}</div>
     </section>
     <section class="caixa estreita"><h3>Sócios x não sócios</h3>
@@ -960,24 +1041,25 @@ function telaGeral() {
       <div class="mini-dl"><div><span>Ticket médio · sócio</span><b>${brl(soc.length ? Math.round(somaTotal(soc) / soc.length) : 0)}</b></div><div><span>Ticket médio · não sócio</span><b>${brl(nao.length ? Math.round(somaTotal(nao) / nao.length) : 0)}</b></div><div><span>Sócios que já compraram</span><b>${socNaLista} de ${listaTotal} (${pctTxt(socNaLista, listaTotal)})</b></div></div>` : `<div class="vazio-mini">Nenhuma venda ainda.</div>`}
     </section>
     <section class="caixa terco"><h3>Recebimento</h3>
-      ${fat ? divisao(["Recebido", "Pix a conferir", "No boleto"], [recebido, aConferir, noBoleto], brl, ["verde", "c", ""]) : `<div class="vazio-mini">Nada a receber ainda.</div>`}
-      <p class="nota-caixa">${formas.map((f) => `${f.rot.split(" ")[0]}: ${plural(f.n, "pedido", "pedidos")}`).join(" · ")}</p>
-    </section>
-    <section class="caixa terco"><h3>${icone("caixa")} Produção <small><button type="button" class="link-mini" data-ir="producao">abrir produção →</button></small></h3>
-      <div class="funil">${etapas.map(([r, n], i) => `<div class="etapa e${i}"><b>${n}</b><span>${r}</span></div>`).join("")}</div>
-    </section>
-    <section class="caixa terco"><h3>Entrega e modelos</h3>
-      <div class="metrica"><span>Entrega</span>${divisao(["Retirada", "Correios"], [ret, cor], (x) => plural(x, "pedido", "pedidos"))}</div>
-      <div class="metrica"><span>Modelos</span>${divisao(Object.keys(porModelo).length ? Object.keys(porModelo) : ["Básica", "Infantil"], Object.keys(porModelo).length ? Object.values(porModelo) : [0, 0], (x) => `${x}`)}</div>
+      <div class="encher">
+        <div>${fat ? divisao(["Recebido", "Pix a conferir", "No boleto"], [recebido, aConferir, noBoleto], brl, ["verde", "c", ""]) : `<div class="vazio-mini">Nada a receber ainda.</div>`}</div>
+        ${listaMeses.length ? `<div class="sub-bloco"><span class="sub-tit">Boletos por mês</span><div class="barras">${listaMeses.map((m) => `<div class="lin"><span>${m.rot}</span><div class="trilho"><i style="width:${pct(m.v, Math.max(...listaMeses.map((x) => x.v)))}%"></i></div><b>${brl(m.v)}</b></div>`).join("")}</div></div>` : ""}
+      </div>
     </section>
     <section class="caixa terco"><h3>Tamanhos mais pedidos</h3>
-      ${topTam.length ? `<div class="barras">${topTam.map(([k, n]) => `<div class="lin"><span>${esc(k)}</span><div class="trilho"><i style="width:${pct(n, maxTam)}%"></i></div><b>${n}</b></div>`).join("")}</div>` : `<div class="vazio-mini">Nenhuma camiseta ainda.</div>`}
+      ${topTam.length ? `<div class="barras encher">${topTam.map(([k, n]) => `<div class="lin"><span>${esc(k)}</span><div class="trilho"><i style="width:${pct(n, maxTam)}%"></i></div><b>${n}</b></div>`).join("")}</div>` : `<div class="vazio-mini">Nenhuma camiseta ainda.</div>`}
     </section>
-    <section class="caixa terco"><h3>Boleto: a receber por mês</h3>
-      ${listaMeses.length ? `<div class="barras">${listaMeses.map((m) => `<div class="lin"><span>Boleto ${m.rot}</span><div class="trilho"><i style="width:${pct(m.v, Math.max(...listaMeses.map((x) => x.v)))}%"></i></div><b>${brl(m.v)}</b></div>`).join("")}</div>` : `<div class="vazio-mini">Nenhum pedido no boleto ainda.</div>`}
+    <section class="caixa terco ultimo"><h3>Atividade recente</h3>
+      ${eventos.length ? `<div class="lista-curta encher">${eventos.slice(0, 5).map((e) => `<button type="button" data-abrir="${esc(e.p.ref)}"><span class="avatar" ${e.painel ? 'style="background:#e7ecfb;color:#3c4a9e"' : ""}>${iniciais(e.quem)}</span><span class="txt"><b>${esc(e.quem || "")}${e.painel ? " (painel)" : ""}</b><small>${esc(e.txt)}</small></span><span class="peq" style="font-size:12px;color:var(--suave);white-space:nowrap">${dataHora(e.em).replace(/\/\d{4},?/, "")}</span></button>`).join("")}</div>` : `<div class="vazio-mini">Nada por aqui ainda.</div>`}
     </section>
-    <section class="caixa terco"><h3>Atividade recente</h3>
-      ${eventos.length ? `<div class="lista-curta">${eventos.slice(0, 5).map((e) => `<button type="button" data-abrir="${esc(e.p.ref)}"><span class="avatar" ${e.painel ? 'style="background:#e7ecfb;color:#3c4a9e"' : ""}>${iniciais(e.quem)}</span><span class="txt"><b>${esc(e.quem || "")}${e.painel ? " (painel)" : ""}</b><small>${esc(e.txt)}</small></span><span class="peq" style="font-size:12px;color:var(--suave);white-space:nowrap">${dataHora(e.em).replace(/\/\d{4},?/, "")}</span></button>`).join("")}</div>` : `<div class="vazio-mini">Nada por aqui ainda.</div>`}
+    <section class="caixa larga"><h3>${icone("caixa")} Produção <small><button type="button" class="link-mini" data-ir="producao">abrir produção →</button></small></h3>
+      <div class="funil encher">${etapas.map(([r, n], i) => `<div class="etapa e${i}"><b>${n}</b><span>${r}</span></div>`).join("")}</div>
+    </section>
+    <section class="caixa estreita"><h3>Entrega e modelos</h3>
+      <div class="encher espalhar">
+        <div class="metrica"><span>Entrega</span>${divisao(["Retirada", "Correios"], [ret, cor], (x) => plural(x, "pedido", "pedidos"))}</div>
+        <div class="metrica"><span>Modelos</span>${divisao(Object.keys(porModelo).length ? Object.keys(porModelo) : ["Básica", "Infantil"], Object.keys(porModelo).length ? Object.values(porModelo) : [0, 0], (x) => `${x}`)}</div>
+      </div>
     </section>
   </div>`;
 }
@@ -1006,8 +1088,8 @@ function telaPedidos() {
     <div class="exportar">
       <button class="btn mini btn-linha" type="button" data-exportar-abrir aria-haspopup="menu" aria-expanded="${!!st.expAberto}">${icone("baixar")} Exportar ${icone("seta-baixo")}</button>
       <div class="menu-exp" role="menu" ${st.expAberto ? "" : "hidden"}>
-        <button type="button" role="menuitem" data-exportar="todos">${icone("planilha")}<span><b>Todos os pedidos</b><small>Excel com todos os pedidos, status, contato, itens e entrega</small></span></button>
-        <button type="button" role="menuitem" data-exportar="boleto">${icone("boleto")}<span><b>Para o boleto</b><small>Só o nome e o valor de cada mês (parcelas somadas por pessoa)</small></span></button>
+        <button type="button" role="menuitem" data-exportar="todos">${icone("planilha")}<span><b>Todos os pedidos</b><small>Excel completo, com status</small></span></button>
+        <button type="button" role="menuitem" data-exportar="boleto">${icone("boleto")}<span><b>Para o boleto</b><small>Nome e valor de cada mês</small></span></button>
       </div>
     </div>
     <span class="contagem">${plural(lista.length, "pedido", "pedidos")} · ${brl(lista.filter(vale).reduce((s, p) => s + p.total, 0))} válidos</span>
@@ -1237,7 +1319,6 @@ function fichaCliente(c) {
       <dt>Primeiro pedido</dt><dd>${dataHora(primeiro)}</dd>
       <dt>Último pedido</dt><dd>${dataHora(c.ultimo)}</dd>
     </dl>
-    ${!cel && !c.email ? `<p class="nota-caixa">Sem contato: no boleto, a pessoa só escolhe o nome na lista de sócios.</p>` : ""}
     ${cel || c.email ? `<div class="contatos">${cel ? `<a class="zap" href="https://wa.me/55${cel}" target="_blank" rel="noopener">${icone("whats")}WhatsApp</a>` : ""}${c.email ? `<a href="mailto:${esc(c.email)}">${icone("email")}E-mail</a>` : ""}</div>` : ""}
     </section>
     ${tams.size ? `<section class="bloco-f"><h4>Camisetas compradas</h4><div class="chips-tam">${[...tams.entries()].sort((a, b) => b[1] - a[1]).map(([k, n]) => `<span><b>${n}</b> ${esc(k)}</span>`).join("")}</div></section>` : ""}
@@ -1261,7 +1342,7 @@ function comNome(fn) {
   const n = meuNome();
   if (n && n.replace(/[^\p{L}]/gu, "").length >= 2) return fn(n);
   abrirForm({
-    titulo: "Quem está usando o painel?", sub: "Seu nome fica registrado em cada mudança (lotes, entregas e cadastros). Pedimos uma vez só neste aparelho.",
+    titulo: "Quem está usando o painel?", sub: "Fica registrado nas mudanças.",
     campos: [{ k: "nome", rot: "Seu nome", req: true }], valores: {}, botao: "Continuar",
     salvar: async (v) => { guardado.gravar("eb-painel-nome", v.nome.trim()); fecharFicha(); return fn(v.nome.trim()); },
   });
@@ -1298,7 +1379,6 @@ function telaProducao() {
     <section class="caixa inteira" id="aguardando">
       <h3>${icone("relogio")} Aguardando lote <small>${plural(pend.length, "pedido", "pedidos")} · ${plural(pecasDe(pend), "camiseta", "camisetas")}</small></h3>
       ${pend.length ? `
-        <p class="nota-caixa" style="margin:-6px 0 14px">Pedidos que já valem (boleto, Pix informado ou confirmado, PagBank pago) e ainda não entraram em nenhum lote. Abra um lote com todos ou marque só alguns.</p>
         ${gradeHTML(alvo)}
         <div class="sel-barra">
           <label class="check-todos"><input type="checkbox" data-sel-todos ${selecionados.length === pend.length ? "checked" : ""}> <span>${selecionados.length ? `${selecionados.length} de ${pend.length} selecionados` : "Selecionar pedidos"}</span></label>
@@ -1669,7 +1749,7 @@ function telaDRE() {
         <div><span>Custos de produção lançados</span><b>${brl(custosProd)}</b></div>
         <div><span>Custo em estoque (não vendido)</span><b>${brl(Math.max(0, estoque))}</b></div>
       </div>
-      <p class="nota-caixa">${esc(cu.base)} O custo entra no DRE à medida que as camisetas são vendidas; o que sobra fica como estoque.</p>
+      <p class="nota-caixa">${esc(cu.base)}</p>
     </section>
   </div>`;
 }
