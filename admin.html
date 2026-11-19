@@ -77,11 +77,11 @@ h1,h2,h3{font-family:Fraunces,Georgia,serif;font-weight:600;letter-spacing:-.01e
 .busca:focus{outline:none;box-shadow:inset 0 0 0 2px var(--cafe)}
 .icone-btn{width:42px;height:42px;flex:none;display:grid;place-items:center;border:0;border-radius:12px;background:#fff;box-shadow:inset 0 0 0 1px var(--borda);color:var(--cafe)}
 .icone-btn:hover{box-shadow:inset 0 0 0 1.5px var(--cafe)}
-.secao{padding:24px 28px 90px;max-width:1320px}
+.secao{padding:24px 28px 90px}
 .mini{width:auto;margin:0;padding:10px 16px;font-size:13px}
 
 /* cartões de números */
-.kpis{display:grid;grid-template-columns:repeat(auto-fill,minmax(205px,1fr));gap:14px;margin-bottom:18px}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:14px}
 .kpis>*{min-width:0}
 .kpi{position:relative;padding:16px 18px;border-radius:18px;background:var(--cartao);box-shadow:var(--sombra);border:1px solid var(--borda);text-align:left;overflow:hidden}
 button.kpi{width:100%;cursor:pointer;transition:transform .15s,box-shadow .15s}
@@ -99,6 +99,8 @@ button.kpi:hover{transform:translateY(-1px);box-shadow:0 1px 2px rgba(69,27,10,.
 .grade{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:14px}
 .caixa{grid-column:span 6;padding:18px 20px;border-radius:18px;background:var(--cartao);box-shadow:var(--sombra);border:1px solid var(--borda);min-width:0}
 .caixa.larga{grid-column:span 8}.caixa.estreita{grid-column:span 4}.caixa.inteira{grid-column:1/-1}
+.caixa.terco{grid-column:span 4}
+@media (min-width:901px) and (max-width:1250px){.caixa.terco{grid-column:span 6}.caixa.larga,.caixa.estreita{grid-column:1/-1}}
 .caixa h3{display:flex;align-items:center;gap:8px;font-size:17px;color:var(--cafe);margin-bottom:14px}
 .caixa h3 small{margin-left:auto;font:600 12px Montserrat,system-ui,sans-serif;color:var(--suave)}
 .colunas{display:flex;align-items:flex-end;gap:6px;height:170px;padding-top:18px}
@@ -169,7 +171,7 @@ button.kpi:hover{transform:translateY(-1px);box-shadow:0 1px 2px rgba(69,27,10,.
 .tab-lin .quem small,.tab-lin .peq{display:block;font-size:12px;color:var(--suave);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .tab-lin .dir,.tab-cab .dir{text-align:right;justify-content:flex-end}
 .tab-lin .valor{font-weight:700;color:var(--tinta);font-variant-numeric:tabular-nums}
-.pedidos-tab{--cols:minmax(180px,1.6fr) 96px minmax(120px,1.1fr) minmax(110px,1fr) 130px 100px 150px}
+.pedidos-tab{--cols:minmax(200px,1.7fr) minmax(130px,1.2fr) minmax(110px,1fr) 120px 110px 190px}
 .clientes-tab{--cols:minmax(200px,1.8fr) 80px 80px 110px minmax(130px,1fr) 120px}
 .vazio{padding:34px;text-align:center;color:var(--suave)}
 
@@ -250,7 +252,7 @@ button.kpi:hover{transform:translateY(-1px);box-shadow:0 1px 2px rgba(69,27,10,.
   .barra .busca-wrap{order:3;width:100%;margin-left:0}
   .barra .acoes-b{margin-left:auto;display:flex;gap:8px}
   .secao{padding:16px 16px 100px}
-  .caixa,.caixa.larga,.caixa.estreita{grid-column:1/-1}
+  .caixa,.caixa.larga,.caixa.estreita,.caixa.terco{grid-column:1/-1}
   .kpis{grid-template-columns:1fr 1fr;gap:10px}
   .kpi{padding:14px}
   .kpi .num{font-size:22px}
@@ -508,6 +510,37 @@ button.kpi:hover{transform:translateY(-1px);box-shadow:0 1px 2px rgba(69,27,10,.
 .tam b{font-size:22px;font-weight:700}
 .modal-cab h2{font-size:19px;font-weight:700}
 .btn{font-weight:600}
+
+/* ---------- ajustes: marca, chips e listas ---------- */
+.marca{flex-direction:column;align-items:flex-start;gap:8px;padding:6px 10px 18px}
+.marca .logo-templo{width:100%;height:auto;max-height:84px;color:var(--ouro)}
+.marca .marca-nome{display:block;width:100%;text-align:center;font:600 11px/1.2 Inter,system-ui,sans-serif;letter-spacing:.32em;text-transform:uppercase;color:rgba(246,233,214,.55)}
+/* chips de status: cantos suaves, contorno fino e ponto */
+.st{display:inline-flex;align-items:center;gap:6px;padding:3px 9px 3px 8px;border-radius:7px;font-size:11.5px;font-weight:600;line-height:1.5;white-space:nowrap;background:var(--fundo-chip,#f5efe6);color:var(--cor-chip,#6b5a4b);box-shadow:inset 0 0 0 1px var(--borda-chip,rgba(107,90,75,.16))}
+.st::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor;opacity:.85;flex:none}
+.st.registrado{--fundo-chip:#ecf6ea;--cor-chip:#2c6e30;--borda-chip:#cfe6cb}
+.st.cancelado{--fundo-chip:#fcefed;--cor-chip:#a3241a;--borda-chip:#f2d0cb}
+.st.pagbank{--fundo-chip:#eff1fc;--cor-chip:#3c4a9e;--borda-chip:#d9ddf5}
+.st.pix{--fundo-chip:#e9f7f3;--cor-chip:#1b6f61;--borda-chip:#c7e9e0}
+.st.alterado{--fundo-chip:#fdf3e1;--cor-chip:#8a5a12;--borda-chip:#f1ddb5}
+.st.alterado::before{border-radius:2px;transform:rotate(45deg);width:5px;height:5px}
+.st.socio{--fundo-chip:#fdf3dc;--cor-chip:#7a4e05;--borda-chip:#f0d9a5}
+.st.neutro{--fundo-chip:#f5efe6;--cor-chip:#6b5a4b;--borda-chip:#e6dccd}
+.st.neutro::before{display:none}
+.st.etapa-aberto{--fundo-chip:#f4ede1;--cor-chip:#7a5a2a;--borda-chip:#e6d8bf;background:var(--fundo-chip);color:var(--cor-chip)}
+.st.etapa-producao{--fundo-chip:#eff1fc;--cor-chip:#3c4a9e;--borda-chip:#d9ddf5;background:var(--fundo-chip);color:var(--cor-chip)}
+.st.etapa-pronto{--fundo-chip:#e9f7f3;--cor-chip:#1b6f61;--borda-chip:#c7e9e0;background:var(--fundo-chip);color:var(--cor-chip)}
+.st.etapa-entregue{--fundo-chip:#ecf6ea;--cor-chip:#2c6e30;--borda-chip:#cfe6cb;background:var(--fundo-chip);color:var(--cor-chip)}
+.chips{display:flex;flex-wrap:wrap;gap:5px;align-items:center}
+/* lista de pedidos mais limpa */
+.pedidos-tab .tab-lin{padding:14px 18px}
+.pedidos-tab .tab-lin .quem b{font-size:14px}
+.pedidos-tab .forma{font-weight:500;color:var(--cafe-2)}
+.resumo-cli{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.resumo-cli div{padding:10px 12px;border-radius:14px;background:#fff;border:1px solid var(--borda)}
+.resumo-cli span{display:block;font-size:11px;font-weight:600;letter-spacing:.03em;text-transform:uppercase;color:var(--suave)}
+.resumo-cli b{display:block;margin-top:4px;font-size:16px;color:var(--cafe);font-variant-numeric:tabular-nums}
+@media (max-width:900px){.kpis{grid-template-columns:1fr 1fr}.resumo-cli{grid-template-columns:1fr 1fr}.marca .logo-templo{max-height:60px}}
 </style>
 </head>
 <body>
@@ -582,7 +615,7 @@ button.kpi:hover{transform:translateY(-1px);box-shadow:0 1px 2px rgba(69,27,10,.
           <path d="M43.5 42 V34.5 a4.5 4.5 0 0 1 9 0 V42"/><path d="M34 42 V36 a3.5 3.5 0 0 1 7 0 V42"/><path d="M55 42 V36 a3.5 3.5 0 0 1 7 0 V42"/>
           <path d="M20 32 h3 v5 h-3z M26 32 h3 v5 h-3z M67 32 h3 v5 h-3z M73 32 h3 v5 h-3z"/>
           <path d="M0 42.5 H96"/>
-        </g></svg><div><b>Estrela Bonita</b><small>Camiseta do Templo</small></div></div>
+        </g></svg><span class="marca-nome">Estrela Bonita</span></div>
     <nav class="nav" aria-label="Seções do painel">
       <button type="button" data-view="geral" aria-current="page"><svg class="ico"><use href="#i-grafico"/></svg><span>Visão geral</span></button>
       <button type="button" data-view="pedidos"><svg class="ico"><use href="#i-lista"/></svg><span>Pedidos</span><em class="bolha" data-bolha-pix hidden></em></button>
@@ -733,7 +766,7 @@ form.addEventListener("submit", async (e) => {
 const st = { senha: "", pedidos: [], lotes: [], cadastrados: [], filtro: "todos", editando: null };
 const formPainel = $("[data-form-painel]"), msgPainel = $("[data-msg-painel]");
 const STATUS = {
-  "aguardando-boleto": ["registrado", "Pedido registrado"], cancelado: ["cancelado", "Cancelado"], pago: ["registrado", "Pago"],
+  "aguardando-boleto": ["registrado", "Pedido registrado"], cancelado: ["cancelado", "Cancelado"], pago: ["registrado", "Pago"], "pix-pago": ["registrado", "Pix confirmado"],
   aguardando: ["pagbank", "Aguardando pagamento"], "em análise": ["pagbank", "Pagamento em análise"], recusado: ["cancelado", "Recusado"],
   "aguardando-pix": ["pix", "Pix a conferir"],
   "pix-informado": ["pix", "Pix informado · conferir"],
@@ -815,7 +848,9 @@ const icone = (n) => `<svg class="ico"><use href="#i-${n}"/></svg>`;
 const plural = (n, um, varios) => `${n} ${n === 1 ? um : varios}`;
 const formaCls = (p) => (p.forma === "pix" ? "pix" : p.forma === "boleto" ? "" : "pagbank");
 const formaCurta = (p) => (p.forma === "boleto" ? `Boleto ${(p.pagamento?.parcelas || 1)}x` : p.forma === "pix" ? "Pix" : "PagBank");
-const statusChip = (p) => { const [cls, rot] = STATUS[p.status] || ["registrado", p.status]; return `<span class="st ${cls}">${esc(rot)}</span>`; };
+const statusChip = (p) => { const [cls, rot] = STATUS[p.forma === "pix" && p.status === "pago" ? "pix-pago" : p.status] || ["registrado", p.status]; return `<span class="st ${cls}">${esc(rot)}</span>`; };
+// "alterado" só quando o pedido foi mudado de verdade (confirmar Pix, cancelar e reativar não contam)
+const foiAlterado = (p) => (p.alteracoes || []).some((a) => a.mudancas.some((m) => !["Status", "Motivo do cancelamento"].includes(m.campo)));
 // mês do boleto de cada parcela: a 1ª no mês seguinte ao pedido
 const mesParcela = (ms, i) => { const d = brasilia(ms); const t = d.getUTCFullYear() * 12 + d.getUTCMonth() + 1 + i; return { chave: t, rot: `${MESES[t % 12]}/${Math.floor(t / 12)}` }; };
 
@@ -895,7 +930,7 @@ function telaGeral() {
     .map(([rot, f, cls]) => { const l = v.filter(f); return { rot, cls, n: l.length, val: somaTotal(l) }; }).filter((x) => x.n || x.rot !== "PagBank");
   const maxForma = Math.max(0, ...formas.map((x) => x.val));
   const tams = new Map(); for (const p of v) for (const i of p.itens || []) { const k = `${i.modelo} ${i.tamanho}`; tams.set(k, (tams.get(k) || 0) + i.qtd); }
-  const topTam = [...tams.entries()].sort((a, b) => b[1] - a[1]).slice(0, 8), maxTam = topTam[0]?.[1] || 0;
+  const topTam = [...tams.entries()].sort((a, b) => b[1] - a[1]).slice(0, 6), maxTam = topTam[0]?.[1] || 0;
   const eventos = [];
   for (const p of todos) {
     eventos.push({ em: p.criadoEm, p, txt: `fez um pedido de ${brl(p.total)}`, quem: p.cliente?.nome });
@@ -924,33 +959,25 @@ function telaGeral() {
       <div class="metrica"><span>Valor</span>${divisao(["Sócios", "Não sócios"], [somaTotal(soc), somaTotal(nao)], brl)}</div>
       <div class="mini-dl"><div><span>Ticket médio · sócio</span><b>${brl(soc.length ? Math.round(somaTotal(soc) / soc.length) : 0)}</b></div><div><span>Ticket médio · não sócio</span><b>${brl(nao.length ? Math.round(somaTotal(nao) / nao.length) : 0)}</b></div><div><span>Sócios que já compraram</span><b>${socNaLista} de ${listaTotal} (${pctTxt(socNaLista, listaTotal)})</b></div></div>` : `<div class="vazio-mini">Nenhuma venda ainda.</div>`}
     </section>
-    <section class="caixa"><h3>Recebimento</h3>
-      ${fat ? divisao(["Recebido", "Pix a conferir", "No boleto (a receber)"], [recebido, aConferir, noBoleto], brl, ["verde", "c", ""]) : `<div class="vazio-mini">Nada a receber ainda.</div>`}
-      <p class="nota-caixa">"Recebido" soma o Pix confirmado no painel e o que o PagBank confirmou. O boleto entra nos meses seguintes ao pedido.</p>
-    </section>
-    <section class="caixa"><h3>${icone("caixa")} Produção <small><button type="button" class="link-mini" data-ir="producao">abrir produção →</button></small></h3>
-      <div class="funil">${etapas.map(([r, n], i) => `<div class="etapa e${i}"><b>${n}</b><span>${r}</span></div>`).join("")}</div>
-      <p class="nota-caixa">Camisetas de pedidos válidos em cada etapa dos lotes de fabricação.</p>
-    </section>
-    <section class="caixa"><h3>Forma de pagamento</h3>
-      <div class="barras">${formas.map((f) => `<div class="lin"><span>${f.rot}</span><div class="trilho"><i class="${f.cls}" style="width:${f.val ? pct(f.val, maxForma) : 0}%"></i></div><b>${brl(f.val)}</b></div>`).join("")}</div>
+    <section class="caixa terco"><h3>Recebimento</h3>
+      ${fat ? divisao(["Recebido", "Pix a conferir", "No boleto"], [recebido, aConferir, noBoleto], brl, ["verde", "c", ""]) : `<div class="vazio-mini">Nada a receber ainda.</div>`}
       <p class="nota-caixa">${formas.map((f) => `${f.rot.split(" ")[0]}: ${plural(f.n, "pedido", "pedidos")}`).join(" · ")}</p>
     </section>
-    <section class="caixa"><h3>Entrega e modelos</h3>
+    <section class="caixa terco"><h3>${icone("caixa")} Produção <small><button type="button" class="link-mini" data-ir="producao">abrir produção →</button></small></h3>
+      <div class="funil">${etapas.map(([r, n], i) => `<div class="etapa e${i}"><b>${n}</b><span>${r}</span></div>`).join("")}</div>
+    </section>
+    <section class="caixa terco"><h3>Entrega e modelos</h3>
       <div class="metrica"><span>Entrega</span>${divisao(["Retirada", "Correios"], [ret, cor], (x) => plural(x, "pedido", "pedidos"))}</div>
       <div class="metrica"><span>Modelos</span>${divisao(Object.keys(porModelo).length ? Object.keys(porModelo) : ["Básica", "Infantil"], Object.keys(porModelo).length ? Object.values(porModelo) : [0, 0], (x) => `${x}`)}</div>
     </section>
-    <section class="caixa"><h3>${icone("pix")} Precisa de atenção <small>${plural(conferir.length, "Pix", "Pix")} a conferir</small></h3>
-      ${conferir.length ? `<div class="lista-curta">${conferir.slice(0, 6).map((p) => `<button type="button" data-abrir="${esc(p.ref)}"><span class="avatar">${iniciais(p.cliente?.nome)}</span><span class="txt"><b>${esc(p.cliente?.nome)}</b><small>${p.status === "pix-informado" ? "Avisou que pagou" : "Ainda não avisou"} · TXID ${esc(p.pagamento?.txid)}</small></span><span class="val">${brl(p.total)}</span></button>`).join("")}</div>` : `<div class="vazio-mini">Nenhum Pix esperando conferência.</div>`}
-    </section>
-    <section class="caixa"><h3>Tamanhos mais pedidos</h3>
+    <section class="caixa terco"><h3>Tamanhos mais pedidos</h3>
       ${topTam.length ? `<div class="barras">${topTam.map(([k, n]) => `<div class="lin"><span>${esc(k)}</span><div class="trilho"><i style="width:${pct(n, maxTam)}%"></i></div><b>${n}</b></div>`).join("")}</div>` : `<div class="vazio-mini">Nenhuma camiseta ainda.</div>`}
     </section>
-    <section class="caixa"><h3>Boleto: a receber por mês</h3>
+    <section class="caixa terco"><h3>Boleto: a receber por mês</h3>
       ${listaMeses.length ? `<div class="barras">${listaMeses.map((m) => `<div class="lin"><span>Boleto ${m.rot}</span><div class="trilho"><i style="width:${pct(m.v, Math.max(...listaMeses.map((x) => x.v)))}%"></i></div><b>${brl(m.v)}</b></div>`).join("")}</div>` : `<div class="vazio-mini">Nenhum pedido no boleto ainda.</div>`}
     </section>
-    <section class="caixa"><h3>Atividade recente</h3>
-      ${eventos.length ? `<div class="lista-curta">${eventos.slice(0, 7).map((e) => `<button type="button" data-abrir="${esc(e.p.ref)}"><span class="avatar" ${e.painel ? 'style="background:#e7ecfb;color:#3c4a9e"' : ""}>${iniciais(e.quem)}</span><span class="txt"><b>${esc(e.quem || "")}${e.painel ? " (painel)" : ""}</b><small>${esc(e.txt)}</small></span><span class="peq" style="font-size:12px;color:var(--suave);white-space:nowrap">${dataHora(e.em).replace(/\/\d{4},?/, "")}</span></button>`).join("")}</div>` : `<div class="vazio-mini">Nada por aqui ainda.</div>`}
+    <section class="caixa terco"><h3>Atividade recente</h3>
+      ${eventos.length ? `<div class="lista-curta">${eventos.slice(0, 5).map((e) => `<button type="button" data-abrir="${esc(e.p.ref)}"><span class="avatar" ${e.painel ? 'style="background:#e7ecfb;color:#3c4a9e"' : ""}>${iniciais(e.quem)}</span><span class="txt"><b>${esc(e.quem || "")}${e.painel ? " (painel)" : ""}</b><small>${esc(e.txt)}</small></span><span class="peq" style="font-size:12px;color:var(--suave);white-space:nowrap">${dataHora(e.em).replace(/\/\d{4},?/, "")}</span></button>`).join("")}</div>` : `<div class="vazio-mini">Nada por aqui ainda.</div>`}
     </section>
   </div>`;
 }
@@ -958,7 +985,7 @@ function telaGeral() {
 /* ---------- pedidos ---------- */
 const FILTROS = [
   ["todos", "Todos", () => true], ["boleto", "Boleto", (p) => p.forma === "boleto" && ativo(p)], ["pixv", "Pix", (p) => p.forma === "pix" && ativo(p)],
-  ["pix", "Pix a conferir", pixAConferir], ["alterados", "Alterados", (p) => p.alteracoes?.length], ["cancelados", "Cancelados", (p) => !ativo(p)],
+  ["pix", "Pix a conferir", pixAConferir], ["alterados", "Alterados", foiAlterado], ["cancelados", "Cancelados", (p) => !ativo(p)],
 ];
 const textoBusca = (p) => norm(`${p.cliente?.nome} ${p.ref} ${p.cliente?.nomeConfirmado || ""} ${p.cliente?.email || ""} ${p.pagamento?.txid || ""} ${p.cliente?.celular || ""}`);
 function pedidosFiltrados() {
@@ -986,20 +1013,19 @@ function telaPedidos() {
     <span class="contagem">${plural(lista.length, "pedido", "pedidos")} · ${brl(lista.filter(vale).reduce((s, p) => s + p.total, 0))} válidos</span>
   </div>
   <div class="tabela pedidos-tab">
-    <div class="tab-cab"><span>Cliente</span><span>Data</span><span>Camisetas</span><span>Entrega</span><span>Pagamento</span><span class="dir">Total</span><span>Status</span></div>
+    <div class="tab-cab"><span>Cliente</span><span>Camisetas</span><span>Entrega</span><span>Pagamento</span><span class="dir">Total</span><span>Status</span></div>
     ${lista.length ? lista.map(linhaPedido).join("") : `<div class="vazio">${st.pedidos.length ? "Nenhum pedido com esse filtro." : "Nenhum pedido ainda."}</div>`}
   </div>`;
 }
 function linhaPedido(p) {
-  const alt = p.alteracoes?.length ? `<span class="st alterado" style="margin-left:6px">alterado</span>` : "";
+  const alt = foiAlterado(p) ? `<span class="st alterado">Alterado</span>` : "";
   return `<button type="button" class="tab-lin${ativo(p) ? "" : " cancelado"}" data-ref="${esc(p.ref)}" data-abrir="${esc(p.ref)}">
-    <span class="quem"><span class="avatar">${iniciais(p.cliente?.nome)}</span><span><b>${esc(p.cliente?.nome)}</b><small>${esc(p.ref)}</small></span></span>
-    <span class="peq so-pc">${dataCurta(p.criadoEm)}</span>
+    <span class="quem"><span class="avatar">${iniciais(p.cliente?.nome)}</span><span><b>${esc(p.cliente?.nome)}</b><small>${dataCurta(p.criadoEm)}</small></span></span>
     <span class="peq">${esc(textoItens(p.itens))}</span>
     <span class="peq so-pc">${p.entrega?.tipo === "RETIRADA" ? "Retirada" : `Correios ${esc(p.entrega?.tipo || "")}${p.entrega?.endereco?.uf ? ` · ${esc(p.entrega.endereco.cidade || "")}/${esc(p.entrega.endereco.uf)}` : ""}`}</span>
     <span class="forma ${formaCls(p)}"><i></i>${esc(formaCurta(p))}</span>
     <span class="dir valor">${brl(p.total)}</span>
-    <span>${statusChip(p)}${alt}</span>
+    <span class="chips">${statusChip(p)}${alt}</span>
   </button>`;
 }
 
@@ -1177,20 +1203,46 @@ function fichaPedido(p) {
   </div>`;
 }
 function fichaCliente(c) {
+  const peds = [...c.pedidos].sort((a, b) => b.criadoEm - a.criadoEm), v = peds.filter(vale);
+  const ult = peds[0] || {}, cli = ult.cliente || {};
   const cel = String(c.celular || "").replace(/\D/g, "");
+  const cpf = peds.map((p) => p.cliente?.cpf).find(Boolean);
+  const confirmou = [...new Set(peds.map((p) => p.cliente?.nomeConfirmado).filter(Boolean))];
+  const enderecos = [...new Map(peds.filter((p) => p.entrega?.endereco?.cep).map((p) => { const e = p.entrega.endereco; return [e.cep + e.numero, e]; })).values()];
+  const socio = peds.some(ehSocio);
+  const tams = new Map(); for (const p of v) for (const i of p.itens || []) { const k = `${i.modelo} ${i.tamanho}`; tams.set(k, (tams.get(k) || 0) + i.qtd); }
+  const meses = new Map();
+  for (const p of v.filter((x) => x.forma === "boleto")) (p.pagamento?.valores?.length ? p.pagamento.valores : [p.total]).forEach((val, i) => { const m = mesParcela(p.criadoEm, i); const a = meses.get(m.chave) || { rot: m.rot, v: 0 }; a.v += val; meses.set(m.chave, a); });
+  const primeiro = Math.min(...peds.map((p) => p.criadoEm));
+  const linha = (rot, val) => (val ? `<dt>${rot}</dt><dd>${val}</dd>` : "");
   return `
   <div class="ficha-cab"><span class="avatar g">${iniciais(c.nome)}</span>
-    <div style="flex:1;min-width:0"><h2 id="ficha-titulo">${esc(c.nome)}</h2><small>${c.socio ? "Sócio do Núcleo Estrela Bonita" : "Comprador"} · último pedido em ${dataHora(c.ultimo)}</small></div>
+    <div style="flex:1;min-width:0"><h2 id="ficha-titulo">${esc(c.nome)}</h2><small>${plural(peds.length, "pedido", "pedidos")} · cliente desde ${diaCurto(primeiro)}</small>
+      <div class="chips" style="margin-top:8px">${socio ? `<span class="st socio">Sócio do Núcleo</span>` : `<span class="st neutro">Não sócio</span>`}${[...c.formas].map((f) => `<span class="st neutro">${esc(f)}</span>`).join("")}</div></div>
     <button class="fechar" type="button" data-fechar-ficha aria-label="Fechar">×</button></div>
   <div class="ficha-corpo">
-    <div class="kpis" style="grid-template-columns:repeat(3,1fr);margin:0">
-      <div class="kpi"><span class="rot">Total</span><b class="num" style="font-size:20px">${brl(c.total)}</b></div>
-      <div class="kpi"><span class="rot">Pedidos</span><b class="num" style="font-size:20px">${c.validos}</b></div>
-      <div class="kpi"><span class="rot">Peças</span><b class="num" style="font-size:20px">${c.pecas}</b></div>
+    <div class="resumo-cli">
+      <div><span>Total</span><b>${brl(c.total)}</b></div>
+      <div><span>Pedidos</span><b>${c.validos}</b></div>
+      <div><span>Camisetas</span><b>${c.pecas}</b></div>
+      <div><span>Ticket médio</span><b>${brl(c.validos ? Math.round(c.total / c.validos) : 0)}</b></div>
     </div>
-    ${cel || c.email ? `<section class="bloco-f"><h4>Contato</h4><dl class="dl">${cel ? `<dt>Celular</dt><dd>${esc(celularTexto(cel))}</dd>` : ""}${c.email ? `<dt>E-mail</dt><dd>${esc(c.email)}</dd>` : ""}</dl>
-      <div class="contatos">${cel ? `<a class="zap" href="https://wa.me/55${cel}" target="_blank" rel="noopener">${icone("whats")}WhatsApp</a>` : ""}${c.email ? `<a href="mailto:${esc(c.email)}">${icone("email")}E-mail</a>` : ""}</div></section>` : ""}
-    <section class="bloco-f"><h4>Pedidos</h4><div class="pedidos-cli">${c.pedidos.sort((a, b) => b.criadoEm - a.criadoEm).map((p) => `<button type="button" data-abrir="${esc(p.ref)}"><span class="txt"><b>${brl(p.total)} · ${esc(formaCurta(p))}</b><small>${esc(textoItens(p.itens))} · ${dataHora(p.criadoEm)}</small></span>${statusChip(p)}</button>`).join("")}</div></section>
+    <section class="bloco-f"><h4>Dados</h4><dl class="dl">
+      <dt>Nome</dt><dd>${esc(c.nome)}</dd>
+      ${linha("Confirmou como", confirmou.map(esc).join(" / "))}
+      ${linha("Celular", cel ? esc(celularTexto(cel)) : "")}
+      ${linha("E-mail", esc(c.email || ""))}
+      ${linha("CPF", cpf ? esc(String(cpf).replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4")) : "")}
+      ${enderecos.map((e) => linha("Endereço", `${esc(`${e.rua}, ${e.numero || "s/n"}${e.complemento ? ` - ${e.complemento}` : ""}`)}<br>${esc(`${e.bairro || ""} · ${e.cidade || ""}/${e.uf || ""}`)}<br>CEP ${esc(String(e.cep).replace(/(\d{5})(\d{3})/, "$1-$2"))}`)).join("")}
+      <dt>Primeiro pedido</dt><dd>${dataHora(primeiro)}</dd>
+      <dt>Último pedido</dt><dd>${dataHora(c.ultimo)}</dd>
+    </dl>
+    ${!cel && !c.email ? `<p class="nota-caixa">Sem contato: no boleto, a pessoa só escolhe o nome na lista de sócios.</p>` : ""}
+    ${cel || c.email ? `<div class="contatos">${cel ? `<a class="zap" href="https://wa.me/55${cel}" target="_blank" rel="noopener">${icone("whats")}WhatsApp</a>` : ""}${c.email ? `<a href="mailto:${esc(c.email)}">${icone("email")}E-mail</a>` : ""}</div>` : ""}
+    </section>
+    ${tams.size ? `<section class="bloco-f"><h4>Camisetas compradas</h4><div class="chips-tam">${[...tams.entries()].sort((a, b) => b[1] - a[1]).map(([k, n]) => `<span><b>${n}</b> ${esc(k)}</span>`).join("")}</div></section>` : ""}
+    ${meses.size ? `<section class="bloco-f"><h4>Boletos</h4><div class="parcelas-f">${[...meses.entries()].sort((a, b) => a[0] - b[0]).map(([, m]) => `<div><span>Boleto de ${m.rot}</span><b>${brl(m.v)}</b></div>`).join("")}</div></section>` : ""}
+    <section class="bloco-f"><h4>Pedidos</h4><div class="pedidos-cli">${peds.map((p) => `<button type="button" data-abrir="${esc(p.ref)}"><span class="txt"><b>${brl(p.total)} · ${esc(formaCurta(p))}</b><small>${esc(textoItens(p.itens))} · ${dataCurta(p.criadoEm)}</small></span>${statusChip(p)}</button>`).join("")}</div></section>
   </div>`;
 }
 
