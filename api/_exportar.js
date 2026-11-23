@@ -12,19 +12,24 @@ function mesDaParcela(ms, i) {
   const d = brasilia(ms), t = d.getUTCFullYear() * 12 + d.getUTCMonth() + 1 + i;
   return { chave: t, rotulo: `${MESES[t % 12]}/${Math.floor(t / 12)}` };
 }
+// pedido bonificado: continua valendo (a camiseta é feita e entregue), mas sem nenhum valor a cobrar
+export const semCobranca = (p) => (p.bonificado ? {
+  ...p, status: "bonificado", subtotal: 0, total: 0, entrega: { ...p.entrega, valor: 0 },
+  pagamento: { ...p.pagamento, parcelas: 0, valores: [] },
+} : p);
 const STATUS = {
-  "aguardando-boleto": "Pedido registrado", "aguardando-pix": "Pix a conferir", "pix-informado": "Pix informado (a conferir)",
+  bonificado: "Bonificado", "aguardando-boleto": "Pedido registrado", "aguardando-pix": "Pix a conferir", "pix-informado": "Pix informado (a conferir)",
   pago: "Pago", aguardando: "Aguardando pagamento", "em análise": "Em análise", recusado: "Recusado", cancelado: "Cancelado",
 };
 const METODO = { PIX: "Pix", CREDIT_CARD: "Cartão de crédito", DEBIT_CARD: "Cartão de débito" };
-const forma = (p) => (p.forma === "boleto" ? `Boleto ${p.pagamento?.parcelas || 1}x` : p.forma === "pix" ? "Pix (QR Code)" : ["PagBank", METODO[p.pagamento?.metodo]].filter(Boolean).join(" · "));
+const forma = (p) => (p.status === "bonificado" ? (p.forma === "boleto" ? "Boleto (bonificado)" : "Pix (bonificado)") : p.forma === "boleto" ? `Boleto ${p.pagamento?.parcelas || 1}x` : p.forma === "pix" ? "Pix (QR Code)" : ["PagBank", METODO[p.pagamento?.metodo]].filter(Boolean).join(" · "));
 const celular = (c = {}) => { const n = String(c.celular || `${c.area || ""}${c.numero || ""}`).replace(/\D/g, ""); return n.length === 11 ? n.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3") : n.length === 10 ? n.replace(/(\d{2})(\d{4})(\d{4})/, "($1) $2-$3") : n; };
 const itens = (p) => (p.itens || []).map((i) => `${i.qtd}× ${i.modelo} ${i.tamanho}`).join("; ");
 const endereco = (p) => { const e = p.entrega?.endereco || {}; return [e.rua && `${e.rua}, ${e.numero || "s/n"}${e.complemento ? ` - ${e.complemento}` : ""}`, e.bairro, e.cidade && `${e.cidade}/${e.uf}`, e.cep && `CEP ${String(e.cep).replace(/(\d{5})(\d{3})/, "$1-$2")}`].filter(Boolean).join(" · "); };
 const carimbo = () => { const d = brasilia(Date.now()), z = (n) => String(n).padStart(2, "0"); return `${d.getUTCFullYear()}-${z(d.getUTCMonth() + 1)}-${z(d.getUTCDate())}-${z(d.getUTCHours())}h${z(d.getUTCMinutes())}`; };
 
 export function exportarTodos(pedidos, lotes = []) {
-  const lista = [...pedidos].sort((a, b) => (a.criadoEm || 0) - (b.criadoEm || 0));
+  const lista = pedidos.map(semCobranca).sort((a, b) => (a.criadoEm || 0) - (b.criadoEm || 0));
   const lote = (p) => lotes.find((l) => l.id === p.lote?.id);
   const colunas = [
     { titulo: "Data", tipo: "data", largura: 17 }, { titulo: "Pedido", largura: 28 }, { titulo: "Nome", largura: 32 },
@@ -47,7 +52,7 @@ export function exportarTodos(pedidos, lotes = []) {
 }
 
 export function exportarBoleto(pedidos) {
-  const boletos = pedidos.filter((p) => p.forma === "boleto" && !["cancelado", "recusado"].includes(p.status));
+  const boletos = pedidos.filter((p) => p.forma === "boleto" && !p.bonificado && !["cancelado", "recusado"].includes(p.status));
   const pessoas = new Map(), meses = new Map();
   for (const p of boletos) {
     const k = p.cliente?.cadastroId || String(p.cliente?.nome || "").trim().toLowerCase();

@@ -5,11 +5,10 @@
    POST { itens, cadastro, parcelas, frete, endereco, confirmacao } -> { referencia, total, parcelas: [centavos...] } */
 import { HttpError, json, rota, readJSON, bancoPronto, dentroDoLimite, ipDe, salvarPedido, linha } from "./_lib.js";
 import { lerItens, itensParaSalvar, lerEntrega, entregaParaSalvar, novaReferencia, cadastroPorId } from "./_pedido.js";
-import { PAGAMENTO, parcelasDe, vendasAbertas, MSG_ENCERRADO } from "../produto.js";
+import { PAGAMENTO, parcelasDe } from "../produto.js";
 
 const POST = async (req) => {
   const cfg = PAGAMENTO.boleto;
-  if (!vendasAbertas()) throw new HttpError(403, MSG_ENCERRADO);
   if (!cfg?.ativo) throw new HttpError(403, "O pagamento por boleto não está disponível no momento.");
   // Sem banco, o pedido se perderia: ele só existe aqui, não no PagBank.
   if (!bancoPronto()) throw new HttpError(503, "Não conseguimos registrar o pedido agora. Tente de novo mais tarde.");

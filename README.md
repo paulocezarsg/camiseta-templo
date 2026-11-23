@@ -119,6 +119,10 @@ O valor das camisetas, o frete, o total e as parcelas são recalculados no servi
 
 **Cancelar pedido:** cada pedido no boleto tem também o botão vermelho **Cancelar pedido**. Ele abre uma confirmação com o pedido (nome, número e valor), um campo para o **motivo** (opcional), **o nome de quem está cancelando** e **a senha do painel**. O pedido cancelado fica riscado, com a faixa "Cancelado por (nome) em (data) · Motivo: …", e ganha o botão **Reativar pedido** (que também pede nome e senha), para desfazer um cancelamento por engano. Pedido cancelado não pode ser alterado; para alterar, reative antes.
 
+**Trocar pagamento:** na ficha de qualquer pedido no boleto ou no Pix, o botão **Trocar pagamento** muda a forma de pagamento: **Boleto** (escolhendo as parcelas), **Pix a conferir** (gera o TXID e o copia e cola do pedido e vai para o filtro Pix a conferir) ou **Pix recebido** (já entra como pago). Pede o nome de quem está trocando e a senha do painel, e a troca fica no histórico.
+
+**Bonificar:** o botão **Bonificar** marca o pedido como cortesia, com um motivo opcional. O pedido bonificado continua valendo (entra na produção e na entrega), mas **não é cobrado**: sai da exportação "Para o boleto", da aba "Por pessoa" e das parcelas na planilha do admin, do "Pix a conferir" e do faturamento; nas planilhas aparece com status **Bonificado** e valor zero. O filtro **Bonificados** lista esses pedidos, e o botão **Tirar bonificação** desfaz.
+
 O pedido alterado ganha o selo **"Alterado por (nome) · data e hora"** e um **histórico** com cada alteração: quem, quando e o que mudou (de → para). O que a pessoa digitou ao confirmar o pedido continua guardado.
 
 A planilha do admin mostra as alterações na hora, sem nada a fazer: os valores novos em todas as abas; na aba **Pedidos**, as colunas **Observação**, **Alterado**, **Última alteração**, **Alterado por** e **Alterações** (o histórico completo); no **Painel**, a tabela das alterações mais recentes. Pedidos **cancelados não vão para a planilha** (nenhuma aba); continuam no painel de pedidos, no filtro **Cancelados**, e voltam para a planilha se forem reativados.
@@ -162,10 +166,6 @@ Em `produto.js`, no bloco `PRODUTO.modelos`, cada modelo tem os seus tamanhos e 
 | Infantil (2 a 10 anos) | 2, 4, 6, 8, 10 |
 
 Os dois modelos custam o `preco` do produto (R$ 100,00). Para cobrar outro valor num modelo, acrescente `preco` nele (em centavos, ex.: `preco: 8000`).
-
-## Prazo das vendas
-
-As vendas vão até **23 de novembro de 2026, às 23:59:59 (horário de Brasília)** — `VENDAS.ate` em `produto.js`. Até lá, uma faixa fixa no topo da página mostra a contagem regressiva (dias, horas, minutos e segundos) e a caixa de compra tem um bloco grande com a mesma contagem; nas últimas 24 horas a faixa fica vermelha. Depois do prazo, a página mostra "Vendas encerradas", esconde a escolha e os botões de compra, e o servidor recusa pedidos novos (boleto, Pix e PagBank). O "Já paguei" do Pix e o painel de pedidos continuam funcionando. Para prorrogar, troque a data em `VENDAS.ate`.
 
 ## Retirada grátis no núcleo
 

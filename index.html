@@ -635,41 +635,11 @@ body.travado .barra.ver{transform:translateY(calc(100% + 40px));opacity:0;pointe
 .aparece{opacity:0;transform:translateY(20px);transition:opacity .8s var(--ease),transform .8s var(--ease)}
 .aparece.visto{opacity:1;transform:none}
 
-/* ---------- prazo das vendas: faixa no topo (fixa com o cabeçalho) e contagem na caixa de compra ---------- */
-.faixa-prazo{display:flex;align-items:center;justify-content:center;gap:10px 14px;flex-wrap:wrap;padding:8px 16px;background:linear-gradient(90deg,#3a1407,#5a2a14 50%,#3a1407);color:#fbeed6;font-size:13.5px;font-weight:600;text-align:center}
-.faixa-prazo .ico{width:17px;height:17px;color:var(--ouro)}
-.faixa-prazo b{color:var(--ouro);font-weight:700}
-.prazo-rel{display:inline-flex;gap:5px;font-variant-numeric:tabular-nums}
-.prazo-rel span{display:inline-grid;place-items:center;min-width:42px;padding:3px 7px;border-radius:8px;background:rgba(244,180,30,.16);box-shadow:inset 0 0 0 1px rgba(244,180,30,.35);color:#fff;font-weight:700;font-size:14px;line-height:1.15}
-.prazo-rel small{font-size:9.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:rgba(251,238,214,.7)}
-.faixa-prazo.urgente{background:linear-gradient(90deg,#7a1610,#a3241a 50%,#7a1610)}
-.faixa-prazo.urgente .prazo-rel span{background:rgba(255,255,255,.14);box-shadow:inset 0 0 0 1px rgba(255,255,255,.3)}
-.faixa-prazo.fim{background:#3a1407}
-@media (max-width:560px){.faixa-prazo{gap:6px 10px;padding:7px 10px;font-size:12.5px}.faixa-prazo .lbl-longo{display:none}.prazo-rel span{min-width:36px;padding:2px 5px;font-size:13px}}
-@media (min-width:561px){.faixa-prazo .lbl-curto{display:none}}
-
-.prazo-caixa{margin:14px 0 2px;padding:11px 12px 10px;border-radius:16px;background:linear-gradient(160deg,#4a1d0b,#2e1206);color:#fbeed6;text-align:center;box-shadow:0 18px 36px -22px rgba(46,18,6,.7)}
-.prazo-caixa .tit{display:flex;align-items:center;justify-content:center;gap:7px;font-size:10.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--ouro)}
-.prazo-caixa .tit .ico{width:14px;height:14px}
-.prazo-caixa .cont{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:8px auto 7px;max-width:300px}
-.prazo-caixa .cont div{padding:6px 3px 5px;border-radius:10px;background:rgba(255,255,255,.07);box-shadow:inset 0 0 0 1px rgba(244,180,30,.28)}
-.prazo-caixa .cont b{display:block;font:700 21px/1 Montserrat,system-ui,sans-serif;letter-spacing:-.02em;color:#fff;font-variant-numeric:tabular-nums lining-nums;font-feature-settings:"tnum" 1,"lnum" 1;text-shadow:0 2px 10px rgba(244,180,30,.25)}
-.prazo-caixa .cont div{position:relative}
-.prazo-rel span{font-family:Montserrat,system-ui,sans-serif;font-variant-numeric:tabular-nums lining-nums}
-@media (max-width:400px){.prazo-caixa .cont b{font-size:19px}}
-.prazo-caixa .cont small{display:block;margin-top:3px;font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(251,238,214,.7)}
-.prazo-caixa p{margin:0;font-size:11.5px;line-height:1.4;color:rgba(251,238,214,.85)}
-.prazo-caixa.urgente{background:linear-gradient(160deg,#8a1c12,#5c0f09)}
-.encerrado-msg{margin:18px 0 0;padding:20px;border-radius:20px;background:var(--mostarda-4,#fbf0da);color:var(--cafe);text-align:center;font-weight:600}
-.encerrado-msg b{display:block;font:600 22px/1.2 Fraunces,Georgia,serif;margin-bottom:6px}
-body.encerrado .caixa .grupo,body.encerrado .caixa .acoes,body.encerrado .caixa [data-frete-compra],body.encerrado .caixa [data-resumo-compra],body.encerrado .caixa .seguro,body.encerrado [data-barra],body.encerrado .prazo-caixa{display:none!important}
-
 /* ---------- um pedido só: aviso na caixa de compra e "adicionar outra" na sacola ---------- */
 .na-sacola{display:flex;gap:10px;align-items:flex-start;margin:12px 0 0;padding:11px 13px;border-radius:14px;background:#eef6ea;color:#24531f;font-size:13.5px;line-height:1.45}
 .na-sacola .ico{flex:none;width:18px;height:18px;margin-top:1px;color:#2f7a33}
 .na-sacola b{color:#1e4a1a}
 .na-sacola button{border:0;background:none;padding:0;font:inherit;font-weight:700;color:#1e4a1a;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
-body.encerrado .na-sacola{display:none!important}
 .mais-uma{border-radius:20px;border:1.5px dashed var(--linho-2);background:rgba(255,255,255,.55);transition:border-color .2s,background .2s}
 .mais-uma:hover{border-color:var(--cafe)}
 .mais-uma.aberta{border-style:solid;border-color:var(--linho-2);background:#fff}
@@ -731,11 +701,6 @@ body.encerrado .na-sacola{display:none!important}
 </svg>
 
 <header class="topo" id="topo">
-  <div class="faixa-prazo" data-prazo role="timer" aria-live="off">
-    <svg class="ico"><use href="#i-relogio"/></svg>
-    <span data-prazo-txt><span class="lbl-longo">Vendas somente até <b data-prazo-data>23/11 às 23:59</b> · faltam</span><span class="lbl-curto">Vendas até <b>23/11</b> · faltam</span></span>
-    <span class="prazo-rel" data-prazo-rel></span>
-  </div>
   <div class="wrap">
     <a class="marca" href="#" aria-label="Início">
       <svg class="marca-templo" viewBox="0 0 96 46" aria-hidden="true">
@@ -813,12 +778,6 @@ body.encerrado .na-sacola{display:none!important}
       </div>
       <div class="preco"><strong data-preco></strong><s data-preco-de></s><span class="desconto" data-desconto hidden></span></div>
       <p class="parcelas" data-parcelas-texto></p>
-      <div class="prazo-caixa" data-prazo-caixa role="timer" aria-live="off">
-        <div class="tit"><svg class="ico"><use href="#i-relogio"/></svg>As vendas concluem em</div>
-        <div class="cont"><div><b data-p="d">0</b><small>dias</small></div><div><b data-p="h">00</b><small>horas</small></div><div><b data-p="m">00</b><small>min</small></div><div><b data-p="s">00</b><small>seg</small></div></div>
-        <p data-prazo-quando></p>
-      </div>
-      <div class="encerrado-msg" data-encerrado hidden><b>Vendas encerradas</b><span data-encerrado-txt></span></div>
 
       <div class="sep"></div>
 
@@ -1127,7 +1086,7 @@ body.encerrado .na-sacola{display:none!important}
 <div class="toast" data-toast role="status" aria-live="polite"><svg class="ico"><use href="#i-check"/></svg><span></span></div>
 
 <script type="module">
-import { PRODUTO, LOJA, EVENTO, TEXTOS, VIDEO, RETIRADA, PAGAMENTO, VENDAS, MSG_ENCERRADO, modeloDe, precoDoModelo, parcelasDe } from "./produto.js";
+import { PRODUTO, LOJA, EVENTO, TEXTOS, VIDEO, RETIRADA, PAGAMENTO, modeloDe, precoDoModelo, parcelasDe } from "./produto.js";
 import { calcularFrete } from "./correios.js";
 
 const $ = (s, el = document) => el.querySelector(s);
@@ -1882,7 +1841,6 @@ function pintarCheckout() {
 }
 function abrirCheckout() {
   if (!qtdSacola()) return;
-  if (Date.now() > FIM_VENDAS) { aviso("As vendas foram encerradas."); return; }
   const frete = freteSacola.opcao();
   if (!frete) { aviso("Calcule o frete com o seu CEP ou escolha a retirada no núcleo."); freteSacola.abrirFoco(); return; }
   const f = $("[data-form-checkout]"), dados = guardado.ler("eb-cliente", {}), retirada = !!frete.retirada;
@@ -2163,39 +2121,6 @@ form.cpf.addEventListener("input", () => (form.cpf.value = mascaraCpf(form.cpf.v
 form.celular.addEventListener("input", () => (form.celular.value = mascaraCel(form.celular.value)));
 form.addEventListener("input", (e) => { const l = e.target.closest("label.invalido"); if (l && regras[e.target.name]?.(e.target.value)) l.classList.remove("invalido"); });
 
-/* ===================== prazo das vendas ===================== */
-const FIM_VENDAS = Date.parse(VENDAS.ate);
-(function () {
-  const dois = (n) => String(n).padStart(2, "0");
-  const fim = new Date(FIM_VENDAS - 3 * 3600_000); // em horário de Brasília
-  const SEMANA = ["domingo", "segunda-feira", "terça-feira", "quarta-feira", "quinta-feira", "sexta-feira", "sábado"];
-  const MES = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
-  const dataCurta = `${dois(fim.getUTCDate())}/${dois(fim.getUTCMonth() + 1)} às ${dois(fim.getUTCHours())}:${dois(fim.getUTCMinutes())}`;
-  $$("[data-prazo-data]").forEach((el) => (el.textContent = dataCurta));
-  $("[data-prazo-quando]").textContent = `Até ${SEMANA[fim.getUTCDay()]}, ${fim.getUTCDate()} de ${MES[fim.getUTCMonth()]}, às ${dois(fim.getUTCHours())}h${dois(fim.getUTCMinutes())} (horário de Brasília).`;
-  $("[data-encerrado-txt]").textContent = MSG_ENCERRADO;
-  const faixa = $("[data-prazo]"), caixa = $("[data-prazo-caixa]");
-  let relogio = 0;
-  function bater() {
-    const resta = FIM_VENDAS - Date.now();
-    if (resta <= 0) {
-      clearInterval(relogio);
-      document.body.classList.add("encerrado");
-      faixa.classList.add("fim"); faixa.classList.remove("urgente");
-      $("[data-prazo-txt]").innerHTML = "<b>Vendas encerradas.</b> Obrigado a todos que fizeram parte!";
-      $("[data-prazo-rel]").innerHTML = "";
-      $("[data-encerrado]").hidden = false;
-      return;
-    }
-    const s = Math.floor(resta / 1000), d = Math.floor(s / 86400), h = Math.floor((s % 86400) / 3600), m = Math.floor((s % 3600) / 60), seg = s % 60;
-    const urgente = resta < 24 * 3600_000;
-    faixa.classList.toggle("urgente", urgente); caixa.classList.toggle("urgente", urgente);
-    $("[data-prazo-rel]").innerHTML = (d ? `<span>${d}<small>${d === 1 ? "dia" : "dias"}</small></span>` : "") + `<span>${dois(h)}<small>h</small></span><span>${dois(m)}<small>min</small></span><span>${dois(seg)}<small>seg</small></span>`;
-    $("[data-p=d]").textContent = d; $("[data-p=h]").textContent = dois(h); $("[data-p=m]").textContent = dois(m); $("[data-p=s]").textContent = dois(seg);
-  }
-  bater();
-  relogio = setInterval(bater, 1000);
-})();
 </script>
 </body>
 </html>

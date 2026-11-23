@@ -14,7 +14,7 @@ export const STATUS_LOTE = ["aberto", "producao", "pronto", "entregue"];
 const NOME_STATUS = { aberto: "Aberto", producao: "Em produção", pronto: "Pronto", entregue: "Entregue" };
 // pedido que vale (entra na produção): boleto não cancelado, Pix informado ou confirmado, PagBank pago
 export const valeProducao = (p) => !["cancelado", "recusado"].includes(p.status)
-  && (p.forma === "boleto" || ["pago", "em análise"].includes(p.status) || (p.forma === "pix" && p.status === "pix-informado"));
+  && (p.bonificado || p.forma === "boleto" || ["pago", "em análise"].includes(p.status) || (p.forma === "pix" && p.status === "pix-informado"));
 
 export const listarLotes = () => ler("cam:lotes");
 

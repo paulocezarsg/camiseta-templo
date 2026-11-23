@@ -4,13 +4,12 @@
    Variáveis: PAGBANK_TOKEN (obrigatória), PAGBANK_AMBIENTE=sandbox|producao (padrão: sandbox), SITE_URL (opcional). */
 import { HttpError, json, rota, readJSON, bancoPronto, salvarPedido, semSegredos } from "./_lib.js";
 import { lerItens, itensParaSalvar, lerCliente, lerEntrega, entregaParaSalvar, novaReferencia } from "./_pedido.js";
-import { PRODUTO, LOJA, PAGAMENTO, vendasAbertas, MSG_ENCERRADO } from "../produto.js";
+import { PRODUTO, LOJA, PAGAMENTO } from "../produto.js";
 
 const pagbankBase = () =>
   process.env.PAGBANK_AMBIENTE === "producao" ? "https://api.pagseguro.com" : "https://sandbox.api.pagseguro.com";
 
 const POST = async (req) => {
-  if (!vendasAbertas()) throw new HttpError(403, MSG_ENCERRADO);
   if (!PAGAMENTO.pagbank?.ativo) throw new HttpError(403, "Pix e cartão ainda não estão disponíveis. Use o boleto.");
   const token = (process.env.PAGBANK_TOKEN || "").trim(); // espaço ou quebra de linha colados junto com o token
   if (!token) throw new HttpError(503, "O pagamento ainda não foi configurado. Fale com a gente para concluir o pedido.");

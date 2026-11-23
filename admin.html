@@ -538,6 +538,27 @@ button.kpi:hover{transform:translateY(-1px);box-shadow:0 1px 2px rgba(69,27,10,.
 .funil.encher .etapa span{font-size:11.5px}
 @media (min-width:901px) and (max-width:1250px){.caixa.terco.ultimo{grid-column:1/-1}}
 
+
+/* ---------- bonificação e troca de forma de pagamento ---------- */
+.st.bonificado{--fundo-chip:#f3effc;--cor-chip:#5b3fa6;--borda-chip:#ddd3f4}
+.obs-f.bonus{display:flex;gap:10px;align-items:flex-start;background:#f3effc;color:#46318a;line-height:1.45}
+.obs-f.bonus .ico{flex:none;margin-top:1px;color:#5b3fa6}
+.ficha-acoes .btn .ico{width:16px;height:16px}
+.btn-bonus{color:#5b3fa6;box-shadow:inset 0 0 0 1.5px #ddd3f4}
+.btn-bonus:hover{background:#f3effc;box-shadow:inset 0 0 0 1.5px #5b3fa6}
+.campo-forma{display:grid;gap:10px;margin-top:14px}
+.rot-forma{font-size:12px;font-weight:600;color:var(--cafe-2)}
+.formas-op{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.op-forma{position:relative;display:block;padding:12px;border-radius:14px;background:#fff;box-shadow:inset 0 0 0 1.5px var(--linho);cursor:pointer;transition:box-shadow .15s,background .15s}
+.op-forma input{position:absolute;opacity:0;pointer-events:none}
+.op-forma b{display:block;font-size:14px;color:var(--cafe)}
+.op-forma small{display:block;margin-top:3px;font-size:11.5px;font-weight:500;color:var(--suave);line-height:1.35}
+.op-forma.on{background:#fdf6e8;box-shadow:inset 0 0 0 2px var(--cafe)}
+.op-forma.atual{opacity:.45;cursor:not-allowed}
+.op-forma.atual small::after{content:" · forma atual";font-weight:700}
+.op-forma:has(input:focus-visible){outline:2px solid var(--mostarda);outline-offset:2px}
+@media (max-width:520px){.formas-op{grid-template-columns:1fr}}
+
 /* ---------- tipografia do painel (CRM): Inter ---------- */
 .app,.ficha,.modal,.toast{font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-feature-settings:"cv11","ss01";letter-spacing:-.006em}
 .app h1,.app h2,.app h3,.ficha h2,.modal h2,.app .kpi .num,.app .tam b,.marca b{font-family:Inter,system-ui,sans-serif;letter-spacing:-.022em}
@@ -622,6 +643,7 @@ button.kpi:hover{transform:translateY(-1px);box-shadow:0 1px 2px rgba(69,27,10,.
   <symbol id="i-email" viewBox="0 0 24 24"><rect x="3.5" y="5.5" width="17" height="13" rx="2"/><path d="M4 7l8 6 8-6"/></symbol>
   <symbol id="i-imprimir" viewBox="0 0 24 24"><path d="M7 9V3.5h10V9M7 17H4.5V9h15v8H17M7 14h10v6.5H7z"/></symbol>
   <symbol id="i-seta" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+  <symbol id="i-presente" viewBox="0 0 24 24"><path d="M4 11h16v9.5H4zM3 7.5h18V11H3zM12 7.5v13M12 7.5C10.5 4 7 3.5 7 5.6 7 7.5 12 7.5 12 7.5zM12 7.5c1.5-3.5 5-4 5-1.9 0 1.9-5 1.9-5 1.9z"/></symbol>
   <symbol id="i-baixar" viewBox="0 0 24 24"><path d="M12 4v11M7 10.5l5 5 5-5M5 19.5h14"/></symbol>
   <symbol id="i-frasco" viewBox="0 0 24 24"><path d="M9.5 3.5h5M10.5 3.5v5.2L5.2 18a1.8 1.8 0 0 0 1.6 2.5h10.4a1.8 1.8 0 0 0 1.6-2.5l-5.3-9.3V3.5M7.6 14h8.8"/></symbol>
   <symbol id="i-seta-baixo" viewBox="0 0 24 24"><path d="M6 9.5l6 6 6-6"/></symbol>
@@ -775,7 +797,16 @@ button.kpi:hover{transform:translateY(-1px);box-shadow:0 1px 2px rgba(69,27,10,.
     <form data-form-confirma novalidate>
       <div class="msg erro" data-erro-confirma hidden></div>
       <div class="confirma-pedido" data-confirma-pedido></div>
-      <label class="campo" data-campo-motivo>Motivo do cancelamento (opcional)<textarea name="motivo" maxlength="300" placeholder="Ex.: desistiu da compra; pedido feito em duplicidade"></textarea></label>
+      <div class="campo-forma" data-campo-forma hidden>
+        <span class="rot-forma">Nova forma de pagamento</span>
+        <div class="formas-op">
+          <label class="op-forma"><input type="radio" name="forma" value="boleto"><span><b>Boleto</b><small>Cobrado no boleto do sócio</small></span></label>
+          <label class="op-forma"><input type="radio" name="forma" value="pix"><span><b>Pix a conferir</b><small>Vai para o Pix a conferir</small></span></label>
+          <label class="op-forma"><input type="radio" name="forma" value="pix-pago"><span><b>Pix recebido</b><small>Já entra como pago</small></span></label>
+        </div>
+        <label class="campo" data-campo-parcelas>Parcelas no boleto<select name="parcelas"></select></label>
+      </div>
+      <label class="campo" data-campo-motivo><span data-motivo-rot>Motivo do cancelamento (opcional)</span><textarea name="motivo" maxlength="300" placeholder="Ex.: desistiu da compra; pedido feito em duplicidade"></textarea></label>
       <div class="confirma">
         <p data-confirma-aviso>Para confirmar, informe quem está cancelando e digite a senha do painel.</p>
         <label class="campo">Seu nome<input name="por" autocomplete="name"></label>
@@ -849,8 +880,11 @@ const STATUS = {
 };
 const ativo = (p) => !["cancelado", "recusado"].includes(p.status);
 // o que entra nas somas (e na planilha): boleto não cancelado, Pix do QR Code confirmado ou Pix/cartão já pago no PagBank
-const vale = (p) => ativo(p) && (p.forma === "boleto" || ["pago", "em análise", "pix-informado"].includes(p.status));
-const pixAConferir = (p) => p.forma === "pix" && ["aguardando-pix", "pix-informado"].includes(p.status);
+const vale = (p) => ativo(p) && (!!p.bonificado || p.forma === "boleto" || ["pago", "em análise", "pix-informado"].includes(p.status));
+const pixAConferir = (p) => p.forma === "pix" && !p.bonificado && ["aguardando-pix", "pix-informado"].includes(p.status);
+// bonificado: a camiseta é feita e entregue, mas não entra no faturamento nem no boleto
+const receita = (p) => (p.bonificado ? 0 : p.total || 0);
+const cobraBoleto = (p) => p.forma === "boleto" && !p.bonificado;
 const METODO = { PIX: "Pix", CREDIT_CARD: "cartão de crédito", DEBIT_CARD: "cartão de débito" };
 const celularTexto = (c) => { const n = String(c || "").replace(/\D/g, ""); return n.length === 11 ? n.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3") : n.length === 10 ? n.replace(/(\d{2})(\d{4})(\d{4})/, "($1) $2-$3") : n; };
 function pagamentoTexto(p) {
@@ -932,9 +966,9 @@ const icone = (n) => `<svg class="ico"><use href="#i-${n}"/></svg>`;
 const plural = (n, um, varios) => `${n} ${n === 1 ? um : varios}`;
 const formaCls = (p) => (p.forma === "pix" ? "pix" : p.forma === "boleto" ? "" : "pagbank");
 const formaCurta = (p) => (p.forma === "boleto" ? `Boleto ${(p.pagamento?.parcelas || 1)}x` : p.forma === "pix" ? "Pix" : "PagBank");
-const statusChip = (p) => { const [cls, rot] = STATUS[p.forma === "pix" && p.status === "pago" ? "pix-pago" : p.status] || ["registrado", p.status]; return `<span class="st ${cls}">${esc(rot)}</span>`; };
+const statusChip = (p) => { if (p.bonificado && ativo(p)) return `<span class="st bonificado">Bonificado</span>`; const [cls, rot] = STATUS[p.forma === "pix" && p.status === "pago" ? "pix-pago" : p.status] || ["registrado", p.status]; return `<span class="st ${cls}">${esc(rot)}</span>`; };
 // "alterado" só quando o pedido foi mudado de verdade (confirmar Pix, cancelar e reativar não contam)
-const foiAlterado = (p) => (p.alteracoes || []).some((a) => a.mudancas.some((m) => !["Status", "Motivo do cancelamento"].includes(m.campo)));
+const foiAlterado = (p) => (p.alteracoes || []).some((a) => a.mudancas.some((m) => !["Status", "Motivo do cancelamento", "Bonificação"].includes(m.campo)));
 // mês do boleto de cada parcela: a 1ª no mês seguinte ao pedido
 const mesParcela = (ms, i) => { const d = brasilia(ms); const t = d.getUTCFullYear() * 12 + d.getUTCMonth() + 1 + i; return { chave: t, rot: `${MESES[t % 12]}/${Math.floor(t / 12)}` }; };
 
@@ -958,7 +992,7 @@ function desenhar() {
   const nPix = todos.filter(pixAConferir).length;
   const bolha = $("[data-bolha-pix]"); bolha.hidden = !nPix; bolha.textContent = nPix;
   $("[data-titulo]").textContent = TITULOS[st.view];
-  $("[data-resumo]").textContent = `${plural(valem.length, "pedido", "pedidos")} · ${valem.reduce((s, p) => s + (p.pecas || 0), 0)} camisetas · ${brl(valem.reduce((s, p) => s + (p.total || 0), 0))}`;
+  $("[data-resumo]").textContent = `${plural(valem.length, "pedido", "pedidos")} · ${valem.reduce((s, p) => s + (p.pecas || 0), 0)} camisetas · ${brl(valem.reduce((s, p) => s + receita(p), 0))}`;
   const pendProd = pecasDe(aguardandoLote()), bp = $("[data-bolha-prod]"); bp.hidden = !pendProd; bp.textContent = pendProd;
   $("[data-titulo]").innerHTML = esc(TITULOS[st.view]) + (VIEWS_BETA.includes(st.view) ? ' <em class="tag-beta">BETA</em>' : "");
   const html = { geral: telaGeral, pedidos: telaPedidos, clientes: telaClientes, producao: telaProducao, produtos: () => telaCadastro("produtos"), servicos: () => telaCadastro("servicos"), fornecedores: () => telaCadastro("fornecedores"), financeiro: telaFinanceiro, dre: telaDRE }[st.view]();
@@ -971,7 +1005,7 @@ function desenhar() {
 const cadSet = () => { if (st._cadN !== st.cadastrados.length) { st._cadN = st.cadastrados.length; st._cad = new Set(st.cadastrados.map((n) => norm(n).trim())); } return st._cad; };
 const ehSocio = (p) => p.forma === "boleto" || cadSet().has(norm(p.cliente?.nome || "").trim());
 const pecasDe = (lista) => lista.reduce((s, p) => s + (p.pecas || 0), 0);
-const somaTotal = (lista) => lista.reduce((s, p) => s + (p.total || 0), 0);
+const somaTotal = (lista) => lista.reduce((s, p) => s + receita(p), 0);
 const loteDe = (p) => (p.lote?.id ? st.lotes.find((l) => l.id === p.lote.id) : null);
 const aguardandoLote = () => st.pedidos.filter((p) => vale(p) && !loteDe(p));
 const pedidosDoLote = (l) => l.refs.map((r) => st.pedidos.find((p) => p.ref === r)).filter(Boolean);
@@ -995,19 +1029,19 @@ function telaGeral() {
   // recebimento
   const recebido = somaTotal(v.filter((p) => (p.forma === "pix" && p.status === "pago") || (!["boleto", "pix"].includes(p.forma))));
   const aConferir = somaTotal(v.filter((p) => p.forma === "pix" && p.status === "pix-informado"));
-  const noBoleto = somaTotal(v.filter((p) => p.forma === "boleto"));
+  const noBoleto = somaTotal(v.filter(cobraBoleto));
   // produção
   const pend = aguardandoLote();
   const pecasEtapa = (s) => st.lotes.filter((l) => l.status === s).reduce((t, l) => t + pecasDe(pedidosDoLote(l).filter(vale)), 0);
   const etapas = [["Aguardando lote", pecasDe(pend)], ["Lote aberto", pecasEtapa("aberto")], ["Em produção", pecasEtapa("producao")], ["Pronto", pecasEtapa("pronto")], ["Entregue", pecasEtapa("entregue")]];
   // boleto por mês
   const meses = new Map();
-  for (const p of v.filter((x) => x.forma === "boleto")) (p.pagamento?.valores?.length ? p.pagamento.valores : [p.total || 0]).forEach((val, i) => { const m = mesParcela(p.criadoEm, i); const a = meses.get(m.chave) || { rot: m.rot, v: 0 }; a.v += val; meses.set(m.chave, a); });
+  for (const p of v.filter(cobraBoleto)) (p.pagamento?.valores?.length ? p.pagamento.valores : [p.total || 0]).forEach((val, i) => { const m = mesParcela(p.criadoEm, i); const a = meses.get(m.chave) || { rot: m.rot, v: 0 }; a.v += val; meses.set(m.chave, a); });
   const listaMeses = [...meses.entries()].sort((a, b) => a[0] - b[0]).map(([, x]) => x);
   // últimos 14 dias
   const hoje = Date.now(), dias = [];
   for (let k = 13; k >= 0; k--) { const ms = hoje - k * 86400_000; dias.push({ chave: chaveDia(ms), rot: diaCurto(ms), n: 0, v: 0 }); }
-  for (const p of v) { const d = dias.find((x) => x.chave === chaveDia(p.criadoEm)); if (d) { d.n += p.pecas || 0; d.v += p.total || 0; } }
+  for (const p of v) { const d = dias.find((x) => x.chave === chaveDia(p.criadoEm)); if (d) { d.n += p.pecas || 0; d.v += receita(p); } }
   const maxDia = Math.max(0, ...dias.map((d) => d.n));
   const tams = new Map(); for (const p of v) for (const i of p.itens || []) { const k = `${i.modelo} ${i.tamanho}`; tams.set(k, (tams.get(k) || 0) + i.qtd); }
   const topTam = [...tams.entries()].sort((a, b) => b[1] - a[1]).slice(0, 6), maxTam = topTam[0]?.[1] || 0;
@@ -1027,7 +1061,7 @@ function telaGeral() {
     ${kpi("estrela", "Compras de sócios", pctTxt(pecasDe(soc), pecas), `das camisetas · ${socNaLista} de ${listaTotal} sócios já compraram`)}
     ${kpi("pix", "Pix a conferir", conferir.length, conferir.length ? `${brl(conferirVal)} para achar no extrato` : "tudo conferido", conferir.length ? "alerta" : "", `type="button" data-ir="pedidos" data-filtro-ir="pix"`)}
     ${kpi("carteira", "Já recebido", brl(recebido), `${brl(aConferir + noBoleto)} a receber ou conferir`)}
-    ${kpi("boleto", "Vendido no boleto", brl(noBoleto), listaMeses.length ? `${plural(v.filter((p) => p.forma === "boleto").length, "pedido", "pedidos")} · ${listaMeses.length > 1 ? `${listaMeses[0].rot} a ${listaMeses.at(-1).rot}` : listaMeses[0].rot}` : "nenhum boleto ainda")}
+    ${kpi("boleto", "Vendido no boleto", brl(noBoleto), listaMeses.length ? `${plural(v.filter(cobraBoleto).length, "pedido", "pedidos")} · ${listaMeses.length > 1 ? `${listaMeses[0].rot} a ${listaMeses.at(-1).rot}` : listaMeses[0].rot}` : "nenhum boleto ainda")}
     ${kpi("caixa", "Produção", pecasDe(pend), pecasDe(pend) ? `camisetas aguardando lote · ${etapas[2][1]} em produção` : `tudo em lote · ${etapas[2][1]} em produção`, pecasDe(pend) ? "aviso" : "", `type="button" data-ir="producao"`)}
   </div>
   <div class="grade">
@@ -1066,7 +1100,7 @@ function telaGeral() {
 /* ---------- pedidos ---------- */
 const FILTROS = [
   ["todos", "Todos", () => true], ["boleto", "Boleto", (p) => p.forma === "boleto" && ativo(p)], ["pixv", "Pix", (p) => p.forma === "pix" && ativo(p)],
-  ["pix", "Pix a conferir", pixAConferir], ["alterados", "Alterados", foiAlterado], ["cancelados", "Cancelados", (p) => !ativo(p)],
+  ["pix", "Pix a conferir", pixAConferir], ["alterados", "Alterados", foiAlterado], ["bonificados", "Bonificados", (p) => !!p.bonificado && ativo(p)], ["cancelados", "Cancelados", (p) => !ativo(p)],
 ];
 const textoBusca = (p) => norm(`${p.cliente?.nome} ${p.ref} ${p.cliente?.nomeConfirmado || ""} ${p.cliente?.email || ""} ${p.pagamento?.txid || ""} ${p.cliente?.celular || ""}`);
 function pedidosFiltrados() {
@@ -1091,7 +1125,7 @@ function telaPedidos() {
         <button type="button" role="menuitem" data-exportar="boleto">${icone("boleto")}<span><b>Para o boleto</b><small>Nome e valor de cada mês</small></span></button>
       </div>
     </div>
-    <span class="contagem">${plural(lista.length, "pedido", "pedidos")} · ${brl(lista.filter(vale).reduce((s, p) => s + p.total, 0))} válidos</span>
+    <span class="contagem">${plural(lista.length, "pedido", "pedidos")} · ${brl(lista.filter(vale).reduce((s, p) => s + receita(p), 0))} válidos</span>
   </div>
   <div class="tabela pedidos-tab">
     <div class="tab-cab"><span>Cliente</span><span>Camisetas</span><span>Entrega</span><span>Pagamento</span><span class="dir">Total</span><span>Status</span></div>
@@ -1151,7 +1185,7 @@ function clientes() {
   }
   return [...m.values()].map((c) => {
     const v = c.pedidos.filter(vale);
-    return { ...c, total: v.reduce((s, p) => s + p.total, 0), pecas: v.reduce((s, p) => s + (p.pecas || 0), 0), validos: v.length, ultimo: Math.max(...c.pedidos.map((p) => p.criadoEm)), socio: c.pedidos.some((p) => p.forma === "boleto") };
+    return { ...c, total: v.reduce((s, p) => s + receita(p), 0), pecas: v.reduce((s, p) => s + (p.pecas || 0), 0), validos: v.length, ultimo: Math.max(...c.pedidos.map((p) => p.criadoEm)), socio: c.pedidos.some((p) => p.forma === "boleto") };
   });
 }
 function telaClientes() {
@@ -1225,9 +1259,15 @@ ficha.addEventListener("click", (e) => {
 });
 function acoesDo(p) {
   const b = (acao, rot, cls) => `<button class="btn mini ${cls}" type="button" data-acao="${acao}" data-ref="${esc(p.ref)}">${rot}</button>`;
-  if (p.forma === "pix") return p.status === "cancelado" ? b("reativar", "Reativar pedido", "btn-linha") : `${pixAConferir(p) ? b("confirmar-pix", "Confirmar Pix recebido", "btn-ok") : ""}${b("cancelar", "Cancelar pedido", "btn-perigo")}`;
-  if (p.forma !== "boleto") return `<small style="color:var(--suave)">${p.status === "pago" ? "Pago pelo PagBank" : "Pix ou cartão pelo PagBank"}: não pode ser alterado aqui.</small>`;
-  return p.status === "cancelado" ? b("reativar", "Reativar pedido", "btn-linha") : `${b("alterar", "Alterar pedido", "btn-linha")}${b("cancelar", "Cancelar pedido", "btn-perigo")}`;
+  if (!["boleto", "pix"].includes(p.forma)) return `<small style="color:var(--suave)">${p.status === "pago" ? "Pago pelo PagBank" : "Pix ou cartão pelo PagBank"}: não pode ser alterado aqui.</small>`;
+  if (p.status === "cancelado") return b("reativar", "Reativar pedido", "btn-linha");
+  return [
+    pixAConferir(p) ? b("confirmar-pix", "Confirmar Pix recebido", "btn-ok") : "",
+    p.forma === "boleto" ? b("alterar", "Alterar pedido", "btn-linha") : "",
+    b("forma", `${icone("carteira")}Trocar pagamento`, "btn-linha"),
+    p.bonificado ? b("desbonificar", "Tirar bonificação", "btn-linha") : b("bonificar", `${icone("presente")}Bonificar`, "btn-linha btn-bonus"),
+    b("cancelar", "Cancelar pedido", "btn-perigo"),
+  ].join("");
 }
 function linhaDoTempo(p) {
   const ev = [{ em: p.criadoEm, cls: "", t: "Pedido feito", s: `${brl(p.total)} · ${pagamentoTexto(p)}` }];
@@ -1235,7 +1275,9 @@ function linhaDoTempo(p) {
   if (p.pagamento?.pagoEm) ev.push({ em: Date.parse(p.pagamento.pagoEm), cls: "verde", t: "Pagamento confirmado pelo PagBank", s: "" });
   for (const a of p.alteracoes || []) {
     const cancel = a.mudancas.some((m) => m.para === "Cancelado"), conf = a.mudancas.some((m) => m.para === "Pix confirmado");
-    ev.push({ em: a.em, cls: cancel ? "verm" : conf ? "verde" : "", t: `${cancel ? "Cancelado" : conf ? "Pix confirmado" : "Alterado"} por ${a.por}`, s: a.mudancas.map((m) => `${m.campo}: ${m.de} → ${m.para}`).join("<br>") , html: true });
+    const bonus = a.mudancas.find((m) => m.campo === "Bonificação"), forma = a.mudancas.some((m) => m.campo === "Forma de pagamento");
+    const tit = bonus ? (bonus.de === "Bonificado" ? "Bonificação retirada" : "Bonificado") : forma ? "Forma de pagamento trocada" : cancel ? "Cancelado" : conf ? "Pix confirmado" : "Alterado";
+    ev.push({ em: a.em, cls: cancel ? "verm" : conf || bonus ? "verde" : "", t: `${tit} por ${a.por}`, s: a.mudancas.map((m) => `${m.campo}: ${m.de} → ${m.para}`).join("<br>") , html: true });
   }
   ev.sort((a, b) => b.em - a.em);
   return `<ul class="tempo">${ev.map((x) => `<li class="${x.cls}"><b>${esc(x.t)}</b><small>${dataHora(x.em)}</small>${x.s ? `<span>${x.html ? x.s.split("<br>").map(esc).join("<br>") : esc(x.s)}</span>` : ""}</li>`).join("")}</ul>`;
@@ -1244,7 +1286,7 @@ function fichaPedido(p) {
   const c = p.cliente || {}, e = p.entrega || {}, end = e.endereco || {};
   const cel = String(c.celular || "").replace(/\D/g, "");
   const doCliente = st.pedidos.filter((x) => pessoaDe(x) === pessoaDe(p));
-  const parcelas = p.forma === "boleto" ? (p.pagamento?.valores?.length ? p.pagamento.valores : [p.total]) : [];
+  const parcelas = cobraBoleto(p) ? (p.pagamento?.valores?.length ? p.pagamento.valores : [p.total]) : [];
   return `
   <div class="ficha-cab"><span class="avatar g">${iniciais(c.nome)}</span>
     <div style="flex:1;min-width:0"><h2 id="ficha-titulo">${esc(c.nome)}</h2><small>${esc(p.ref)} · ${dataHora(p.criadoEm)}</small>${statusChip(p)}</div>
@@ -1252,6 +1294,7 @@ function fichaPedido(p) {
   <div class="ficha-corpo">
     <div class="ficha-acoes">${acoesDo(p)}</div>
     ${p.status === "cancelado" && p.cancelamento ? `<div class="obs-f" style="background:var(--err-soft);color:var(--err)"><b>Cancelado por ${esc(p.cancelamento.por)}</b> em ${dataHora(p.cancelamento.em)}${p.cancelamento.motivo ? ` · ${esc(p.cancelamento.motivo)}` : ""}</div>` : ""}
+    ${p.bonificado && ativo(p) ? `<div class="obs-f bonus">${icone("presente")}<span><b>Bonificado por ${esc(p.bonificado.por)}</b> em ${dataHora(p.bonificado.em)}${p.bonificado.motivo ? ` · ${esc(p.bonificado.motivo)}` : ""}<br>Não é cobrado: fica fora do boleto e do faturamento.</span></div>` : ""}
     ${p.observacao ? `<div class="obs-f"><b>Observação:</b> ${esc(p.observacao)}</div>` : ""}
     <section class="bloco-f"><h4>Comprador</h4>
       <dl class="dl"><dt>Nome</dt><dd>${esc(c.nome)}</dd>
@@ -1266,7 +1309,7 @@ function fichaPedido(p) {
     <section class="bloco-f"><h4>Camisetas</h4>
       <div class="itens-f">${(p.itens || []).map((i) => `<div><span>${i.qtd}× ${esc(i.modelo)} · ${esc(i.tamanho)}</span><b>${brl((i.unitario || 0) * i.qtd)}</b></div>`).join("")}
         ${e.valor ? `<div><span>Frete (${esc(e.tipo)})</span><b>${brl(e.valor)}</b></div>` : ""}
-        <div class="tot"><span>Total</span><b>${brl(p.total)}</b></div></div>
+        <div class="tot"><span>Total</span><b>${p.bonificado ? `<s style="color:var(--suave);font-weight:500">${brl(p.total)}</s> ${brl(0)}` : brl(p.total)}</b></div></div>
     </section>
     <section class="bloco-f"><h4>Entrega</h4>
       <dl class="dl"><dt>Forma</dt><dd>${esc(textoEntrega(e).split(" (")[0])}</dd>
@@ -1274,7 +1317,7 @@ function fichaPedido(p) {
         ${end.rua ? `<dt>Endereço</dt><dd>${esc(`${end.rua}, ${end.numero || "s/n"}${end.complemento ? ` - ${end.complemento}` : ""}`)}<br>${esc(`${end.bairro || ""} · ${end.cidade || ""}/${end.uf || ""}`)}<br>CEP ${esc(String(end.cep || "").replace(/(\d{5})(\d{3})/, "$1-$2"))}</dd>` : ""}</dl>
     </section>
     <section class="bloco-f"><h4>Pagamento</h4>
-      <dl class="dl"><dt>Forma</dt><dd>${esc(pagamentoTexto(p))}</dd>
+      <dl class="dl"><dt>Forma</dt><dd>${esc(pagamentoTexto(p))}${p.bonificado ? " · bonificado" : ""}</dd>
         ${p.forma === "pix" ? `<dt>TXID</dt><dd style="font-family:ui-monospace,Menlo,monospace">${esc(p.pagamento?.txid)}</dd>` : ""}
         ${p.pagamento?.confirmadoEm ? `<dt>Confirmado por</dt><dd>${esc(p.pagamento.confirmadoPor)} · ${dataHora(p.pagamento.confirmadoEm)}</dd>` : ""}</dl>
       ${parcelas.length ? `<div class="parcelas-f">${parcelas.map((v, i) => `<div><span>${parcelas.length > 1 ? `${i + 1}ª parcela · ` : ""}boleto de ${mesParcela(p.criadoEm, i).rot}</span><b>${brl(v)}</b></div>`).join("")}</div>` : ""}
@@ -1293,7 +1336,7 @@ function fichaCliente(c) {
   const socio = peds.some(ehSocio);
   const tams = new Map(); for (const p of v) for (const i of p.itens || []) { const k = `${i.modelo} ${i.tamanho}`; tams.set(k, (tams.get(k) || 0) + i.qtd); }
   const meses = new Map();
-  for (const p of v.filter((x) => x.forma === "boleto")) (p.pagamento?.valores?.length ? p.pagamento.valores : [p.total]).forEach((val, i) => { const m = mesParcela(p.criadoEm, i); const a = meses.get(m.chave) || { rot: m.rot, v: 0 }; a.v += val; meses.set(m.chave, a); });
+  for (const p of v.filter(cobraBoleto)) (p.pagamento?.valores?.length ? p.pagamento.valores : [p.total]).forEach((val, i) => { const m = mesParcela(p.criadoEm, i); const a = meses.get(m.chave) || { rot: m.rot, v: 0 }; a.v += val; meses.set(m.chave, a); });
   const primeiro = Math.min(...peds.map((p) => p.criadoEm));
   const linha = (rot, val) => (val ? `<dt>${rot}</dt><dd>${val}</dd>` : "");
   return `
@@ -1706,7 +1749,7 @@ function telaDRE() {
   const noPer = (m) => per === "tudo" || m === per;
   const vendas = st.pedidos.filter((p) => vale(p) && noPer(mesDe(p.criadoEm)));
   const L = st.beta.lancamentos.filter((x) => noPer(String(x.data).slice(0, 7)));
-  const receitaCam = vendas.reduce((s, p) => s + (p.subtotal || 0), 0), fretes = vendas.reduce((s, p) => s + (p.entrega?.valor || 0), 0);
+  const receitaCam = vendas.reduce((s, p) => s + (p.bonificado ? 0 : p.subtotal || 0), 0), fretes = vendas.reduce((s, p) => s + (p.bonificado ? 0 : p.entrega?.valor || 0), 0);
   const bruta = receitaCam + fretes;
   const taxas = L.filter((x) => x.tipo === "taxa").reduce((s, x) => s + x.valor, 0);
   const liquida = bruta - taxas;
@@ -1915,17 +1958,32 @@ const TEXTO_ACAO = {
   cancelar: { titulo: "Cancelar pedido", gerundio: "cancelando", fazendo: "Cancelando", feito: "Pedido cancelado. Ele não vai mais para a planilha." },
   reativar: { titulo: "Reativar pedido", gerundio: "reativando", fazendo: "Reativando", feito: "Pedido reativado. Ele voltou para a planilha." },
   "confirmar-pix": { titulo: "Confirmar Pix recebido", gerundio: "conferindo o Pix", fazendo: "Confirmando", feito: "Pix confirmado. O pedido entrou na planilha." },
+  forma: { titulo: "Trocar forma de pagamento", gerundio: "trocando a forma de pagamento", fazendo: "Salvando", feito: "Forma de pagamento trocada." },
+  bonificar: { titulo: "Bonificar pedido", gerundio: "bonificando", fazendo: "Bonificando", feito: "Pedido bonificado. Ele não será cobrado." },
+  desbonificar: { titulo: "Tirar bonificação", gerundio: "tirando a bonificação", fazendo: "Salvando", feito: "Bonificação retirada. O pedido volta a ser cobrado." },
 };
+const MAX_PARC = PAGAMENTO.boleto?.parcelasMax || 1;
+fc.elements.parcelas.innerHTML = Array.from({ length: MAX_PARC }, (_, i) => `<option value="${i + 1}">${i === 0 ? "À vista (1x)" : `${i + 1}x`}</option>`).join("");
+function mostrarParcelas() {
+  const forma = fc.elements.forma.value;
+  $("[data-campo-parcelas]").hidden = forma !== "boleto";
+  $$(".op-forma", fc).forEach((l) => l.classList.toggle("on", l.querySelector("input").checked));
+}
+fc.addEventListener("change", (e) => { if (e.target.name === "forma") mostrarParcelas(); });
 function abrirConfirma(p, acao) {
   if (!p) return;
   confirmando = { p, acao };
-  const cancelar = acao === "cancelar", pix = acao === "confirmar-pix";
+  const cancelar = acao === "cancelar", pix = acao === "confirmar-pix", forma = acao === "forma", bonus = acao === "bonificar";
   $("[data-confirma-titulo]").textContent = TEXTO_ACAO[acao].titulo;
-  $("[data-confirma-sub]").textContent = pix ? "Confira no extrato do banco: Pix recebido com este valor e, se aparecer, este TXID. O pedido passa a valer e entra na planilha."
+  $("[data-confirma-sub]").textContent = forma ? "" : bonus ? "O pedido continua valendo (camiseta feita e entregue), mas não é cobrado." : acao === "desbonificar" ? "O pedido volta a ser cobrado na forma de pagamento dele."
+    : pix ? "Confira no extrato do banco: Pix recebido com este valor e, se aparecer, este TXID. O pedido passa a valer e entra na planilha."
     : cancelar ? (p.forma === "pix" ? "O pedido sai da planilha e do Pix a conferir; dá para reativar depois." : "O pedido sai da planilha; dá para reativar depois.")
     : p.forma === "pix" ? "O pedido volta para o Pix a conferir." : "O pedido volta para a planilha.";
   $("[data-confirma-pedido]").innerHTML = `<b>${esc(p.cliente?.nome)}</b>${esc(p.ref)} · ${esc(textoItens(p.itens))} · ${brl(p.total)}${(p.pagamento?.parcelas || 1) > 1 ? ` em ${p.pagamento.parcelas}x` : ""}${p.forma === "pix" ? ` · TXID ${esc(p.pagamento?.txid)}` : ""}`;
-  $("[data-campo-motivo]").hidden = !cancelar;
+  $("[data-campo-motivo]").hidden = !(cancelar || bonus);
+  $("[data-motivo-rot]").textContent = bonus ? "Motivo da bonificação (opcional)" : "Motivo do cancelamento (opcional)";
+  fc.elements.motivo.placeholder = bonus ? "Ex.: cortesia para quem ajudou na obra" : "Ex.: desistiu da compra; pedido feito em duplicidade";
+  $("[data-campo-forma]").hidden = !forma;
   $("[data-confirma-aviso]").textContent = `Para confirmar, informe quem está ${TEXTO_ACAO[acao].gerundio} e digite a senha do painel.`;
   const b = $("[data-confirmar]");
   b.textContent = TEXTO_ACAO[acao].titulo;
@@ -1934,8 +1992,16 @@ function abrirConfirma(p, acao) {
   $$(".invalido", fc).forEach((l) => l.classList.remove("invalido"));
   $("[data-erro-confirma]").hidden = true;
   fc.elements.por.value = guardado.ler("eb-painel-nome");
+  if (forma) {
+    // já marca a outra forma (no boleto, sugere o Pix; no Pix, o boleto)
+    const atual = p.forma === "pix" ? (p.status === "pago" ? "pix-pago" : "pix") : "boleto";
+    fc.elements.forma.value = p.forma === "boleto" ? "pix" : "boleto";
+    $$("[name=forma]", fc).forEach((r) => { r.closest(".op-forma").classList.toggle("atual", r.value === atual && r.value !== "boleto"); r.disabled = r.value === atual && r.value !== "boleto"; });
+    fc.elements.parcelas.value = String(Math.min(MAX_PARC, p.pagamento?.parcelas || 1));
+    mostrarParcelas();
+  }
   mc.hidden = false;
-  setTimeout(() => (cancelar ? fc.elements.motivo : fc.elements.por.value ? fc.elements.senha : fc.elements.por).focus(), 50);
+  setTimeout(() => (cancelar || bonus ? fc.elements.motivo : fc.elements.por.value ? fc.elements.senha : fc.elements.por).focus(), 50);
 }
 function fecharConfirma() { mc.hidden = true; confirmando = null; }
 $$("[data-fechar-confirma]", mc).forEach((b) => b.addEventListener("click", fecharConfirma));
@@ -1958,7 +2024,10 @@ fc.addEventListener("submit", async (e) => {
   const b = $("[data-confirmar]"), rot = b.textContent;
   b.disabled = true; b.innerHTML = `<span class="giro"></span><span>${TEXTO_ACAO[acao].fazendo}…</span>`;
   try {
-    const d = await api({ acao, senha: fc.elements.senha.value, ref: p.ref, por: fc.elements.por.value, motivo: acao === "cancelar" ? fc.elements.motivo.value : undefined });
+    const extra = acao === "forma" ? { forma: fc.elements.forma.value, parcelas: Number(fc.elements.parcelas.value) }
+      : acao === "bonificar" ? { bonificar: true, motivo: fc.elements.motivo.value } : acao === "desbonificar" ? { bonificar: false }
+      : acao === "cancelar" ? { motivo: fc.elements.motivo.value } : {};
+    const d = await api({ acao: acao === "desbonificar" ? "bonificar" : acao, senha: fc.elements.senha.value, ref: p.ref, por: fc.elements.por.value, ...extra });
     guardado.gravar("eb-painel-nome", fc.elements.por.value.trim());
     st.pedidos = st.pedidos.map((x) => (x.ref === d.pedido.ref ? d.pedido : x));
     fecharConfirma(); desenhar();

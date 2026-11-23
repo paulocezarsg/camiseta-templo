@@ -4,6 +4,7 @@
    POST { senha } -> arquivo pedidos-camiseta-AAAA-MM-DD-HHhMM.xlsx
    (abas Painel, Pedidos, Itens, Tamanhos e Por pessoa) */
 import { HttpError, rota, readJSON, bancoPronto, dentroDoLimite, ipDe, listarPedidos, confereSenha } from "./_lib.js";
+import { semCobranca } from "./_exportar.js";
 import { planilha, PAINEL } from "./_xlsx.js";
 import { PRODUTO, RETIRADA, PAGAMENTO, EVENTO } from "../produto.js";
 
@@ -21,6 +22,7 @@ const POST = async (req) => {
   // e Pix/cartão já pagos no PagBank. Os demais ficam só no painel de pedidos (o cancelado pode ser reativado lá).
   const pedidos = (await listarPedidos())
     .filter(conta)
+    .map(semCobranca)
     .sort((a, b) => (a.criadoEm || 0) - (b.criadoEm || 0));
   const arquivo = planilha(montarAbas(pedidos));
   return new Response(arquivo, {
@@ -37,7 +39,7 @@ export default rota({ POST });
 
 /* ===================== conteúdo da planilha ===================== */
 const STATUS = {
-  "aguardando-boleto": "Pedido registrado", "aguardando-pix": "Aguardando conferência do Pix", "pix-informado": "Pix informado (a conferir)", aguardando: "Aguardando pagamento", pago: "Pago",
+  bonificado: "Bonificado", "aguardando-boleto": "Pedido registrado", "aguardando-pix": "Aguardando conferência do Pix", "pix-informado": "Pix informado (a conferir)", aguardando: "Aguardando pagamento", pago: "Pago",
   "em análise": "Em análise", recusado: "Recusado", cancelado: "Cancelado",
 };
 const METODO = { PIX: "Pix", CREDIT_CARD: "Cartão de crédito", DEBIT_CARD: "Cartão de débito", BOLETO: "Boleto PagBank" };
@@ -48,7 +50,7 @@ const formaDe = (p) => ehBoleto(p) ? "Boleto" : ehPix(p) ? "Pix (QR Code)" : ["P
 const statusDe = (p) => STATUS[p.status] || p.status || "";
 const entregaDe = (p) => p.entrega?.tipo === "RETIRADA" ? (RETIRADA?.nome || "Retirada") : p.entrega?.tipo ? `Correios ${p.entrega.tipo}` : "";
 // entra na contagem de produção: pedido no boleto ou pago no PagBank (fora cancelados e recusados)
-const conta = (p) => !["cancelado", "recusado"].includes(p.status) && (ehBoleto(p) || ["pago", "em análise"].includes(p.status) || (ehPix(p) && p.status === "pix-informado"));
+const conta = (p) => !["cancelado", "recusado"].includes(p.status) && (p.bonificado || p.status === "bonificado" || ehBoleto(p) || ["pago", "em análise"].includes(p.status) || (ehPix(p) && p.status === "pix-informado"));
 // (o Pix do QR Code entra quando o comprador aperta "Já paguei" ou quando o núcleo confirma no painel)
 
 const cpfFmt = (c) => (c = String(c || "").replace(/\D/g, "")).length === 11 ? c.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4") : c;
@@ -87,7 +89,7 @@ const soma = (lista, f) => lista.reduce((s, x) => s + (Number(f(x)) || 0), 0);
    quantidade, valor, parcelamento de cada pedido e quanto vai no boleto de cada mês. */
 function juntarPorPessoa(pedidos) {
   const pessoas = new Map(), meses = new Map();
-  for (const p of pedidos.filter((x) => ehBoleto(x) && !["cancelado", "recusado"].includes(x.status))) {
+  for (const p of pedidos.filter((x) => ehBoleto(x) && !["cancelado", "recusado", "bonificado"].includes(x.status))) {
     const k = pessoaDe(p);
     if (!pessoas.has(k)) pessoas.set(k, { nome: p.cliente?.nome || "", confirmados: [], pedidos: [], pecas: 0, total: 0, parcelas: [], porMes: new Map() });
     const x = pessoas.get(k);
@@ -309,6 +311,7 @@ function montarAbas(pedidos) {
     { titulo: "Pix confirmado em", tipo: "data", largura: 17, valor: pixConf, opcional: true },
     { titulo: "Pix confirmado por", largura: 22, valor: (p) => (ehPix(p) ? p.pagamento?.confirmadoPor : ""), opcional: true },
     // feitas no painel de pedidos
+    { titulo: "Bonificado por", largura: 30, valor: (p) => (p.bonificado ? [p.bonificado.por, p.bonificado.motivo].filter(Boolean).join(" · ") : ""), opcional: true },
     { titulo: "Observação", largura: 30, valor: (p) => p.observacao },
     { titulo: "Alterado", largura: 9, valor: (p) => (p.alteracoes?.length ? "Sim" : "") },
     { titulo: "Última alteração", tipo: "data", largura: 17, valor: (p) => p.alteracoes?.at(-1)?.em ?? "" },

@@ -63,6 +63,8 @@ Busca na lista de cadastrados (mínimo de 3 letras, sem acento e sem maiúsculas
 ### `POST /api/pix` e `GET /api/pix?pedido=REF`
 POST com `{ itens, cliente: { nome, email, celular }, frete, endereco }`: grava o pedido (`forma: "pix"`, `status: "aguardando-pix"`, `pagamento: { metodo: "PIX", txid, copiaECola, chave }`) e responde `{ referencia, total, copiaECola, txid }`. GET devolve o mesmo código para reabrir o QR. No painel, `{ "acao": "confirmar-pix", "ref", "por" }` passa o pedido a `pago` (com `pagamento.confirmadoEm` e `confirmadoPor`); só então ele entra na planilha.
 
+Também no painel: `{ "acao": "forma", "ref", "por", "forma": "boleto" | "pix" | "pix-pago", "parcelas" }` troca a forma de pagamento (no Pix gera `txid` e `copiaECola`; no boleto recalcula `pagamento.valores`), e `{ "acao": "bonificar", "ref", "por", "bonificar": true | false, "motivo" }` grava ou tira `bonificado: { em, por, motivo }`. Pedido bonificado vale para a produção, mas não é cobrado: as planilhas passam por `semCobranca()` (em `api/_exportar.js`), que o mostra com status `bonificado` e valores zerados, e ele fica fora dos boletos.
+
 ### `POST /api/checkout` (PagBank)
 ```json
 { "itens": [{ "cor": "amarela", "modelo": "basica", "tamanho": "G", "qtd": 1 }],

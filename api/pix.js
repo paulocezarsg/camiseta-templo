@@ -6,7 +6,7 @@
    GET ?pedido=REF -> { referencia, total, copiaECola, txid, status } (para reabrir o QR Code na página de obrigado) */
 import { HttpError, json, rota, readJSON, bancoPronto, dentroDoLimite, ipDe, salvarPedido, lerPedido, linha } from "./_lib.js";
 import { lerItens, itensParaSalvar, lerCliente, lerEntrega, entregaParaSalvar, novaReferencia } from "./_pedido.js";
-import { PAGAMENTO, vendasAbertas, MSG_ENCERRADO } from "../produto.js";
+import { PAGAMENTO } from "../produto.js";
 import { pixCopiaECola, txidDoPedido } from "../pix.js";
 
 const POST = async (req) => {
@@ -17,8 +17,7 @@ const POST = async (req) => {
   if (!(await dentroDoLimite("cam:pix:" + ipDe(req), 60, 3600))) throw new HttpError(429, "Muitos pedidos seguidos. Tente de novo mais tarde.");
 
   const body = await readJSON(req);
-  if (body.acao === "ja-paguei") return jaPaguei(body); // avisar que pagou continua valendo depois do prazo
-  if (!vendasAbertas()) throw new HttpError(403, MSG_ENCERRADO);
+  if (body.acao === "ja-paguei") return jaPaguei(body);
   const { itens, total: pecas, subtotal } = lerItens(body.itens);
   const cliente = lerCliente(body.cliente, { cpf: false });
   const entrega = lerEntrega(body, pecas);
@@ -59,7 +58,7 @@ const GET = async (req) => {
   const ref = linha(new URL(req.url).searchParams.get("pedido"), 60);
   const p = ref && (await lerPedido(ref));
   if (!p || p.forma !== "pix") throw new HttpError(404, "Pedido não encontrado.");
-  return json({ referencia: p.ref, total: p.total, copiaECola: p.pagamento?.copiaECola, txid: p.pagamento?.txid, status: p.status });
+  return json({ referencia: p.ref, total: p.total, copiaECola: p.pagamento?.copiaECola, txid: p.pagamento?.txid, status: p.bonificado ? "pago" : p.status });
 };
 
 export default rota({ GET, POST });

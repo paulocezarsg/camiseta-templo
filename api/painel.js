@@ -8,6 +8,8 @@
    POST { acao: "cancelar", senha, ref, por, motivo }     -> { pedido }   (sai das somas da planilha)
    POST { acao: "reativar", senha, ref, por }             -> { pedido }   (desfaz um cancelamento)
    POST { acao: "confirmar-pix", senha, ref, por }        -> { pedido }   (Pix conferido no extrato: o pedido passa a valer)
+   POST { acao: "forma", senha, ref, por, forma: "boleto"|"pix"|"pix-pago", parcelas } -> { pedido }   (troca a forma de pagamento)
+   POST { acao: "bonificar", senha, ref, por, bonificar: true|false, motivo } -> { pedido }   (bonificado: vale, mas não é cobrado)
    Pedidos no Pix (QR Code do núcleo) podem ser confirmados, cancelados e reativados; só os no boleto podem ser alterados.
    Produção (api/_gestao.js): "criar-lote" { refs, nome, observacao, por }, "lote-status" { id, status, por },
      "desfazer-lote" { id, ref?, por }, "entrega" { ref, entregue, rastreio, por }.
@@ -16,6 +18,7 @@
 import { HttpError, json, rota, readJSON, bancoPronto, dentroDoLimite, redis, ipDe, listarPedidos, lerPedido, salvarPedido, confereSenha, linha } from "./_lib.js";
 import { lerItens, itensParaSalvar, lerEntrega, entregaParaSalvar, cadastroPorNome, nomesCadastrados, mesmoNome } from "./_pedido.js";
 import { PRODUTO, PAGAMENTO, RETIRADA, parcelasDe } from "../produto.js";
+import { pixCopiaECola, txidDoPedido } from "../pix.js";
 import { exportarTodos, exportarBoleto } from "./_exportar.js";
 import { listarLotes, criarLote, mudarStatusLote, desfazerLote, marcarEntrega, listarBeta, salvarBeta, excluirBeta } from "./_gestao.js";
 
@@ -99,6 +102,7 @@ async function reativar(body) {
 async function confirmarPix(body) {
   const { pedido, por } = await pedidoParaMexer(body, "confirmados", true);
   if (pedido.forma !== "pix") throw new HttpError(400, "Só os pedidos no Pix são confirmados aqui.");
+  if (pedido.bonificado) throw new HttpError(400, "Este pedido está bonificado: não há Pix a confirmar.");
   if (!["aguardando-pix", "pix-informado"].includes(pedido.status)) throw new HttpError(400, pedido.status === "pago" ? "Este Pix já foi confirmado." : "Reative o pedido antes de confirmar o Pix.");
   const novo = { ...pedido, status: "pago", pagamento: { ...pedido.pagamento, confirmadoEm: Date.now(), confirmadoPor: por } };
   return registrar(pedido, novo, por, [{ campo: "Status", de: STATUS[pedido.status], para: STATUS.pago }]);
@@ -134,6 +138,54 @@ async function alterar(body) {
   return registrar(pedido, novo, por, mudancas);
 }
 
+// forma de pagamento escrita para o histórico
+const textoForma = (p) => (p.forma === "boleto" ? `Boleto ${p.pagamento?.parcelas || 1}x` : p.forma === "pix" ? "Pix" : "PagBank");
+
+async function trocarForma(body) {
+  const { pedido, por } = await pedidoParaMexer(body, "alterados", true);
+  if (pedido.status === "cancelado") throw new HttpError(400, "Este pedido está cancelado. Reative o pedido para poder alterar.");
+  const forma = String(body.forma || ""), agora = Date.now();
+  let novo;
+  if (forma === "boleto") {
+    const max = PAGAMENTO.boleto?.parcelasMax || 1, n = Number(body.parcelas);
+    if (!Number.isInteger(n) || n < 1 || n > max) throw new HttpError(400, `Escolha de 1 a ${max} parcelas.`, { campo: "parcelas" });
+    if (pedido.forma === "boleto" && (pedido.pagamento?.parcelas || 1) === n) throw new HttpError(400, `Este pedido já está no boleto em ${n}x.`);
+    // no boleto o comprador é um sócio da lista: liga ao cadastro quando o nome bate
+    const pessoa = cadastroPorNome(pedido.cliente?.nome);
+    const cliente = pessoa ? { ...pedido.cliente, nome: pessoa.nome, cadastroId: pessoa.id } : pedido.cliente;
+    novo = { ...pedido, forma: "boleto", status: "aguardando-boleto", cliente, pagamento: { metodo: "BOLETO", parcelas: n, valores: parcelasDe(pedido.total, n) } };
+  } else if (forma === "pix" || forma === "pix-pago") {
+    const pago = forma === "pix-pago";
+    if (pedido.forma === "pix" && (pedido.status === "pago") === pago) throw new HttpError(400, pago ? "Este Pix já está confirmado." : "Este pedido já está no Pix.");
+    const cfg = PAGAMENTO.pix || {};
+    const txid = pedido.forma === "pix" && pedido.pagamento?.txid ? pedido.pagamento.txid : txidDoPedido(pedido.ref);
+    const copiaECola = cfg.recebedor ? pixCopiaECola({ recebedor: cfg.recebedor, valor: pedido.total, txid }) : undefined;
+    novo = {
+      ...pedido, forma: "pix", status: pago ? "pago" : "aguardando-pix",
+      pagamento: { metodo: "PIX", txid, copiaECola, chave: cfg.recebedor?.chave, ...(pago ? { confirmadoEm: agora, confirmadoPor: por } : {}) },
+    };
+  } else throw new HttpError(400, "Escolha a nova forma de pagamento.", { campo: "forma" });
+  const mudancas = [];
+  if (textoForma(pedido) !== textoForma(novo)) mudancas.push({ campo: "Forma de pagamento", de: textoForma(pedido), para: textoForma(novo) });
+  const st = (p) => (p.forma === "pix" && p.status === "pago" ? "Pix confirmado" : STATUS[p.status] || p.status);
+  if (st(pedido) !== st(novo)) mudancas.push({ campo: "Status", de: st(pedido), para: st(novo) });
+  return registrar(pedido, novo, por, mudancas);
+}
+
+async function bonificar(body) {
+  const { pedido, por } = await pedidoParaMexer(body, "bonificados", true);
+  if (pedido.status === "cancelado") throw new HttpError(400, "Este pedido está cancelado. Reative o pedido antes de bonificar.");
+  if (body.bonificar === false) {
+    if (!pedido.bonificado) throw new HttpError(400, "Este pedido não está bonificado.");
+    const { bonificado, ...novo } = pedido;
+    return registrar(pedido, novo, por, [{ campo: "Bonificação", de: "Bonificado", para: "Sem bonificação (volta a ser cobrado)" }]);
+  }
+  if (pedido.bonificado) throw new HttpError(400, "Este pedido já está bonificado.");
+  const motivo = linha(body.motivo, 300);
+  const novo = { ...pedido, bonificado: { em: Date.now(), por, motivo } };
+  return registrar(pedido, novo, por, [{ campo: "Bonificação", de: "—", para: motivo ? `Bonificado · ${motivo}` : "Bonificado" }]);
+}
+
 const POST = async (req) => {
   const body = await readJSON(req, 20_000);
   await exigirSenha(req, body.senha);
@@ -166,6 +218,8 @@ const POST = async (req) => {
   if (body.acao === "cancelar") return json({ pedido: await cancelar(body) });
   if (body.acao === "reativar") return json({ pedido: await reativar(body) });
   if (body.acao === "confirmar-pix") return json({ pedido: await confirmarPix(body) });
+  if (body.acao === "forma") return json({ pedido: await trocarForma(body) });
+  if (body.acao === "bonificar") return json({ pedido: await bonificar(body) });
   throw new HttpError(400, "Ação inválida.");
 };
 
