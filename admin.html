@@ -1294,6 +1294,7 @@ function fichaPedido(p) {
   <div class="ficha-corpo">
     <div class="ficha-acoes">${acoesDo(p)}</div>
     ${p.status === "cancelado" && p.cancelamento ? `<div class="obs-f" style="background:var(--err-soft);color:var(--err)"><b>Cancelado por ${esc(p.cancelamento.por)}</b> em ${dataHora(p.cancelamento.em)}${p.cancelamento.motivo ? ` · ${esc(p.cancelamento.motivo)}` : ""}</div>` : ""}
+    ${p.alerta ? `<div class="obs-f" style="background:var(--err-soft);color:var(--err)"><b>Atenção:</b> ${esc(p.alerta)}</div>` : ""}
     ${p.bonificado && ativo(p) ? `<div class="obs-f bonus">${icone("presente")}<span><b>Bonificado por ${esc(p.bonificado.por)}</b> em ${dataHora(p.bonificado.em)}${p.bonificado.motivo ? ` · ${esc(p.bonificado.motivo)}` : ""}<br>Não é cobrado: fica fora do boleto e do faturamento.</span></div>` : ""}
     ${p.observacao ? `<div class="obs-f"><b>Observação:</b> ${esc(p.observacao)}</div>` : ""}
     <section class="bloco-f"><h4>Comprador</h4>

@@ -26,6 +26,15 @@ const POST = async (req) => {
     const c = cobrancas.find((x) => STATUS[x.status] === "pago") || cobrancas.at(-1);
     if (c) {
       const status = STATUS[c.status] || String(c.status || "").toLowerCase();
+      // depois de pago, só cancelamento/estorno muda o status (aviso fora de ordem não volta para "aguardando")
+      if (pedido.status === "pago" && !["cancelado", "recusado"].includes(status)) {
+        console.warn("Aviso ignorado: pedido já pago", pedido.ref, c.status);
+        return json({ ok: true });
+      }
+      if (status === "pago" && Number(c.amount?.value) < Number(pedido.total || 0)) {
+        console.error("Valor pago menor que o pedido:", pedido.ref, c.amount?.value, "<", pedido.total);
+        pedido.alerta = `Valor pago (${c.amount?.value}) menor que o total do pedido (${pedido.total}). Confira no PagBank.`;
+      }
       if (pedido.status !== status) pedido.historico = [...(pedido.historico || []), { em: Date.now(), status }];
       pedido.status = status;
       pedido.pagamento = {

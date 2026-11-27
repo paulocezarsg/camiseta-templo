@@ -5,7 +5,7 @@ import { scryptSync, timingSafeEqual } from "node:crypto";
    Se a variável de ambiente indicada estiver definida, ela vale no lugar do hash (para trocar sem mexer no código). */
 export function confereSenha(senha, hashGuardado, nomeVariavel) {
   const s = String(senha || "");
-  const env = nomeVariavel && process.env[nomeVariavel];
+  const env = nomeVariavel && (process.env[nomeVariavel] || "").trim();
   if (env) {
     const a = Buffer.from(s), b = Buffer.from(env);
     return a.length === b.length && timingSafeEqual(a, b);
@@ -110,7 +110,9 @@ export async function dentroDoLimite(chave, limite, janelaSeg) {
   return n <= limite;
 }
 export function ipDe(req) {
-  return (req.headers.get("x-forwarded-for") || "").split(",")[0].trim() || req.headers.get("x-real-ip") || "local";
+  // na Vercel, x-real-ip e x-vercel-forwarded-for vêm da própria Vercel (o visitante não consegue forjar)
+  const h = (n) => (req.headers.get(n) || "").split(",")[0].trim();
+  return h("x-real-ip") || h("x-vercel-forwarded-for") || h("x-forwarded-for") || "local";
 }
 
 /* ===================== pedidos ===================== */

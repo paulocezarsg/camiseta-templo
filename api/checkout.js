@@ -2,7 +2,7 @@
    Fica travado enquanto PAGAMENTO.pagbank.ativo for false (produto.js); o boleto é feito em api/boleto.js.
    O preço e o frete são recalculados aqui: o valor enviado pelo navegador não é usado.
    Variáveis: PAGBANK_TOKEN (obrigatória), PAGBANK_AMBIENTE=sandbox|producao (padrão: sandbox), SITE_URL (opcional). */
-import { HttpError, json, rota, readJSON, bancoPronto, salvarPedido, semSegredos } from "./_lib.js";
+import { HttpError, json, rota, readJSON, bancoPronto, salvarPedido, semSegredos, dentroDoLimite, ipDe } from "./_lib.js";
 import { lerItens, itensParaSalvar, lerCliente, lerEntrega, entregaParaSalvar, novaReferencia } from "./_pedido.js";
 import { PRODUTO, LOJA, PAGAMENTO } from "../produto.js";
 
@@ -13,6 +13,8 @@ const POST = async (req) => {
   if (!PAGAMENTO.pagbank?.ativo) throw new HttpError(403, "Pix e cartão ainda não estão disponíveis. Use o boleto.");
   const token = (process.env.PAGBANK_TOKEN || "").trim(); // espaço ou quebra de linha colados junto com o token
   if (!token) throw new HttpError(503, "O pagamento ainda não foi configurado. Fale com a gente para concluir o pedido.");
+  // limite por endereço de internet: cada chamada cria um checkout no PagBank e um pedido no banco
+  if (bancoPronto() && !(await dentroDoLimite("cam:checkout:" + ipDe(req), 30, 3600))) throw new HttpError(429, "Muitos pedidos seguidos. Tente de novo mais tarde.");
 
   const body = await readJSON(req);
   const { itens, total, subtotal } = lerItens(body.itens);

@@ -8,7 +8,7 @@ const GET = async (req) => {
   if (!PAGAMENTO.boleto?.ativo) return json({ pronta: false, resultados: [] });
   if (bancoPronto()) {
     let dentro = true;
-    try { dentro = await dentroDoLimite("cam:busca:" + ipDe(req), 600, 600); } catch (e) { console.error(semSegredos(e)); }
+    try { dentro = await dentroDoLimite("cam:busca:" + ipDe(req), 150, 600); } catch (e) { console.error(semSegredos(e)); }
     if (!dentro) throw new HttpError(429, "Muitas buscas seguidas. Espere alguns minutos.");
   }
   const busca = (new URL(req.url).searchParams.get("busca") || "").slice(0, 80);

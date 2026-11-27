@@ -1,0 +1,4 @@
+# Não publicar no site: documentação interna e arquivos do repositório
+*.md
+.gitignore
+.vercelignore
