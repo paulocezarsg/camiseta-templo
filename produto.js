@@ -74,9 +74,8 @@ export const PAGAMENTO = {
     aviso: "Pague com o QR Code ou o Pix copia e cola. O núcleo confere o Pix e confirma o seu pedido.",
   },
   pagbank: {
-    // desligado até o PagBank homologar a conta (hoje ele responde 403 "Allowlist access required");
-    // quando liberar, é só trocar para true: o token já está na Vercel.
-    ativo: false,
+    // conta liberada em produção pela PagBank (nov/2026); token de produção em PAGBANK_TOKEN na Vercel.
+    ativo: true,
     metodos: ["PIX", "CREDIT_CARD", "DEBIT_CARD"],
   },
 };
