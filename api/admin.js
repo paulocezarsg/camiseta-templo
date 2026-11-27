@@ -8,6 +8,10 @@ import { semCobranca } from "./_exportar.js";
 import { planilha, PAINEL } from "./_xlsx.js";
 import { PRODUTO, RETIRADA, PAGAMENTO, EVENTO } from "../produto.js";
 
+/* Reset da planilha: ela só traz os pedidos feitos a partir deste momento (horário de Brasília).
+   Os pedidos anteriores continuam no banco e no painel de pedidos (e nas exportações do painel); só saem desta planilha. */
+const PLANILHA_DESDE = "2026-11-27T16:49:00-03:00";
+
 const HASH_SENHA = "W+jQnwqgrk0csbugEIv7pA==:j1mhphb2aEH67XMpgY/3sClbiRR5GOPTlr69lDSzIOc="; // hash da senha combinada (maiúsculas e minúsculas contam)
 
 const POST = async (req) => {
@@ -20,7 +24,9 @@ const POST = async (req) => {
 
   // Só vão para a planilha os pedidos que valem: no boleto (fora os cancelados), Pix do QR Code já confirmado no painel
   // e Pix/cartão já pagos no PagBank. Os demais ficam só no painel de pedidos (o cancelado pode ser reativado lá).
+  const desde = Date.parse(PLANILHA_DESDE);
   const pedidos = (await listarPedidos())
+    .filter((p) => (p.criadoEm || 0) >= desde)
     .filter(conta)
     .map(semCobranca)
     .sort((a, b) => (a.criadoEm || 0) - (b.criadoEm || 0));
@@ -143,7 +149,7 @@ function montarPainel(vale, pp, pedidos = []) {
   const barra = (v, max) => (v > 0 && max > 0 ? "  " + "█".repeat(Math.max(1, Math.round((v / max) * 30))) : "");
 
   put("B2", "Painel de pedidos · Camiseta da Inauguração do Templo", P.titulo); junta("B2", "I2"); alturas[2] = 36;
-  put("B3", `${EVENTO?.nucleo || ""} · atualizado em ${dataHora(Date.now())} (horário de Brasília) · conta os pedidos no boleto e os Pix confirmados`, P.subtitulo); junta("B3", "I3");
+  put("B3", `${EVENTO?.nucleo || ""} · atualizado em ${dataHora(Date.now())} (horário de Brasília) · pedidos feitos a partir de ${dataHora(Date.parse(PLANILHA_DESDE))} · conta os pedidos no boleto e os Pix confirmados`, P.subtitulo); junta("B3", "I3");
 
   // cartões
   const totalPecas = soma(vale, pecasDe), totalValor = soma(vale, (p) => p.total);
