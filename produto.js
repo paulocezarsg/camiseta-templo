@@ -69,7 +69,9 @@ export const PAGAMENTO = {
     semNome: "Não encontrou o seu nome? O boleto é só para sócios do Núcleo Estrela Bonita: fale com o núcleo.",
   },
   pix: {
-    ativo: true,
+    // desligado na loja desde que o Pix pelo PagBank foi liberado (nov/2026): o Pix agora é só o do PagBank.
+    // Os pedidos antigos no Pix do QR Code continuam no painel, e o "Já paguei" deles segue funcionando.
+    ativo: false,
     recebedor: { chave: "tes.estrelabonita@udv.org.br", nome: "CEBUDV Estrela Bonita", cidade: "BERTIOGA" },
     aviso: "Pague com o QR Code ou o Pix copia e cola. O núcleo confere o Pix e confirma o seu pedido.",
   },

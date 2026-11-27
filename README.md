@@ -4,7 +4,6 @@ Landing page de venda da camiseta comemorativa da inauguração do templo do **N
 
 - A camiseta é **amarela** (cor única), em dois modelos: **Básica** (adulto, PP ao G5) e **Infantil** (2 a 10 anos). A pessoa escolhe **modelo, tamanho e quantidade**, pode juntar modelos e tamanhos diferentes na **sacola** e escolhe a **retirada grátis no núcleo** (já marcada) ou o **frete dos Correios** (PAC e SEDEX, com valor e prazo, digitando o CEP).
 - Formas de pagamento:
-  - **Pix pelo QR Code do núcleo**, para **qualquer pessoa** (veja "Pix pelo QR Code do núcleo" abaixo).
   - **Pix ou cartão em até 3x sem juros, pelo PagBank**, para **qualquer pessoa**. A pessoa informa nome, e-mail, celular e CPF e paga na página segura do PagBank; o pedido passa a "pago" sozinho quando o PagBank confirma.
   - **Boleto em até 3x**, só para os **sócios do Núcleo Estrela Bonita** (a lista de cadastrados do núcleo): a pessoa acha o próprio nome, escolhe as parcelas e, na hora de confirmar, digita o nome e sobrenome.
 - O **acesso admin** pede a senha e baixa na hora uma **planilha Excel** com todos os pedidos.
@@ -200,7 +199,7 @@ Com o [Vercel CLI](https://vercel.com/docs/cli) instalado e o projeto ligado (`v
 
 ## Pix pelo QR Code do núcleo
 
-Ligado em `PAGAMENTO.pix` (`produto.js`), com a chave `tes.estrelabonita@udv.org.br`, recebedor **CEBUDV Estrela Bonita**, cidade **BERTIOGA**. Não passa pelo PagBank:
+**Desligado na loja** desde que o Pix pelo PagBank foi liberado (`pix.ativo: false`): o Pix agora é só o do PagBank. Os pedidos antigos continuam no painel e o "Já paguei" deles segue funcionando. Quando estava ligado, usava `PAGAMENTO.pix` (`produto.js`), com a chave `tes.estrelabonita@udv.org.br`, recebedor **CEBUDV Estrela Bonita**, cidade **BERTIOGA**. Não passa pelo PagBank:
 
 1. Na finalização, a pessoa escolhe **Pix**, informa nome, e-mail e celular (sem CPF) e clica em **Gerar o Pix**.
 2. O pedido é gravado como **"Pix a conferir"** e a página de obrigado mostra o **QR Code**, o **Pix copia e cola** (com o valor do pedido) e o **identificador (TXID)**, que é o número do pedido sem os traços. O link da página reabre o QR a qualquer momento.

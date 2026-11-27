@@ -11,7 +11,9 @@ import { pixCopiaECola, txidDoPedido } from "../pix.js";
 
 const POST = async (req) => {
   const cfg = PAGAMENTO.pix;
-  if (!cfg?.ativo) throw new HttpError(403, "O Pix não está disponível no momento.");
+  // pedidos antigos continuam podendo avisar "Já paguei", mesmo com o Pix do QR Code desligado na loja
+  const ehJaPaguei = req.headers.get("content-type")?.includes("json") && (await req.clone().json().catch(() => ({}))).acao === "ja-paguei";
+  if (!cfg?.ativo && !ehJaPaguei) throw new HttpError(403, "O Pix não está disponível no momento.");
   // sem banco, o pedido se perderia: o Pix só vale com o pedido registrado
   if (!bancoPronto()) throw new HttpError(503, "Não conseguimos registrar o pedido agora. Tente de novo mais tarde.");
   if (!(await dentroDoLimite("cam:pix:" + ipDe(req), 60, 3600))) throw new HttpError(429, "Muitos pedidos seguidos. Tente de novo mais tarde.");
